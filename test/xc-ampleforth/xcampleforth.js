@@ -1,0 +1,426 @@
+const { ethers, upgrades } = require('@nomiclabs/buidler');
+const { expect } = require('chai');
+
+// NOTE: This is just a copy of all the test-cases for the core ampleforth token
+// Only, the rebase invocation function signature and max_supply spec have been altered
+// https://github.com/ampleforth/uFragments/blob/master/test/unit/UFragments.js
+
+const DECIMALS = 9;
+const toUFrgDenomination = ample => ethers.utils.parseUnits(ample, DECIMALS);
+
+const INITIAL_SUPPLY = ethers.utils.parseUnits('50', 6 + DECIMALS);
+const transferAmount = toUFrgDenomination('10');
+const unitTokenAmount = toUFrgDenomination('1');
+
+let accounts, deployer, xcampleforth, initialSupply;
+
+async function setupContracts () {
+  // prepare signers
+  accounts = await ethers.getSigners();
+  deployer = accounts[0];
+  // deploy upgradable token
+  const factory = await ethers.getContractFactory('XCAmpleforth');
+  xcampleforth = await upgrades.deployProxy(
+    factory.connect(deployer),
+    ['XCAmpleforth', 'xcAMPL', INITIAL_SUPPLY],
+    {
+      initializer: 'initialize(string,string,uint256)'
+    },
+  );
+  await xcampleforth.setMonetaryPolicy(deployer.getAddress());
+  await xcampleforth.mint(deployer.getAddress(), INITIAL_SUPPLY);
+  // fetch initial supply
+  initialSupply = await xcampleforth.totalSupply();
+}
+
+describe('XCAmpleforth', () => {
+  before('setup XCAmpleforth contract', setupContracts);
+
+  it('should reject any ether sent to it', async function () {
+    const user = accounts[1];
+    await expect(user.sendTransaction({ to: xcampleforth.address, value: 1 }))
+      .to.be.reverted;
+  });
+});
+
+describe('XCAmpleforth:Initialization', () => {
+  before('setup XCAmpleforth contract', setupContracts);
+
+  it('should transfer 50M xcampleforth to the deployer', async function () {
+    expect(await xcampleforth.balanceOf(await deployer.getAddress())).to.eq(
+      INITIAL_SUPPLY,
+    );
+  });
+
+  it('should set the totalSupply to 50M', async function () {
+    expect(await xcampleforth.totalSupply()).to.eq(INITIAL_SUPPLY);
+  });
+
+  it('should set the owner', async function () {
+    expect(await xcampleforth.owner()).to.eq(await deployer.getAddress());
+  });
+
+  it('should set detailed ERC20 parameters', async function () {
+    expect(await xcampleforth.name()).to.eq('XCAmpleforth');
+    expect(await xcampleforth.symbol()).to.eq('xcAMPL');
+    expect(await xcampleforth.decimals()).to.eq(DECIMALS);
+  });
+});
+
+describe('XCAmpleforth:setMonetaryPolicy', async () => {
+  let policy, policyAddress;
+
+  before('setup XCAmpleforth contract', async () => {
+    await setupContracts();
+    policy = accounts[1];
+    policyAddress = await policy.getAddress();
+  });
+
+  it('should set reference to policy contract', async function () {
+    await expect(
+      xcampleforth.connect(deployer).setMonetaryPolicy(policyAddress),
+    )
+      .to.emit(xcampleforth, 'LogMonetaryPolicyUpdated')
+      .withArgs(policyAddress);
+    expect(await xcampleforth.monetaryPolicy()).to.eq(policyAddress);
+  });
+});
+
+describe('XCAmpleforth:setMonetaryPolicy:accessControl', async () => {
+  let policy, policyAddress;
+
+  before('setup XCAmpleforth contract', async () => {
+    await setupContracts();
+    policy = accounts[1];
+    policyAddress = await policy.getAddress();
+  });
+
+  it('should be callable by owner', async function () {
+    await expect(
+      xcampleforth.connect(deployer).setMonetaryPolicy(policyAddress),
+    ).to.not.be.reverted;
+  });
+});
+
+describe('XCAmpleforth:setMonetaryPolicy:accessControl', async () => {
+  let policy, policyAddress, user;
+
+  before('setup XCAmpleforth contract', async () => {
+    await setupContracts();
+    policy = accounts[1];
+    user = accounts[2];
+    policyAddress = await policy.getAddress();
+  });
+
+  it('should NOT be callable by non-owner', async function () {
+    await expect(xcampleforth.connect(user).setMonetaryPolicy(policyAddress)).to
+      .be.reverted;
+  });
+});
+
+describe('XCAmpleforth:Rebase:accessControl', async () => {
+  let user, userAddress;
+
+  before('setup XCAmpleforth contract', async function () {
+    await setupContracts();
+    user = accounts[1];
+    userAddress = await user.getAddress();
+    await xcampleforth.connect(deployer).setMonetaryPolicy(userAddress);
+  });
+
+  it('should be callable by monetary policy', async function () {
+    await expect(xcampleforth.connect(user).rebase(1, 1)).to.not.be.reverted;
+  });
+
+  it('should not be callable by others', async function () {
+    await expect(xcampleforth.connect(deployer).rebase(1, 1)).to.be.reverted;
+  });
+});
+
+describe('XCAmpleforth:Rebase:Expansion', async () => {
+  // Rebase +5M (10%), with starting balances A:750 and B:250.
+  let A, B, policy;
+  const rebaseAmt = INITIAL_SUPPLY.div(10);
+
+  before('setup XCAmpleforth contract', async function () {
+    await setupContracts();
+    A = accounts[2];
+    B = accounts[3];
+    policy = accounts[1];
+    await xcampleforth
+      .connect(deployer)
+      .setMonetaryPolicy(await policy.getAddress());
+    await xcampleforth
+      .connect(deployer)
+      .transfer(await A.getAddress(), toUFrgDenomination('750'));
+    await xcampleforth
+      .connect(deployer)
+      .transfer(await B.getAddress(), toUFrgDenomination('250'));
+  });
+
+  it('should emit Rebase', async function () {
+    await expect(
+      xcampleforth.connect(policy).rebase(1, initialSupply.add(rebaseAmt)),
+    )
+      .to.emit(xcampleforth, 'LogRebase')
+      .withArgs(1, initialSupply.add(rebaseAmt));
+  });
+
+  it('should increase the totalSupply', async function () {
+    expect(await xcampleforth.totalSupply()).to.eq(
+      initialSupply.add(rebaseAmt),
+    );
+  });
+
+  it('should increase individual balances', async function () {
+    expect(await xcampleforth.balanceOf(await A.getAddress())).to.eq(
+      toUFrgDenomination('825'),
+    );
+    expect(await xcampleforth.balanceOf(await B.getAddress())).to.eq(
+      toUFrgDenomination('275'),
+    );
+  });
+
+  it('should return the new supply', async function () {
+    const returnVal = await xcampleforth
+      .connect(policy)
+      .callStatic.rebase(2, initialSupply.add(rebaseAmt));
+    await xcampleforth.connect(policy).rebase(2, initialSupply.add(rebaseAmt));
+    expect(await xcampleforth.totalSupply()).to.eq(returnVal);
+  });
+});
+
+describe('XCAmpleforth:Rebase:Expansion', async function () {
+  let policy;
+  const MAX_SUPPLY = ethers.BigNumber.from(2).pow(128).sub(1);
+  const MAX_SUPPLY_MINUS1 = MAX_SUPPLY.sub(toUFrgDenomination('1'));
+  const MAX_SUPPLY_PLUS1 = MAX_SUPPLY.add(toUFrgDenomination('1'));
+
+  describe('when totalSupply is less than MAX_SUPPLY and expands beyond', function () {
+    before('setup XCAmpleforth contract', async function () {
+      await setupContracts();
+      policy = accounts[1];
+      await xcampleforth
+        .connect(deployer)
+        .setMonetaryPolicy(await policy.getAddress());
+      await xcampleforth.connect(policy).rebase(1, MAX_SUPPLY_MINUS1);
+    });
+
+    it('should revert', async function () {
+      await expect(xcampleforth.connect(policy).rebase(2, MAX_SUPPLY_PLUS1)).to
+        .be.reverted;
+    });
+  });
+
+  describe('when totalSupply is MAX_SUPPLY and expands', function () {
+    before(async function () {
+      await setupContracts();
+      policy = accounts[1];
+      await xcampleforth
+        .connect(deployer)
+        .setMonetaryPolicy(await policy.getAddress());
+      await xcampleforth.connect(policy).rebase(2, MAX_SUPPLY);
+      expect(await xcampleforth.totalSupply()).to.eq(MAX_SUPPLY);
+    });
+
+    it('should revert', async function () {
+      await expect(xcampleforth.connect(policy).rebase(3, MAX_SUPPLY_PLUS1)).to
+        .be.reverted;
+    });
+  });
+});
+
+describe('XCAmpleforth:Rebase:NoChange', function () {
+  // Rebase (0%), with starting balances A:750 and B:250.
+  let A, B, policy;
+
+  before('setup XCAmpleforth contract', async function () {
+    await setupContracts();
+    A = accounts[2];
+    B = accounts[3];
+    policy = accounts[1];
+    await xcampleforth
+      .connect(deployer)
+      .setMonetaryPolicy(await policy.getAddress());
+    await xcampleforth
+      .connect(deployer)
+      .transfer(await A.getAddress(), toUFrgDenomination('750'));
+    await xcampleforth
+      .connect(deployer)
+      .transfer(await B.getAddress(), toUFrgDenomination('250'));
+  });
+
+  it('should emit Rebase', async function () {
+    await expect(xcampleforth.connect(policy).rebase(1, initialSupply))
+      .to.emit(xcampleforth, 'LogRebase')
+      .withArgs(1, initialSupply);
+  });
+
+  it('should NOT CHANGE the totalSupply', async function () {
+    expect(await xcampleforth.totalSupply()).to.eq(initialSupply);
+  });
+
+  it('should NOT CHANGE individual balances', async function () {
+    expect(await xcampleforth.balanceOf(await A.getAddress())).to.eq(
+      toUFrgDenomination('750'),
+    );
+    expect(await xcampleforth.balanceOf(await B.getAddress())).to.eq(
+      toUFrgDenomination('250'),
+    );
+  });
+});
+
+describe('XCAmpleforth:Rebase:Contraction', function () {
+  // Rebase -5M (-10%), with starting balances A:750 and B:250.
+  let A, B, policy;
+  const rebaseAmt = INITIAL_SUPPLY.div(10);
+
+  before('setup XCAmpleforth contract', async function () {
+    await setupContracts();
+    A = accounts[2];
+    B = accounts[3];
+    policy = accounts[1];
+    await xcampleforth
+      .connect(deployer)
+      .setMonetaryPolicy(await policy.getAddress());
+    await xcampleforth
+      .connect(deployer)
+      .transfer(await A.getAddress(), toUFrgDenomination('750'));
+    await xcampleforth
+      .connect(deployer)
+      .transfer(await B.getAddress(), toUFrgDenomination('250'));
+  });
+
+  it('should emit Rebase', async function () {
+    await expect(
+      xcampleforth.connect(policy).rebase(1, initialSupply.sub(rebaseAmt)),
+    )
+      .to.emit(xcampleforth, 'LogRebase')
+      .withArgs(1, initialSupply.sub(rebaseAmt));
+  });
+
+  it('should decrease the totalSupply', async function () {
+    expect(await xcampleforth.totalSupply()).to.eq(
+      initialSupply.sub(rebaseAmt),
+    );
+  });
+
+  it('should decrease individual balances', async function () {
+    expect(await xcampleforth.balanceOf(await A.getAddress())).to.eq(
+      toUFrgDenomination('675'),
+    );
+    expect(await xcampleforth.balanceOf(await B.getAddress())).to.eq(
+      toUFrgDenomination('225'),
+    );
+  });
+});
+
+describe('XCAmpleforth:Transfer', function () {
+  let A, B, C;
+
+  before('setup XCAmpleforth contract', async () => {
+    await setupContracts();
+    A = accounts[2];
+    B = accounts[3];
+    C = accounts[4];
+  });
+
+  describe('deployer transfers 12 to A', function () {
+    it('should have correct balances', async function () {
+      const deployerBefore = await xcampleforth.balanceOf(
+        await deployer.getAddress(),
+      );
+      await xcampleforth
+        .connect(deployer)
+        .transfer(await A.getAddress(), toUFrgDenomination('12'));
+      expect(await xcampleforth.balanceOf(await deployer.getAddress())).to.eq(
+        deployerBefore.sub(toUFrgDenomination('12')),
+      );
+      expect(await xcampleforth.balanceOf(await A.getAddress())).to.eq(
+        toUFrgDenomination('12'),
+      );
+    });
+  });
+
+  describe('deployer transfers 15 to B', async function () {
+    it('should have balances [973,15]', async function () {
+      const deployerBefore = await xcampleforth.balanceOf(
+        await deployer.getAddress(),
+      );
+      await xcampleforth
+        .connect(deployer)
+        .transfer(await B.getAddress(), toUFrgDenomination('15'));
+      expect(await xcampleforth.balanceOf(await deployer.getAddress())).to.eq(
+        deployerBefore.sub(toUFrgDenomination('15')),
+      );
+      expect(await xcampleforth.balanceOf(await B.getAddress())).to.eq(
+        toUFrgDenomination('15'),
+      );
+    });
+  });
+
+  describe('deployer transfers the rest to C', async function () {
+    it('should have balances [0,973]', async function () {
+      const deployerBefore = await xcampleforth.balanceOf(
+        await deployer.getAddress(),
+      );
+      await xcampleforth
+        .connect(deployer)
+        .transfer(await C.getAddress(), deployerBefore);
+      expect(await xcampleforth.balanceOf(await deployer.getAddress())).to.eq(
+        0,
+      );
+      expect(await xcampleforth.balanceOf(await C.getAddress())).to.eq(
+        deployerBefore,
+      );
+    });
+  });
+
+  describe('when the recipient address is the contract address', function () {
+    it('reverts on transfer', async function () {
+      await expect(
+        xcampleforth.connect(A).transfer(xcampleforth.address, unitTokenAmount),
+      ).to.be.reverted;
+    });
+
+    it('reverts on transferFrom', async function () {
+      await expect(
+        xcampleforth
+          .connect(A)
+          .transferFrom(
+            await A.getAddress(),
+            xcampleforth.address,
+            unitTokenAmount,
+          ),
+      ).to.be.reverted;
+    });
+  });
+
+  describe('when the recipient is the zero address', function () {
+    it('emits an approval event', async function () {
+      await expect(
+        xcampleforth
+          .connect(A)
+          .approve(ethers.constants.AddressZero, transferAmount),
+      )
+        .to.emit(xcampleforth, 'Approval')
+        .withArgs(
+          await A.getAddress(),
+          ethers.constants.AddressZero,
+          transferAmount,
+        );
+    });
+
+    it('transferFrom should fail', async function () {
+      await expect(
+        xcampleforth
+          .connect(C)
+          .transferFrom(
+            await A.getAddress(),
+            ethers.constants.AddressZero,
+            unitTokenAmount,
+          ),
+      ).to.be.reverted;
+    });
+  });
+});
