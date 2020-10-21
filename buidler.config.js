@@ -7,9 +7,9 @@ usePlugin('@nomiclabs/buidler-ganache');
 
 module.exports = {
   solc: {
-    version: '0.6.4'
+    version: '0.6.4',
   },
   mocha: {
-    timeout: 100000
-  }
+    timeout: 100000,
+  },
 };

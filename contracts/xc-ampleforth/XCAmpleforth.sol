@@ -11,7 +11,8 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
  *      EVM compilable chains. XCAmpleforth behaves exactly the same as the Ampleforth ERC20
  *      on Ethereum, wrt. rebasing and balance changes.
  *
- *      Additionally, the XCAmpleforth can `mint` or `burn` tokens.
+ *      Additionally, the XCAmpleforth can `mint` or `burn` tokens and,
+ *      keeps track of current circulating supply (total mint - total burnt).
  *
  */
 contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
