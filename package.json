@@ -12,8 +12,8 @@
     "lint": "yarn solhint 'contracts/**/*.sol' && yarn eslint ./test *.js --cache --fix"
   },
   "pre-commit": [
-    "format",
-    "lint"
+    "lint",
+    "format"
   ],
   "dependencies": {
     "@nomiclabs/buidler-ganache": "^1.3.3",

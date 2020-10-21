@@ -29,7 +29,7 @@
 const { ethers, upgrades, waffle } = require('@nomiclabs/buidler');
 const { expect } = require('chai');
 
-function toUFrgDenomination (x) {
+function toUFrgDenomination(x) {
   return ethers.utils.parseUnits(x, DECIMALS);
 }
 
@@ -44,14 +44,14 @@ const transferAmountPlusOne = transferAmount.add(unitTokenAmount);
 const transferAmountMinusOne = transferAmount.sub(unitTokenAmount);
 
 let token, owner, anotherAccount, recipient;
-async function upgradeableToken () {
+async function upgradeableToken() {
   const [owner, recipient, anotherAccount] = await ethers.getSigners();
   const factory = await ethers.getContractFactory('XCAmpleforth');
   token = await upgrades.deployProxy(
     factory.connect(owner),
     ['XCAmpleforth', 'xcAMPL', INITIAL_SUPPLY],
     {
-      initializer: 'initialize(string,string,uint256)'
+      initializer: 'initialize(string,string,uint256)',
     },
   );
   await token.setMonetaryPolicy(owner.getAddress());

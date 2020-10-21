@@ -160,6 +160,7 @@ module.exports = {
           'upgradeable',
           'chainsafe',
           'chainbridge',
+          'amples',
 
           // names
           'nithin',
