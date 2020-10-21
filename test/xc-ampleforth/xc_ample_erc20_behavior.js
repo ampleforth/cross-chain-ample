@@ -22,7 +22,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 
-  This file tests if the XCAmpleforth contract confirms to the ERC20 specification.
+  This file tests if the XCAmple contract confirms to the ERC20 specification.
   These test cases are inspired from OpenZepplin's ERC20 unit test.
   https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/test/token/ERC20/ERC20.test.js
 */
@@ -46,10 +46,10 @@ const transferAmountMinusOne = transferAmount.sub(unitTokenAmount);
 let token, owner, anotherAccount, recipient;
 async function upgradeableToken () {
   const [owner, recipient, anotherAccount] = await ethers.getSigners();
-  const factory = await ethers.getContractFactory('XCAmpleforth');
+  const factory = await ethers.getContractFactory('XCAmple');
   token = await upgrades.deployProxy(
     factory.connect(owner),
-    ['XCAmpleforth', 'xcAMPL', INITIAL_SUPPLY],
+    ['XCAmple', 'xcAMPL', INITIAL_SUPPLY],
     {
       initializer: 'initialize(string,string,uint256)'
     },
@@ -59,8 +59,8 @@ async function upgradeableToken () {
   return { token, owner, recipient, anotherAccount };
 }
 
-describe('XCAmpleforth:ERC20', () => {
-  before('setup XCAmpleforth contract', async function () {
+describe('XCAmple:ERC20', () => {
+  before('setup XCAmple contract', async function () {
     ({ token, owner, recipient, anotherAccount } = await waffle.loadFixture(
       upgradeableToken,
     ));
@@ -91,8 +91,8 @@ describe('XCAmpleforth:ERC20', () => {
   });
 });
 
-describe('XCAmpleforth:ERC20:transfer', () => {
-  before('setup XCAmpleforth contract', async function () {
+describe('XCAmple:ERC20:transfer', () => {
+  before('setup XCAmple contract', async function () {
     ({ token, owner, recipient, anotherAccount } = await waffle.loadFixture(
       upgradeableToken,
     ));
@@ -145,8 +145,8 @@ describe('XCAmpleforth:ERC20:transfer', () => {
   });
 });
 
-describe('XCAmpleforth:ERC20:transferFrom', () => {
-  before('setup XCAmpleforth contract', async function () {
+describe('XCAmple:ERC20:transferFrom', () => {
+  before('setup XCAmple contract', async function () {
     ({ token, owner, recipient, anotherAccount } = await waffle.loadFixture(
       upgradeableToken,
     ));
@@ -254,8 +254,8 @@ describe('XCAmpleforth:ERC20:transferFrom', () => {
   });
 });
 
-describe('XCAmpleforth:ERC20:approve', () => {
-  before('setup XCAmpleforth contract', async function () {
+describe('XCAmple:ERC20:approve', () => {
+  before('setup XCAmple contract', async function () {
     ({ token, owner, recipient, anotherAccount } = await waffle.loadFixture(
       upgradeableToken,
     ));
@@ -402,8 +402,8 @@ describe('XCAmpleforth:ERC20:approve', () => {
   });
 });
 
-describe('XCAmpleforth:ERC20:increaseAllowance', () => {
-  before('setup XCAmpleforth contract', async function () {
+describe('XCAmple:ERC20:increaseAllowance', () => {
+  before('setup XCAmple contract', async function () {
     ({ token, owner, recipient, anotherAccount } = await waffle.loadFixture(
       upgradeableToken,
     ));
@@ -555,8 +555,8 @@ describe('XCAmpleforth:ERC20:increaseAllowance', () => {
   });
 });
 
-describe('XCAmpleforth:ERC20:decreaseAllowance', () => {
-  before('setup XCAmpleforth contract', async function () {
+describe('XCAmple:ERC20:decreaseAllowance', () => {
+  before('setup XCAmple contract', async function () {
     ({ token, owner, recipient, anotherAccount } = await waffle.loadFixture(
       upgradeableToken,
     ));

@@ -5,16 +5,17 @@ import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.so
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
 /**
- * @title XC(cross-chain) Ampleforth ERC20 token
+ * @title XC(cross-chain)Ample ERC20 token
  *
- * @dev This is a 'bridge-secured' implementation of the Ampleforth ERC20 token on
- *      EVM compilable chains. XCAmpleforth behaves exactly the same as the Ampleforth ERC20
+ * @dev This is a 'bridge-secured' implementation of the AMPL ERC20 token on
+ *      EVM compilable chains. XCAmple behaves exactly the same as the AMPL does
  *      on Ethereum, wrt. rebasing and balance changes.
  *
- *      Additionally, the XCAmpleforth can `mint` or `burn` tokens.
+ *      Additionally, the XCAmple contract lets the XCAmpleController
+ *      `mint` or `burn` tokens.
  *
  */
-contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
+contract XCAmple is IERC20, OwnableUpgradeSafe {
     // PLEASE EXERCISE CAUTION BEFORE CHANGING ANY ACCOUNTING OR MATH
     using SafeMath for uint256;
 
@@ -25,13 +26,13 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     address public controller;
 
     modifier onlyController() {
-        require(msg.sender == controller, "XCAmpleforth: caller not controller");
+        require(msg.sender == controller, "XCAmple: caller not controller");
         _;
     }
 
     modifier validRecipient(address to) {
-        require(to != address(0x0), "XCAmpleforth: recipient zero address");
-        require(to != address(this), "XCAmpleforth: recipient token address");
+        require(to != address(0x0), "XCAmple: recipient zero address");
+        require(to != address(this), "XCAmple: recipient token address");
         _;
     }
 
@@ -55,7 +56,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     uint256 public totalAMPLSupply;
     uint256 private _gonsPerAMPL;
 
-    // The total supply of xc-ampl, ie) the total xc-ampl currently in circulation
+    // The total supply of xcAmple, ie) the total xcAmple currently in circulation
     uint256 private _totalSupply;
 
     // Gons are an internal denomination to represent wallet balances for rebase safe accounting
@@ -63,8 +64,8 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     // public wallet balance = _gonBalances[wallet] * _gonsPerAMPL
     mapping(address => uint256) private _gonBalances;
 
-    // This is denominated in XCAmpl amount,
-    // because the gons xc-ampl conversion might change before it's fully paid.
+    // This is denominated in XCAmple amount,
+    // because the gons xcAmple conversion might change before it's fully paid.
     mapping(address => mapping(address => uint256)) private _allowedXCAmples;
 
     /**
@@ -76,9 +77,9 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     }
 
     /**
-     * @dev Notifies Amples contract about a new rebase cycle.
+     * @dev XCAmpleController notifies this contract about a new rebase cycle.
      * @param newTotalAMPLSupply The new total supply of AMPL from the master chain.
-     * @return The total number of amples after the supply adjustment.
+     * @return The new total AMPL supply.
      */
     function rebase(uint256 epoch, uint256 newTotalAMPLSupply)
         external
@@ -151,7 +152,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     }
 
     /**
-     * @return The total supply of amples.
+     * @return The total supply of xcAmples.
      */
     function totalSupply() public view override returns (uint256) {
         return _totalSupply;
@@ -260,38 +261,35 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     }
 
     /**
-     * @dev Mint xc-amples to a beneficiary.
+     * @dev Mint xcAmples to a beneficiary.
      *
      * @param who The address of the beneficiary.
-     * @param xcAmplAmount The amount of xc-ampl tokens to be minted.
+     * @param xcAmpleAmount The amount of xcAmple tokens to be minted.
      */
-    function mint(address who, uint256 xcAmplAmount) public onlyController validRecipient(who) {
-        uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);
+    function mint(address who, uint256 xcAmpleAmount) public onlyController validRecipient(who) {
+        uint256 gonValue = xcAmpleAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].add(gonValue);
-        _totalSupply = _totalSupply.add(xcAmplAmount);
+        _totalSupply = _totalSupply.add(xcAmpleAmount);
 
-        require(
-            _totalSupply <= totalAMPLSupply,
-            "XCAmpleforth: total mint exceeded total ampl supply"
-        );
-        require(_totalSupply <= MAX_SUPPLY, "XCAmpleforth: total mint exceeded max supply");
+        require(_totalSupply <= totalAMPLSupply, "XCAmple: total mint exceeded total ampl supply");
+        require(_totalSupply <= MAX_SUPPLY, "XCAmple: total mint exceeded max supply");
 
-        emit Transfer(address(0), who, xcAmplAmount);
+        emit Transfer(address(0), who, xcAmpleAmount);
     }
 
     /**
-     * @dev Burn xc-amples from the beneficiary.
+     * @dev Burn xcAmples from the beneficiary.
      *
      * @param who The address of the beneficiary.
-     * @param xcAmplAmount The amount of xc-ampl tokens to be burned.
+     * @param xcAmpleAmount The amount of xcAmple tokens to be burned.
      */
-    function burn(address who, uint256 xcAmplAmount) public onlyController {
-        require(who != address(0), "XCAmpleforth: burn address zero address");
+    function burn(address who, uint256 xcAmpleAmount) public onlyController {
+        require(who != address(0), "XCAmple: burn address zero address");
 
-        uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);
+        uint256 gonValue = xcAmpleAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].sub(gonValue);
-        _totalSupply = _totalSupply.sub(xcAmplAmount);
+        _totalSupply = _totalSupply.sub(xcAmpleAmount);
 
-        emit Transfer(who, address(0), xcAmplAmount);
+        emit Transfer(who, address(0), xcAmpleAmount);
     }
 }

@@ -35,13 +35,11 @@ To guarantee rebase safe transfers between chains, we denominate transfers using
 
 ### XC-Ampleforth
 
-Cross-Chain Ampleforth, A clone version of the Ampleforth token, policy and the orchestrator with some functional modifications deployed on the 'other' chain. They are triggered by the chain-bridge when a cross-chain event occurs.
+Cross-Chain Ampleforth, A clone version of the AMPL token, policy and the rebaseRelayer with some functional modifications deployed on the 'other' chain. They are triggered by the chain-bridge when a cross-chain event occurs.
 
-* `XCAmpleforth.sol`: Cross-Chain Ampleforth ERC20 token is functionally identical to the Ampleforth ERC20, additionally has the ability to `mint` and `burn`. On rebase it takes in the new `totalSupply` from the master chain via the bridge and updates the scalar variable (`gonsPerFragment`).
+* `XCAmple.sol`: Cross-Chain Ample ERC20 token is functionally identical to the AMPL token on Ethereum, but additionally has the ability to `mint` and `burn`. On rebase it takes in the new `totalSupply` from the master chain via the bridge and updates the scalar variable (`gonsPerFragment`).
 
-* `XCAmpleforthPolicy.sol`: Cross-Chain Ampleforth Policy contract, acts as a controller contract with deals with white-listing bridges and propagating `mint`, `burn` and `rebase` calls to the xc-ampl token.
-
-* `XCOrchestrator.sol`: Identical to the Ampleforth Orchestrator.
+* `XCAmpleController.sol`: A controller contract with deals with white-listing bridges and propagating `mint`, `burn` and `rebase` calls to the xc-ampl token.
 
 
 ## Ampleforth-Chainbridge Architecture
@@ -53,9 +51,9 @@ Both AMPL rebases and transfers are propagated between chains through Chain-Brid
 `AmpleforthChainBridgeGateway.sol` is deployed on the master chain. It deals with validating data sent to and from the bridge. It also locks/unlocks AMPLs to/from a vault when a user executes a cross-chain transfer.
 
 
-### Chain-Bridge XCAmpleforthPolicy Gateway
+### Chain-Bridge XCAmpleController Gateway
 
-`ChainBrdigeXCAmpleforthPolicyGateway.sol` is deployed on the 'other' chain. It deals with validating data to and from the bridge. It acts as a pass-through contract between chain-bridge and the `XCAmpleforthPolicy.sol` contract.
+`ChainBrdigeXCAmpleControllerGateway.sol` is deployed on the 'other' chain. It deals with validating data to and from the bridge. It acts as a pass-through contract between chain-bridge and the `XCAmpleController.sol` contract.
 
 ## Integration testing
 

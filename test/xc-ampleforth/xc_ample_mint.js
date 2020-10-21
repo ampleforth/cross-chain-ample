@@ -8,7 +8,7 @@ const INITIAL_SUPPLY = ethers.utils.parseUnits('50', 6 + DECIMALS);
 const MAX_SUPPLY = ethers.BigNumber.from('2').pow(128).sub(1);
 const unitTokenAmount = toUFrgDenomination('1');
 
-let accounts, deployer, otherUser, xcampleforth, initialSupply;
+let accounts, deployer, otherUser, xcAmple, initialSupply;
 
 async function setupContracts () {
   // prepare signers
@@ -17,47 +17,43 @@ async function setupContracts () {
   otherUser = accounts[1];
 
   // deploy upgradable token
-  const factory = await ethers.getContractFactory('XCAmpleforth');
-  xcampleforth = await upgrades.deployProxy(
+  const factory = await ethers.getContractFactory('XCAmple');
+  xcAmple = await upgrades.deployProxy(
     factory.connect(deployer),
-    ['XCAmpleforth', 'xcAMPL', INITIAL_SUPPLY],
+    ['XCAmple', 'xcAMPL', INITIAL_SUPPLY],
     {
       initializer: 'initialize(string,string,uint256)'
     },
   );
-  await xcampleforth.setController(deployer.getAddress());
+  await xcAmple.setController(deployer.getAddress());
 
   // fetch initial supply
-  initialSupply = await xcampleforth.totalAMPLSupply();
+  initialSupply = await xcAmple.totalAMPLSupply();
 }
 
-describe('XCAmpleforth:mint:accessControl', () => {
-  before('setup XCAmpleforth contract', setupContracts);
+describe('XCAmple:mint:accessControl', () => {
+  before('setup XCAmple contract', setupContracts);
 
   it('should NOT be callable by other user', async function () {
     await expect(
-      xcampleforth
-        .connect(otherUser)
-        .mint(otherUser.getAddress(), unitTokenAmount),
+      xcAmple.connect(otherUser).mint(otherUser.getAddress(), unitTokenAmount),
     ).to.be.reverted;
   });
 
   it('should be callable by controller', async function () {
     await expect(
-      xcampleforth
-        .connect(deployer)
-        .mint(otherUser.getAddress(), unitTokenAmount),
+      xcAmple.connect(deployer).mint(otherUser.getAddress(), unitTokenAmount),
     ).not.to.be.reverted;
   });
 });
 
-describe('XCAmpleforth:mint', () => {
-  beforeEach('setup XCAmpleforth contract', setupContracts);
+describe('XCAmple:mint', () => {
+  beforeEach('setup XCAmple contract', setupContracts);
 
   describe('when mint address is zero address', () => {
     it('should revert', async function () {
       await expect(
-        xcampleforth
+        xcAmple
           .connect(deployer)
           .mint(ethers.constants.AddressZero, unitTokenAmount),
       ).to.be.reverted;
@@ -67,9 +63,7 @@ describe('XCAmpleforth:mint', () => {
   describe('when mint address is contract address', () => {
     it('should revert', async function () {
       await expect(
-        xcampleforth
-          .connect(deployer)
-          .mint(xcampleforth.address, unitTokenAmount),
+        xcAmple.connect(deployer).mint(xcAmple.address, unitTokenAmount),
       ).to.be.reverted;
     });
   });
@@ -78,18 +72,18 @@ describe('XCAmpleforth:mint', () => {
     it('should revert', async function () {
       const mintAmt = initialSupply.add(unitTokenAmount);
       await expect(
-        xcampleforth.connect(deployer).mint(otherUser.getAddress(), mintAmt),
+        xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt),
       ).to.be.reverted;
     });
   });
 
   describe('when total supply > totalAMPLSupply', () => {
     it('should revert', async function () {
-      await xcampleforth
+      await xcAmple
         .connect(deployer)
         .mint(otherUser.getAddress(), toUFrgDenomination('45000000'));
       await expect(
-        xcampleforth
+        xcAmple
           .connect(deployer)
           .mint(otherUser.getAddress(), toUFrgDenomination('5000001')),
       ).to.be.reverted;
@@ -100,16 +94,14 @@ describe('XCAmpleforth:mint', () => {
     const totalAmplAmt = MAX_SUPPLY.add(1);
 
     it('should revert', async function () {
-      await xcampleforth.rebase(1, totalAmplAmt);
-      await xcampleforth
+      await xcAmple.rebase(1, totalAmplAmt);
+      await xcAmple
         .connect(deployer)
         .mint(deployer.getAddress(), MAX_SUPPLY.sub(1));
-      await expect(
-        xcampleforth.connect(deployer).mint(otherUser.getAddress(), 1),
-      ).not.to.be.reverted;
-      await expect(
-        xcampleforth.connect(deployer).mint(otherUser.getAddress(), 1),
-      ).to.be.reverted;
+      await expect(xcAmple.connect(deployer).mint(otherUser.getAddress(), 1))
+        .not.to.be.reverted;
+      await expect(xcAmple.connect(deployer).mint(otherUser.getAddress(), 1)).to
+        .be.reverted;
     });
   });
 
@@ -117,26 +109,22 @@ describe('XCAmpleforth:mint', () => {
     const mintAmt = toUFrgDenomination('500000');
 
     it('should mint tokens to wallet', async function () {
-      await xcampleforth
-        .connect(deployer)
-        .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.balanceOf(await otherUser.getAddress())).to.eq(
+      await xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt);
+      expect(await xcAmple.balanceOf(await otherUser.getAddress())).to.eq(
         mintAmt,
       );
     });
 
     it('should update total supply', async function () {
-      await xcampleforth
-        .connect(deployer)
-        .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.totalSupply()).to.eq(mintAmt);
+      await xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt);
+      expect(await xcAmple.totalSupply()).to.eq(mintAmt);
     });
 
     it('should log Transfer from zero address', async function () {
       await expect(
-        xcampleforth.connect(deployer).mint(otherUser.getAddress(), mintAmt),
+        xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt),
       )
-        .to.emit(xcampleforth, 'Transfer')
+        .to.emit(xcAmple, 'Transfer')
         .withArgs(
           ethers.constants.AddressZero,
           await otherUser.getAddress(),
@@ -148,43 +136,35 @@ describe('XCAmpleforth:mint', () => {
   describe('when total supply > 0', () => {
     const mintAmt = toUFrgDenomination('3500000');
     beforeEach(async function () {
-      await xcampleforth
+      await xcAmple
         .connect(deployer)
         .mint(deployer.getAddress(), toUFrgDenomination('30000000'));
     });
 
     it('should mint tokens to wallet', async function () {
-      await xcampleforth
-        .connect(deployer)
-        .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.balanceOf(await otherUser.getAddress())).to.eq(
+      await xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt);
+      expect(await xcAmple.balanceOf(await otherUser.getAddress())).to.eq(
         mintAmt,
       );
     });
 
     it('should not affect other wallets', async function () {
-      await xcampleforth
-        .connect(deployer)
-        .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.balanceOf(await deployer.getAddress())).to.eq(
+      await xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt);
+      expect(await xcAmple.balanceOf(await deployer.getAddress())).to.eq(
         toUFrgDenomination('30000000'),
       );
     });
 
     it('should update total supply', async function () {
-      await xcampleforth
-        .connect(deployer)
-        .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.totalSupply()).to.eq(
-        toUFrgDenomination('33500000'),
-      );
+      await xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt);
+      expect(await xcAmple.totalSupply()).to.eq(toUFrgDenomination('33500000'));
     });
 
     it('should log Transfer from zero address', async function () {
       await expect(
-        xcampleforth.connect(deployer).mint(otherUser.getAddress(), mintAmt),
+        xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt),
       )
-        .to.emit(xcampleforth, 'Transfer')
+        .to.emit(xcAmple, 'Transfer')
         .withArgs(
           ethers.constants.AddressZero,
           await otherUser.getAddress(),
@@ -198,33 +178,27 @@ describe('XCAmpleforth:mint', () => {
     const mintAmt = MAX_SUPPLY.sub(initialBal);
 
     beforeEach(async function () {
-      await xcampleforth.rebase(1, MAX_SUPPLY);
-      await xcampleforth
-        .connect(deployer)
-        .mint(deployer.getAddress(), initialBal);
+      await xcAmple.rebase(1, MAX_SUPPLY);
+      await xcAmple.connect(deployer).mint(deployer.getAddress(), initialBal);
     });
 
     it('should mint tokens to wallet', async function () {
-      await xcampleforth
-        .connect(deployer)
-        .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.balanceOf(await otherUser.getAddress())).to.eq(
+      await xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt);
+      expect(await xcAmple.balanceOf(await otherUser.getAddress())).to.eq(
         mintAmt,
       );
     });
 
     it('should update total supply', async function () {
-      await xcampleforth
-        .connect(deployer)
-        .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.totalSupply()).to.eq(MAX_SUPPLY);
+      await xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt);
+      expect(await xcAmple.totalSupply()).to.eq(MAX_SUPPLY);
     });
 
     it('should log Transfer from zero address', async function () {
       await expect(
-        xcampleforth.connect(deployer).mint(otherUser.getAddress(), mintAmt),
+        xcAmple.connect(deployer).mint(otherUser.getAddress(), mintAmt),
       )
-        .to.emit(xcampleforth, 'Transfer')
+        .to.emit(xcAmple, 'Transfer')
         .withArgs(
           ethers.constants.AddressZero,
           await otherUser.getAddress(),
