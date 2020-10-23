@@ -37,11 +37,11 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
 
     uint256 private constant DECIMALS = 9;
     uint256 private constant MAX_UINT256 = ~uint256(0);
-    uint256 private constant INITIAL_AMPLEFORTH_SUPPLY = 50 * 10**6 * 10**DECIMALS;
+    uint256 private constant INITIAL_AMPL_SUPPLY = 50 * 10**6 * 10**DECIMALS;
 
-    // TOTAL_GONS is a multiple of INITIAL_AMPLEFORTH_SUPPLY so that _gonsPerAmple is an integer.
+    // TOTAL_GONS is a multiple of INITIAL_AMPL_SUPPLY so that _gonsPerAmple is an integer.
     // Use the highest value that fits in a uint256 for max granularity.
-    uint256 private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_AMPLEFORTH_SUPPLY);
+    uint256 private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_AMPL_SUPPLY);
 
     // MAX_SUPPLY = maximum integer < (sqrt(4*TOTAL_GONS + 1) - 1) / 2
     uint256 private constant MAX_SUPPLY = ~uint128(0); // (2^128) - 1
