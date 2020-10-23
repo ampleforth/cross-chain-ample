@@ -39,16 +39,20 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     uint256 private constant MAX_UINT256 = ~uint256(0);
     uint256 private constant INITIAL_AMPL_SUPPLY = 50 * 10**6 * 10**DECIMALS;
 
-    // TOTAL_GONS is a multiple of INITIAL_AMPL_SUPPLY so that _gonsPerAmple is an integer.
+    // TOTAL_GONS is a multiple of INITIAL_AMPL_SUPPLY so that _gonsPerAMPL is an integer.
     // Use the highest value that fits in a uint256 for max granularity.
     uint256 private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_AMPL_SUPPLY);
 
     // MAX_SUPPLY = maximum integer < (sqrt(4*TOTAL_GONS + 1) - 1) / 2
     uint256 private constant MAX_SUPPLY = ~uint128(0); // (2^128) - 1
 
+    // The total supply of AMPL
+    uint256 public totalAMPLSupply;
+    uint256 private _gonsPerAMPL;
+
+    // The total supply of xc-ampl, ie) the total xc-ampl currently in circulation
     uint256 private _totalSupply;
-    uint256 private _circulatingSupply;
-    uint256 private _gonsPerAmple;
+
     mapping(address => uint256) private _gonBalances;
 
     // This is denominated in Amples, because the gons-amples conversion might change before
@@ -69,29 +73,27 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
 
     /**
      * @dev Notifies Amples contract about a new rebase cycle.
-     * @param totalSupply The new total supply from the master chain.
+     * @param newTotalSupply The new total supply from the master chain.
      * @return The total number of amples after the supply adjustment.
      */
-    function rebase(uint256 epoch, uint256 totalSupply)
+    function rebase(uint256 epoch, uint256 newTotalSupply)
         external
         onlyMonetaryPolicy
         returns (uint256)
     {
-        if (totalSupply == _totalSupply) {
-            emit LogRebase(epoch, _totalSupply);
-            return _totalSupply;
+        if (newTotalSupply == totalAMPLSupply) {
+            emit LogRebase(epoch, totalAMPLSupply);
+            return totalAMPLSupply;
         }
 
-        require(totalSupply <= MAX_SUPPLY);
+        _totalSupply = _totalSupply.mul(newTotalSupply).div(totalAMPLSupply);
 
-        _circulatingSupply = _circulatingSupply.mul(totalSupply).div(_totalSupply);
+        totalAMPLSupply = newTotalSupply;
 
-        _totalSupply = totalSupply;
+        _gonsPerAMPL = TOTAL_GONS.div(totalAMPLSupply);
 
-        _gonsPerAmple = TOTAL_GONS.div(_totalSupply);
-
-        emit LogRebase(epoch, _totalSupply);
-        return _totalSupply;
+        emit LogRebase(epoch, totalAMPLSupply);
+        return totalAMPLSupply;
     }
 
     /**
@@ -110,10 +112,10 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
         _symbol = symbol;
         _decimals = uint8(DECIMALS);
 
-        _totalSupply = totalSupply;
-        _circulatingSupply = 0;
+        totalAMPLSupply = totalSupply;
+        _totalSupply = 0;
 
-        _gonsPerAmple = TOTAL_GONS.div(_totalSupply);
+        _gonsPerAMPL = TOTAL_GONS.div(totalAMPLSupply);
     }
 
     /**
@@ -152,19 +154,11 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     }
 
     /**
-     * @return The total number of xc-ampls minted by this instance of XCAmpleforth
-     *         and currently in circulation.
-     */
-    function circulatingSupply() public view returns (uint256) {
-        return _circulatingSupply;
-    }
-
-    /**
      * @param who The address to query.
      * @return The balance of the specified address.
      */
     function balanceOf(address who) public view override returns (uint256) {
-        return _gonBalances[who].div(_gonsPerAmple);
+        return _gonBalances[who].div(_gonsPerAMPL);
     }
 
     /**
@@ -174,7 +168,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @return True on success, false otherwise.
      */
     function transfer(address to, uint256 value) public override validRecipient(to) returns (bool) {
-        uint256 gonValue = value.mul(_gonsPerAmple);
+        uint256 gonValue = value.mul(_gonsPerAMPL);
         _gonBalances[msg.sender] = _gonBalances[msg.sender].sub(gonValue);
         _gonBalances[to] = _gonBalances[to].add(gonValue);
         emit Transfer(msg.sender, to, value);
@@ -204,7 +198,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     ) public override validRecipient(to) returns (bool) {
         _allowedAmples[from][msg.sender] = _allowedAmples[from][msg.sender].sub(value);
 
-        uint256 gonValue = value.mul(_gonsPerAmple);
+        uint256 gonValue = value.mul(_gonsPerAMPL);
         _gonBalances[from] = _gonBalances[from].sub(gonValue);
         _gonBalances[to] = _gonBalances[to].add(gonValue);
         emit Transfer(from, to, value);
@@ -263,33 +257,34 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @dev Mint xc-amples to a beneficiary.
      *
      * @param who The address of the beneficiary.
-     * @param value The amount of tokens to be minted.
+     * @param xcAmplAmount The amount of xc-ampl tokens to be minted.
      */
-    function mint(address who, uint256 value) public onlyMonetaryPolicy {
+    function mint(address who, uint256 xcAmplAmount) public onlyMonetaryPolicy {
         require(who != address(0));
 
-        uint256 gonValue = value.mul(_gonsPerAmple);
+        uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].add(gonValue);
-        _circulatingSupply = _circulatingSupply.add(value);
+        _totalSupply = _totalSupply.add(xcAmplAmount);
 
-        require(_circulatingSupply <= _totalSupply);
+        require(_totalSupply <= totalAMPLSupply);
+        require(_totalSupply <= MAX_SUPPLY);
 
-        emit Transfer(address(0), who, value);
+        emit Transfer(address(0), who, xcAmplAmount);
     }
 
     /**
      * @dev Burn xc-amples from the beneficiary.
      *
      * @param who The address of the beneficiary.
-     * @param value The amount of tokens to be burned.
+     * @param xcAmplAmount The amount of xc-ampl tokens to be burned.
      */
-    function burn(address who, uint256 value) public onlyMonetaryPolicy {
+    function burn(address who, uint256 xcAmplAmount) public onlyMonetaryPolicy {
         require(who != address(0));
 
-        uint256 gonValue = value.mul(_gonsPerAmple);
+        uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].sub(gonValue);
-        _circulatingSupply = _circulatingSupply.sub(value);
+        _totalSupply = _totalSupply.sub(xcAmplAmount);
 
-        emit Transfer(who, address(0), value);
+        emit Transfer(who, address(0), xcAmplAmount);
     }
 }

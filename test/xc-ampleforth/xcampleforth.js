@@ -1,18 +1,25 @@
 const { ethers, upgrades } = require('@nomiclabs/buidler');
 const { expect } = require('chai');
 
-// NOTE: This is just a copy of all the test-cases for the core ampleforth token
-// Only, the rebase invocation function signature and max_supply spec have been altered
+// NOTE: This is a copy of all the test-cases for the core ampleforth token
 // https://github.com/ampleforth/uFragments/blob/master/test/unit/UFragments.js
 
 const DECIMALS = 9;
 const toUFrgDenomination = ample => ethers.utils.parseUnits(ample, DECIMALS);
 
-const INITIAL_SUPPLY = ethers.utils.parseUnits('50', 6 + DECIMALS);
+const INITIAL_AMPL_SUPPLY = ethers.utils.parseUnits('50', 6 + DECIMALS);
+const REBASE_AMT = INITIAL_AMPL_SUPPLY.div(10);
+const EXPANDED_AMPL_SUPPLY = INITIAL_AMPL_SUPPLY.add(REBASE_AMT);
+const CONTRACTED_AMPL_SUPPLY = INITIAL_AMPL_SUPPLY.sub(REBASE_AMT);
+
+const INITIAL_XCAMPL_SUPPLY = INITIAL_AMPL_SUPPLY.div(2);
+const EXPANDED_XCAMPL_SUPPLY = EXPANDED_AMPL_SUPPLY.div(2);
+const CONTRACTED_XCAMPL_SUPPLY = CONTRACTED_AMPL_SUPPLY.div(2);
+
 const transferAmount = toUFrgDenomination('10');
 const unitTokenAmount = toUFrgDenomination('1');
 
-let accounts, deployer, xcampleforth, initialSupply;
+let accounts, deployer, xcampleforth;
 
 async function setupContracts () {
   // prepare signers
@@ -22,15 +29,11 @@ async function setupContracts () {
   const factory = await ethers.getContractFactory('XCAmpleforth');
   xcampleforth = await upgrades.deployProxy(
     factory.connect(deployer),
-    ['XCAmpleforth', 'xcAMPL', INITIAL_SUPPLY],
+    ['XCAmpleforth', 'xcAMPL', INITIAL_AMPL_SUPPLY],
     {
       initializer: 'initialize(string,string,uint256)'
     },
   );
-  await xcampleforth.setMonetaryPolicy(deployer.getAddress());
-  await xcampleforth.mint(deployer.getAddress(), INITIAL_SUPPLY);
-  // fetch initial supply
-  initialSupply = await xcampleforth.totalSupply();
 }
 
 describe('XCAmpleforth', () => {
@@ -46,14 +49,12 @@ describe('XCAmpleforth', () => {
 describe('XCAmpleforth:Initialization', () => {
   before('setup XCAmpleforth contract', setupContracts);
 
-  it('should transfer 50M xcampleforth to the deployer', async function () {
-    expect(await xcampleforth.balanceOf(await deployer.getAddress())).to.eq(
-      INITIAL_SUPPLY,
-    );
+  it('should set the totalAMPLSupply', async function () {
+    expect(await xcampleforth.totalAMPLSupply()).to.eq(INITIAL_AMPL_SUPPLY);
   });
 
-  it('should set the totalSupply to 50M', async function () {
-    expect(await xcampleforth.totalSupply()).to.eq(INITIAL_SUPPLY);
+  it('should set the totalSupply', async function () {
+    expect(await xcampleforth.totalSupply()).to.eq(0);
   });
 
   it('should set the owner', async function () {
@@ -128,19 +129,18 @@ describe('XCAmpleforth:Rebase:accessControl', async () => {
     await xcampleforth.connect(deployer).setMonetaryPolicy(userAddress);
   });
 
-  it('should be callable by monetary policy', async function () {
-    await expect(xcampleforth.connect(user).rebase(1, 1)).to.not.be.reverted;
-  });
-
   it('should not be callable by others', async function () {
     await expect(xcampleforth.connect(deployer).rebase(1, 1)).to.be.reverted;
+  });
+
+  it('should be callable by monetary policy', async function () {
+    await expect(xcampleforth.connect(user).rebase(1, 1)).to.not.be.reverted;
   });
 });
 
 describe('XCAmpleforth:Rebase:Expansion', async () => {
   // Rebase +5M (10%), with starting balances A:750 and B:250.
   let A, B, policy;
-  const rebaseAmt = INITIAL_SUPPLY.div(10);
 
   before('setup XCAmpleforth contract', async function () {
     await setupContracts();
@@ -151,6 +151,9 @@ describe('XCAmpleforth:Rebase:Expansion', async () => {
       .connect(deployer)
       .setMonetaryPolicy(await policy.getAddress());
     await xcampleforth
+      .connect(policy)
+      .mint(deployer.getAddress(), INITIAL_XCAMPL_SUPPLY);
+    await xcampleforth
       .connect(deployer)
       .transfer(await A.getAddress(), toUFrgDenomination('750'));
     await xcampleforth
@@ -159,17 +162,17 @@ describe('XCAmpleforth:Rebase:Expansion', async () => {
   });
 
   it('should emit Rebase', async function () {
-    await expect(
-      xcampleforth.connect(policy).rebase(1, initialSupply.add(rebaseAmt)),
-    )
+    await expect(xcampleforth.connect(policy).rebase(1, EXPANDED_AMPL_SUPPLY))
       .to.emit(xcampleforth, 'LogRebase')
-      .withArgs(1, initialSupply.add(rebaseAmt));
+      .withArgs(1, EXPANDED_AMPL_SUPPLY);
+  });
+
+  it('should increase the totalAMPLSupply', async function () {
+    expect(await xcampleforth.totalAMPLSupply()).to.eq(EXPANDED_AMPL_SUPPLY);
   });
 
   it('should increase the totalSupply', async function () {
-    expect(await xcampleforth.totalSupply()).to.eq(
-      initialSupply.add(rebaseAmt),
-    );
+    expect(await xcampleforth.totalSupply()).to.eq(EXPANDED_XCAMPL_SUPPLY);
   });
 
   it('should increase individual balances', async function () {
@@ -181,52 +184,12 @@ describe('XCAmpleforth:Rebase:Expansion', async () => {
     );
   });
 
-  it('should return the new supply', async function () {
+  it('should return the new AMPL supply', async function () {
     const returnVal = await xcampleforth
       .connect(policy)
-      .callStatic.rebase(2, initialSupply.add(rebaseAmt));
-    await xcampleforth.connect(policy).rebase(2, initialSupply.add(rebaseAmt));
-    expect(await xcampleforth.totalSupply()).to.eq(returnVal);
-  });
-});
-
-describe('XCAmpleforth:Rebase:Expansion', async function () {
-  let policy;
-  const MAX_SUPPLY = ethers.BigNumber.from(2).pow(128).sub(1);
-  const MAX_SUPPLY_MINUS1 = MAX_SUPPLY.sub(toUFrgDenomination('1'));
-  const MAX_SUPPLY_PLUS1 = MAX_SUPPLY.add(toUFrgDenomination('1'));
-
-  describe('when totalSupply is less than MAX_SUPPLY and expands beyond', function () {
-    before('setup XCAmpleforth contract', async function () {
-      await setupContracts();
-      policy = accounts[1];
-      await xcampleforth
-        .connect(deployer)
-        .setMonetaryPolicy(await policy.getAddress());
-      await xcampleforth.connect(policy).rebase(1, MAX_SUPPLY_MINUS1);
-    });
-
-    it('should revert', async function () {
-      await expect(xcampleforth.connect(policy).rebase(2, MAX_SUPPLY_PLUS1)).to
-        .be.reverted;
-    });
-  });
-
-  describe('when totalSupply is MAX_SUPPLY and expands', function () {
-    before(async function () {
-      await setupContracts();
-      policy = accounts[1];
-      await xcampleforth
-        .connect(deployer)
-        .setMonetaryPolicy(await policy.getAddress());
-      await xcampleforth.connect(policy).rebase(2, MAX_SUPPLY);
-      expect(await xcampleforth.totalSupply()).to.eq(MAX_SUPPLY);
-    });
-
-    it('should revert', async function () {
-      await expect(xcampleforth.connect(policy).rebase(3, MAX_SUPPLY_PLUS1)).to
-        .be.reverted;
-    });
+      .callStatic.rebase(2, EXPANDED_AMPL_SUPPLY);
+    await xcampleforth.connect(policy).rebase(2, EXPANDED_AMPL_SUPPLY);
+    expect(await xcampleforth.totalAMPLSupply()).to.eq(returnVal);
   });
 });
 
@@ -243,6 +206,9 @@ describe('XCAmpleforth:Rebase:NoChange', function () {
       .connect(deployer)
       .setMonetaryPolicy(await policy.getAddress());
     await xcampleforth
+      .connect(policy)
+      .mint(deployer.getAddress(), INITIAL_XCAMPL_SUPPLY);
+    await xcampleforth
       .connect(deployer)
       .transfer(await A.getAddress(), toUFrgDenomination('750'));
     await xcampleforth
@@ -251,13 +217,17 @@ describe('XCAmpleforth:Rebase:NoChange', function () {
   });
 
   it('should emit Rebase', async function () {
-    await expect(xcampleforth.connect(policy).rebase(1, initialSupply))
+    await expect(xcampleforth.connect(policy).rebase(1, INITIAL_AMPL_SUPPLY))
       .to.emit(xcampleforth, 'LogRebase')
-      .withArgs(1, initialSupply);
+      .withArgs(1, INITIAL_AMPL_SUPPLY);
+  });
+
+  it('should NOT CHANGE the totalAMPLSupply', async function () {
+    expect(await xcampleforth.totalAMPLSupply()).to.eq(INITIAL_AMPL_SUPPLY);
   });
 
   it('should NOT CHANGE the totalSupply', async function () {
-    expect(await xcampleforth.totalSupply()).to.eq(initialSupply);
+    expect(await xcampleforth.totalSupply()).to.eq(INITIAL_XCAMPL_SUPPLY);
   });
 
   it('should NOT CHANGE individual balances', async function () {
@@ -273,7 +243,6 @@ describe('XCAmpleforth:Rebase:NoChange', function () {
 describe('XCAmpleforth:Rebase:Contraction', function () {
   // Rebase -5M (-10%), with starting balances A:750 and B:250.
   let A, B, policy;
-  const rebaseAmt = INITIAL_SUPPLY.div(10);
 
   before('setup XCAmpleforth contract', async function () {
     await setupContracts();
@@ -284,6 +253,9 @@ describe('XCAmpleforth:Rebase:Contraction', function () {
       .connect(deployer)
       .setMonetaryPolicy(await policy.getAddress());
     await xcampleforth
+      .connect(policy)
+      .mint(deployer.getAddress(), INITIAL_XCAMPL_SUPPLY);
+    await xcampleforth
       .connect(deployer)
       .transfer(await A.getAddress(), toUFrgDenomination('750'));
     await xcampleforth
@@ -292,17 +264,17 @@ describe('XCAmpleforth:Rebase:Contraction', function () {
   });
 
   it('should emit Rebase', async function () {
-    await expect(
-      xcampleforth.connect(policy).rebase(1, initialSupply.sub(rebaseAmt)),
-    )
+    await expect(xcampleforth.connect(policy).rebase(1, CONTRACTED_AMPL_SUPPLY))
       .to.emit(xcampleforth, 'LogRebase')
-      .withArgs(1, initialSupply.sub(rebaseAmt));
+      .withArgs(1, CONTRACTED_AMPL_SUPPLY);
+  });
+
+  it('should decrease the totalAMPLSupply', async function () {
+    expect(await xcampleforth.totalAMPLSupply()).to.eq(CONTRACTED_AMPL_SUPPLY);
   });
 
   it('should decrease the totalSupply', async function () {
-    expect(await xcampleforth.totalSupply()).to.eq(
-      initialSupply.sub(rebaseAmt),
-    );
+    expect(await xcampleforth.totalSupply()).to.eq(CONTRACTED_XCAMPL_SUPPLY);
   });
 
   it('should decrease individual balances', async function () {
@@ -323,6 +295,12 @@ describe('XCAmpleforth:Transfer', function () {
     A = accounts[2];
     B = accounts[3];
     C = accounts[4];
+    await xcampleforth
+      .connect(deployer)
+      .setMonetaryPolicy(await deployer.getAddress());
+    await xcampleforth
+      .connect(deployer)
+      .mint(deployer.getAddress(), INITIAL_XCAMPL_SUPPLY);
   });
 
   describe('deployer transfers 12 to A', function () {

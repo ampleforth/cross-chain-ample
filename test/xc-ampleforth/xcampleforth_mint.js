@@ -28,7 +28,7 @@ async function setupContracts () {
   await xcampleforth.setMonetaryPolicy(deployer.getAddress());
 
   // fetch initial supply
-  initialSupply = await xcampleforth.totalSupply();
+  initialSupply = await xcampleforth.totalAMPLSupply();
 }
 
 describe('XCAmpleforth:mint:accessControl', () => {
@@ -64,7 +64,7 @@ describe('XCAmpleforth:mint', () => {
     });
   });
 
-  describe('when mint value > totalSupply', () => {
+  describe('when mint value > totalAMPLSupply', () => {
     it('should revert', async function () {
       const mintAmt = initialSupply.add(unitTokenAmount);
       await expect(
@@ -73,7 +73,7 @@ describe('XCAmpleforth:mint', () => {
     });
   });
 
-  describe('when circulating supply > totalSupply', () => {
+  describe('when total supply > totalAMPLSupply', () => {
     it('should revert', async function () {
       await xcampleforth
         .connect(deployer)
@@ -86,7 +86,24 @@ describe('XCAmpleforth:mint', () => {
     });
   });
 
-  describe('when circulating supply is 0', () => {
+  describe('when mint value > MAX_SUPPLY', () => {
+    const totalAmplAmt = MAX_SUPPLY.add(1);
+
+    it('should revert', async function () {
+      await xcampleforth.rebase(1, totalAmplAmt);
+      await xcampleforth
+        .connect(deployer)
+        .mint(deployer.getAddress(), MAX_SUPPLY.sub(1));
+      await expect(
+        xcampleforth.connect(deployer).mint(otherUser.getAddress(), 1),
+      ).not.to.be.reverted;
+      await expect(
+        xcampleforth.connect(deployer).mint(otherUser.getAddress(), 1),
+      ).to.be.reverted;
+    });
+  });
+
+  describe('when total supply is 0', () => {
     const mintAmt = toUFrgDenomination('500000');
 
     it('should mint tokens to wallet', async function () {
@@ -98,11 +115,11 @@ describe('XCAmpleforth:mint', () => {
       );
     });
 
-    it('should update circulating supply', async function () {
+    it('should update total supply', async function () {
       await xcampleforth
         .connect(deployer)
         .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.circulatingSupply()).to.eq(mintAmt);
+      expect(await xcampleforth.totalSupply()).to.eq(mintAmt);
     });
 
     it('should log Transfer from zero address', async function () {
@@ -118,7 +135,7 @@ describe('XCAmpleforth:mint', () => {
     });
   });
 
-  describe('when circulating supply > 0', () => {
+  describe('when total supply > 0', () => {
     const mintAmt = toUFrgDenomination('3500000');
     beforeEach(async function () {
       await xcampleforth
@@ -144,11 +161,11 @@ describe('XCAmpleforth:mint', () => {
       );
     });
 
-    it('should update circulating supply', async function () {
+    it('should update total supply', async function () {
       await xcampleforth
         .connect(deployer)
         .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.circulatingSupply()).to.eq(
+      expect(await xcampleforth.totalSupply()).to.eq(
         toUFrgDenomination('33500000'),
       );
     });
@@ -186,11 +203,11 @@ describe('XCAmpleforth:mint', () => {
       );
     });
 
-    it('should update circulating supply', async function () {
+    it('should update total supply', async function () {
       await xcampleforth
         .connect(deployer)
         .mint(otherUser.getAddress(), mintAmt);
-      expect(await xcampleforth.circulatingSupply()).to.eq(MAX_SUPPLY);
+      expect(await xcampleforth.totalSupply()).to.eq(MAX_SUPPLY);
     });
 
     it('should log Transfer from zero address', async function () {

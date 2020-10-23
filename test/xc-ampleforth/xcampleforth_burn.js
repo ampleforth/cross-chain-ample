@@ -98,10 +98,10 @@ describe('XCAmpleforth:burn', () => {
       await xcampleforth.connect(deployer).burn(otherUser.getAddress(), amt1);
       expect(await xcampleforth.balanceOf(deployer.getAddress())).to.eq(amt2);
     });
-    it('should update the circulating supply', async function () {
-      expect(await xcampleforth.circulatingSupply()).to.eq(totalAmt);
+    it('should update the total supply', async function () {
+      expect(await xcampleforth.totalSupply()).to.eq(totalAmt);
       await xcampleforth.connect(deployer).burn(otherUser.getAddress(), amt1);
-      expect(await xcampleforth.circulatingSupply()).to.eq(amt2);
+      expect(await xcampleforth.totalSupply()).to.eq(amt2);
     });
     it('should log Transfer to zero address', async function () {
       await expect(
@@ -134,12 +134,12 @@ describe('XCAmpleforth:burn', () => {
         remainingBal,
       );
     });
-    it('should update the circulating supply', async function () {
-      expect(await xcampleforth.circulatingSupply()).to.eq(mintAmt);
+    it('should update the total supply', async function () {
+      expect(await xcampleforth.totalSupply()).to.eq(mintAmt);
       await xcampleforth
         .connect(deployer)
         .burn(otherUser.getAddress(), burnAmt);
-      expect(await xcampleforth.circulatingSupply()).to.eq(remainingBal);
+      expect(await xcampleforth.totalSupply()).to.eq(remainingBal);
     });
     it('should log Transfer to zero address', async function () {
       await expect(
@@ -173,12 +173,12 @@ describe('XCAmpleforth:burn', () => {
         remainingBal,
       );
     });
-    it('should update the circulating supply', async function () {
-      expect(await xcampleforth.circulatingSupply()).to.eq(MAX_SUPPLY);
+    it('should update the total supply', async function () {
+      expect(await xcampleforth.totalSupply()).to.eq(MAX_SUPPLY);
       await xcampleforth
         .connect(deployer)
         .burn(otherUser.getAddress(), burnAmt);
-      expect(await xcampleforth.circulatingSupply()).to.eq(remainingBal);
+      expect(await xcampleforth.totalSupply()).to.eq(remainingBal);
     });
     it('should log Transfer to zero address', async function () {
       await expect(
