@@ -195,7 +195,7 @@ describe('Orchestrator', function () {
     });
   });
 
-  describe('when a transaction reverts', async function () {
+  describe.only('when a transaction reverts', async function () {
     before('adding 3 transactions', async function () {
       const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
         123,
@@ -219,9 +219,9 @@ describe('Orchestrator', function () {
     });
 
     it('should NOT revert', async function () {
+      const call = await mockDownstream.populateTransaction.reverts();
       await expect(await orchestrator.callStatic.executePostRebaseCallbacks())
         .to.be.false;
-      const call = await mockDownstream.populateTransaction.reverts();
       await expect(orchestrator.connect(deployer).executePostRebaseCallbacks())
         .to.emit(orchestrator, 'TransactionFailed')
         .withArgs(mockDownstream.address, 1, call.data).and.not.to.be.reverted;

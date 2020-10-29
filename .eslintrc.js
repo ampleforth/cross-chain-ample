@@ -95,6 +95,10 @@ module.exports = {
           'dns',
           'Srv',
           'ethersproject',
+          'hexlify',
+          'Utf8Bytes',
+          'keccak256',
+          'Sighash',
 
           // shorthand
           'eth',
@@ -126,6 +130,8 @@ module.exports = {
           'opcode',
           'aprox',
           'str',
+          'cpi',
+          'len',
 
           // project-specific
           'rebase',
@@ -161,6 +167,7 @@ module.exports = {
           'chainsafe',
           'chainbridge',
           'amples',
+          'xcampl',
 
           // names
           'nithin',

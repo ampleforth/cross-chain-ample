@@ -1,4 +1,4 @@
-## Ampleforth-Chainbridge
+## Ampleforth-ChainBridge
 
 Chain-Bridge secured cross-chain implementation of the Ampleforth protocol.
 
@@ -66,6 +66,6 @@ TODO!
 
 * [Introduction](https://www.notion.so/Introduction-to-ChainBridge-f1b783317e464f61909c743e1e934e99) to Chain-bridge.
 
-* Chainbrdige solidity [spec](https://www.notion.so/ChainBridge-Solidity-ad0b0e53e5204e7c8e5e850cbd40392b).
+* Chainbridge solidity [spec](https://www.notion.so/ChainBridge-Solidity-ad0b0e53e5204e7c8e5e850cbd40392b).
 
 * [Steps](https://www.notion.so/Step-by-Step-Usage-Guide-ethereum-62fc70f1c39e45a48f9079d6b027d4ca) to run Chain-bridge relayer.

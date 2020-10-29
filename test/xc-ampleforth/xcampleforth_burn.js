@@ -11,12 +11,10 @@ const unitTokenAmount = toUFrgDenomination('1');
 let accounts, deployer, otherUser, xcampleforth;
 
 async function setupContracts () {
-  // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
   otherUser = accounts[1];
 
-  // deploy upgradable token
   const factory = await ethers.getContractFactory('XCAmpleforth');
   xcampleforth = await upgrades.deployProxy(
     factory.connect(deployer),
@@ -25,7 +23,7 @@ async function setupContracts () {
       initializer: 'initialize(string,string,uint256)'
     },
   );
-  await xcampleforth.setController(deployer.getAddress());
+  await xcampleforth.setMonetaryPolicy(deployer.getAddress());
 }
 
 describe('XCAmpleforth:burn:accessControl', function () {
@@ -44,7 +42,7 @@ describe('XCAmpleforth:burn:accessControl', function () {
     ).to.be.reverted;
   });
 
-  it('should be callable by controller', async function () {
+  it('should be callable by policy', async function () {
     await expect(
       xcampleforth
         .connect(deployer)
