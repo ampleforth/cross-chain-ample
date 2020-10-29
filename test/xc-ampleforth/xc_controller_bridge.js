@@ -9,7 +9,6 @@ let accounts,
   policy,
   mockToken;
 async function setupContracts() {
-  // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
   bridge = accounts[1];

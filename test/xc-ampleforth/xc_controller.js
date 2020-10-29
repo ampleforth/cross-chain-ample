@@ -3,7 +3,6 @@ const { expect } = require('chai');
 
 let accounts, deployer, policy, mockToken;
 async function setupContracts() {
-  // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
 
@@ -46,13 +45,14 @@ describe('XCAmpleforthController:setOrchestrator', async () => {
   });
 
   it('should NOT be callable by non-owner', async function () {
-    expect(policy.connect(accounts[5]).setOrchestrator(orchestrator)).to.be
-      .reverted;
+    await expect(
+      policy.connect(accounts[5]).setOrchestrator(orchestrator),
+    ).to.be.revertedWith('Ownable: caller is not the owner');
   });
 
   it('should be callable by owner', async function () {
-    expect(policy.connect(deployer).setOrchestrator(orchestrator)).to.not.be
-      .reverted;
+    await expect(policy.connect(deployer).setOrchestrator(orchestrator)).to.not
+      .be.reverted;
   });
 
   it('should update the Orchestrator reference', async function () {
@@ -71,7 +71,9 @@ describe('XCAmpleforthController:addBridgeGateway', async () => {
   });
 
   it('should NOT be callable by non-owner', async function () {
-    expect(policy.connect(accounts[5]).addBridgeGateway(bridge)).to.be.reverted;
+    expect(
+      policy.connect(accounts[5]).addBridgeGateway(bridge),
+    ).to.be.revertedWith('Ownable: caller is not the owner');
   });
 
   it('should be callable by owner', async function () {
@@ -105,12 +107,13 @@ describe('XCAmpleforthController:removeBridgeGateway', async () => {
   });
 
   it('should NOT be callable by non-owner', async function () {
-    expect(policy.connect(accounts[5]).removeBridgeGateway(bridge)).to.be
-      .reverted;
+    await expect(
+      policy.connect(accounts[5]).removeBridgeGateway(bridge),
+    ).to.be.revertedWith('Ownable: caller is not the owner');
   });
 
   it('should be callable by owner', async function () {
-    expect(policy.connect(deployer).removeBridgeGateway(bridge)).to.not.be
+    await expect(policy.connect(deployer).removeBridgeGateway(bridge)).to.not.be
       .reverted;
   });
 

@@ -4,7 +4,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SignedSafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
-import "../lib/UInt256Lib.sol";
+import "../_lib/UInt256Lib.sol";
 
 interface IXCAmpleforth {
     function totalSupply() external returns (uint256);

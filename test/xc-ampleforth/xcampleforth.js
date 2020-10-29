@@ -22,10 +22,9 @@ const unitTokenAmount = toUFrgDenomination('1');
 let accounts, deployer, xcampleforth;
 
 async function setupContracts() {
-  // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
-  // deploy upgradable token
+
   const factory = await ethers.getContractFactory('XCAmpleforth');
   xcampleforth = await upgrades.deployProxy(
     factory.connect(deployer),
@@ -114,8 +113,9 @@ describe('XCAmpleforth:setMonetaryPolicy:accessControl', async () => {
   });
 
   it('should NOT be callable by non-owner', async function () {
-    await expect(xcampleforth.connect(user).setMonetaryPolicy(policyAddress)).to
-      .be.reverted;
+    await expect(
+      xcampleforth.connect(user).setMonetaryPolicy(policyAddress),
+    ).to.be.revertedWith('Ownable: caller is not the owner');
   });
 });
 
