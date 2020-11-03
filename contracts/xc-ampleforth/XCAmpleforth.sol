@@ -18,7 +18,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     // PLEASE EXERCISE CAUTION BEFORE CHANGING ANY ACCOUNTING OR MATH
     using SafeMath for uint256;
 
-    event LogRebase(uint256 indexed epoch, uint256 totalSupply);
+    event LogRebase(uint256 indexed epoch, uint256 totalAMPLSupply);
     event LogMonetaryPolicyUpdated(address monetaryPolicy);
 
     // Used for authentication
@@ -104,7 +104,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     function initialize(
         string memory name,
         string memory symbol,
-        uint256 totalSupply
+        uint256 totalAMPLSupply_
     ) public initializer {
         __Ownable_init();
 
@@ -112,7 +112,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
         _symbol = symbol;
         _decimals = uint8(DECIMALS);
 
-        totalAMPLSupply = totalSupply;
+        totalAMPLSupply = totalAMPLSupply_;
         _totalSupply = 0;
 
         _gonsPerAMPL = TOTAL_GONS.div(totalAMPLSupply);
