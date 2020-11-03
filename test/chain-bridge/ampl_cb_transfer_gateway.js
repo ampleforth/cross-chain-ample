@@ -9,7 +9,6 @@ let accounts,
   bridge,
   bridgeAddress,
   ampl,
-  policy,
   vault,
   gateway;
 async function setupContracts() {
@@ -24,29 +23,24 @@ async function setupContracts() {
   ampl = await (await ethers.getContractFactory('MockAmpl'))
     .connect(deployer)
     .deploy();
-  policy = await (await ethers.getContractFactory('MockAmplPolicy'))
-    .connect(deployer)
-    .deploy();
   vault = await (await ethers.getContractFactory('MockVault'))
     .connect(deployer)
     .deploy();
 
   gateway = await (
-    await ethers.getContractFactory('AmpleforthChainBridgeGateway')
+    await ethers.getContractFactory('AmplCBTransferGateway')
   )
     .connect(deployer)
-    .deploy(bridgeAddress, ampl.address, policy.address, vault.address);
+    .deploy(bridgeAddress, ampl.address, vault.address);
 
-  await policy.updateEpoch(1);
   await ampl.updateTotalSupply(50000);
 }
 
-describe('AmpleforthChainBridgeGateway:Initialization', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
+describe('AmplCBTransferGateway:Initialization', () => {
+  before('setup AmplCBTransferGateway contract', setupContracts);
 
   it('should initialize the references', async function () {
     expect(await gateway.ampl()).to.eq(ampl.address);
-    expect(await gateway.policy()).to.eq(policy.address);
     expect(await gateway.vault()).to.eq(vault.address);
   });
 
@@ -55,57 +49,8 @@ describe('AmpleforthChainBridgeGateway:Initialization', () => {
   });
 });
 
-describe('AmpleforthChainBridgeGateway:validateRebaseReport:accessControl', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
-
-  it('should NOT be callable by non-owner', async function () {
-    await expect(
-      gateway.connect(deployer).validateRebaseReport(1, 50000),
-    ).to.be.revertedWith('Ownable: caller is not the owner');
-  });
-
-  it('should be callable by owner', async function () {
-    await expect(gateway.connect(bridge).validateRebaseReport(1, 50000)).to.not
-      .be.reverted;
-  });
-});
-
-describe('AmpleforthChainBridgeGateway:validateRebaseReport', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
-
-  describe('when epoch is not consistent', async function () {
-    it('should revert', async function () {
-      await expect(
-        gateway.connect(bridge).validateRebaseReport(2, 50000),
-      ).to.be.revertedWith(
-        'AmpleforthChainBridgeGateway: recorded epoch not consistent',
-      );
-    });
-  });
-
-  describe('when total supply is not consistent', async function () {
-    it('should revert', async function () {
-      await expect(
-        gateway.connect(bridge).validateRebaseReport(1, 50001),
-      ).to.be.revertedWith(
-        'AmpleforthChainBridgeGateway: recorded total supply not consistent',
-      );
-    });
-  });
-});
-
-describe('AmpleforthChainBridgeGateway:validateRebaseReport', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
-
-  it('should emit XCRebaseReportOut', async function () {
-    await expect(gateway.connect(bridge).validateRebaseReport(1, 50000))
-      .to.emit(gateway, 'XCRebaseReportOut')
-      .withArgs(1, 50000);
-  });
-});
-
-describe('AmpleforthChainBridgeGateway:validateAndLock:accessControl', () => {
-  before('setup AmpleforthChainBridgeGateway contract', async function () {
+describe('AmplCBTransferGateway:validateAndLock:accessControl', () => {
+  before('setup AmplCBTransferGateway contract', async function () {
     await setupContracts();
   });
 
@@ -130,8 +75,9 @@ describe('AmpleforthChainBridgeGateway:validateAndLock:accessControl', () => {
   });
 });
 
-describe('AmpleforthChainBridgeGateway:validateAndLock', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
+
+describe('AmplCBTransferGateway:validateAndLock', () => {
+  before('setup AmplCBTransferGateway contract', setupContracts);
 
   describe('when total supply is not consistent', async function () {
     it('should revert', async function () {
@@ -140,14 +86,14 @@ describe('AmpleforthChainBridgeGateway:validateAndLock', () => {
           .connect(bridge)
           .validateAndLock(depositorAddress, recipientAddress, 1001, 50001),
       ).to.be.revertedWith(
-        'AmpleforthChainBridgeGateway: recorded total supply not consistent',
+        'AmplCBTransferGateway: recorded total supply not consistent',
       );
     });
   });
 });
 
-describe('AmpleforthChainBridgeGateway:validateAndLock', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
+describe('AmplCBTransferGateway:validateAndLock', () => {
+  before('setup AmplCBTransferGateway contract', setupContracts);
 
   it('should emit XCTransferOut', async function () {
     await expect(
@@ -170,8 +116,8 @@ describe('AmpleforthChainBridgeGateway:validateAndLock', () => {
   });
 });
 
-describe('AmpleforthChainBridgeGateway:unlock:accessControl', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
+describe('AmplCBTransferGateway:unlock:accessControl', () => {
+  before('setup AmplCBTransferGateway contract', setupContracts);
 
   it('should NOT be callable by non-owner', async function () {
     await expect(
@@ -190,8 +136,8 @@ describe('AmpleforthChainBridgeGateway:unlock:accessControl', () => {
   });
 });
 
-describe('AmpleforthChainBridgeGateway:unlock', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
+describe('AmplCBTransferGateway:unlock', () => {
+  before('setup AmplCBTransferGateway contract', setupContracts);
 
   describe('when recorded supply = total supply', function () {
     it('should emit XCTransferIn', async function () {
@@ -216,8 +162,8 @@ describe('AmpleforthChainBridgeGateway:unlock', () => {
   });
 });
 
-describe('AmpleforthChainBridgeGateway:unlock', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
+describe('AmplCBTransferGateway:unlock', () => {
+  before('setup AmplCBTransferGateway contract', setupContracts);
 
   describe('when recorded supply > total supply', function () {
     it('should emit XCTransferIn', async function () {
@@ -242,8 +188,8 @@ describe('AmpleforthChainBridgeGateway:unlock', () => {
   });
 });
 
-describe('AmpleforthChainBridgeGateway:unlock', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
+describe('AmplCBTransferGateway:unlock', () => {
+  before('setup AmplCBTransferGateway contract', setupContracts);
 
   describe('when recorded supply < total supply', function () {
     it('should emit XCTransferIn', async function () {
@@ -268,8 +214,8 @@ describe('AmpleforthChainBridgeGateway:unlock', () => {
   });
 });
 
-describe('AmpleforthChainBridgeGateway:unlock', () => {
-  before('setup AmpleforthChainBridgeGateway contract', setupContracts);
+describe('AmplCBTransferGateway:unlock', () => {
+  before('setup AmplCBTransferGateway contract', setupContracts);
 
   describe('large numbers', function () {
     const MAX_SUPPLY = ethers.BigNumber.from(2).pow(128).sub(1);

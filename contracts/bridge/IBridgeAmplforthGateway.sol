@@ -37,7 +37,7 @@ interface ITokenVault {
  *      On the 'master' chain they interface between chain bridge handler and the AmplVault
  *      On the 'other' chain they interface between chain bridge handler and the XCAmpleforthPolicy
  */
-interface IBridgeAmplforthGateway {
+interface IBridgeAmplforthRebaseGateway {
     event XCRebaseReportIn(
         uint256 recordedAMPLEpoch,
         uint256 recordedTotalAMPLSupply,
@@ -47,6 +47,9 @@ interface IBridgeAmplforthGateway {
 
     event XCRebaseReportOut(uint256 currentAMPLEpoch, uint256 currentTotalAMPLSupply);
 
+}
+
+interface IBridgeAmplforthTransferGateway {
     event XCTransferIn(
         address depositor,
         address recipient,

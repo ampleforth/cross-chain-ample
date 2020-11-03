@@ -50,45 +50,6 @@ describe('ChainBridgeXCAmpleforthPolicyGateway:Initialization', () => {
   });
 });
 
-describe('ChainBridgeXCAmpleforthPolicyGateway:reportRebase:accessControl', () => {
-  before('setup ChainBridgeXCAmpleforthPolicyGateway contract', setupContracts);
-
-  it('should NOT be callable by non-owner', async function () {
-    await expect(
-      gateway.connect(deployer).reportRebase(1, 50000),
-    ).to.be.revertedWith('Ownable: caller is not the owner');
-  });
-
-  it('should be callable by owner', async function () {
-    await expect(gateway.connect(bridge).reportRebase(1, 50000)).to.not.be
-      .reverted;
-  });
-});
-
-describe('ChainBridgeXCAmpleforthPolicyGateway:reportRebase', () => {
-  before('setup ChainBridgeXCAmpleforthPolicyGateway contract', setupContracts);
-
-  describe('when on-chain supply is different', async function () {
-    it('should emit XCRebaseReportIn', async function () {
-      await expect(gateway.connect(bridge).reportRebase(2, 100000))
-        .to.emit(gateway, 'XCRebaseReportIn')
-        .withArgs(2, 100000, 1, 50000);
-
-      await expect(gateway.connect(bridge).reportRebase(3, 40000))
-        .to.emit(gateway, 'XCRebaseReportIn')
-        .withArgs(3, 40000, 1, 50000);
-    });
-  });
-
-  describe('when on-chain supply is the same', async function () {
-    it('should emit XCRebaseReportIn', async function () {
-      await expect(gateway.connect(bridge).reportRebase(2, 50000))
-        .to.emit(gateway, 'XCRebaseReportIn')
-        .withArgs(2, 50000, 1, 50000);
-    });
-  });
-});
-
 describe('ChainBridgeXCAmpleforthPolicyGateway:mint:accessControl', () => {
   before('setup ChainBridgeXCAmpleforthPolicyGateway contract', setupContracts);
 

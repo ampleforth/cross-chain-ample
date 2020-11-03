@@ -5,44 +5,27 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "../bridge/IBridgeAmplforthGateway.sol";
 
 /**
- * @title AmpleforthChainBridgeGateway
+ * @title AmplCBTransferGateway: Ampl-ChainBridge Rebase Gateway
  * @dev This contract is deployed on the 'master' chain (Ethereum).
- *      It's a intermediate contract between the ChainBridge Generic handler contract and
- *      the Ampl vault.
+ *      It's a pass-through contract between the ChainBridge handler contract and
+ *      the AMPL vault.
  *
- *      It validates data from the handler contract.
- *      In case of unlocks, it also handles gons to ampl conversion.
+ *      When the user transfers AMPLs from the master chain to the other chain
+ *      `validateAndLock` locks ampls in the vault and validates the total supply
+ *      reported is consistent with the current on-chain value.
+ *
+ *      When the user transfers AMPLs from the other chain back to the master chain
+ *      the tokens are unlocked from the vault. The amount of tokens to be unlocked
+ *      is calculated based on the total supply recored at the time of transfer
+ *      and the total supply at the time of unlock.
  *
  *      NOTE: This contract is NOT upgradeable.
  */
-contract AmpleforthChainBridgeGateway is IBridgeAmplforthGateway, Ownable {
+contract AmplCBTransferGateway is IBridgeAmplforthTransferGateway, Ownable {
     using SafeMath for uint256;
 
     address public ampl;
-    address public policy;
     address public vault;
-
-    /**
-     * @notice Validates if the data from the handler is consistent with the current on-chain value.
-     */
-    function validateRebaseReport(uint256 recordedAMPLEpoch, uint256 recordedTotalAMPLSupply)
-        public
-        onlyOwner
-        returns (bool)
-    {
-        require(
-            recordedAMPLEpoch == IAmpleforthPolicy(policy).epoch(),
-            "AmpleforthChainBridgeGateway: recorded epoch not consistent"
-        );
-        require(
-            recordedTotalAMPLSupply == IAmpleforth(ampl).totalSupply(),
-            "AmpleforthChainBridgeGateway: recorded total supply not consistent"
-        );
-
-        emit XCRebaseReportOut(recordedAMPLEpoch, recordedTotalAMPLSupply);
-
-        return true;
-    }
 
     /**
      * @notice Validates the data from the handler and transfers specified amount from
@@ -56,7 +39,7 @@ contract AmpleforthChainBridgeGateway is IBridgeAmplforthGateway, Ownable {
     ) public onlyOwner returns (bool) {
         require(
             recordedTotalAMPLSupply == IAmpleforth(ampl).totalSupply(),
-            "AmpleforthChainBridgeGateway: recorded total supply not consistent"
+            "AmplCBTransferGateway: recorded total supply not consistent"
         );
 
         ITokenVault(vault).lock(depositor, recordedAmount);
@@ -97,11 +80,9 @@ contract AmpleforthChainBridgeGateway is IBridgeAmplforthGateway, Ownable {
     constructor(
         address bridgeHandler,
         address ampl_,
-        address policy_,
         address vault_
     ) public {
         ampl = ampl_;
-        policy = policy_;
         vault = vault_;
 
         transferOwnership(bridgeHandler);
