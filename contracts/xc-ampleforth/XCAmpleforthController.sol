@@ -16,25 +16,22 @@ interface IXCAmpleforth {
     function burn(address who, uint256 value) external;
 }
 
+interface IXCOrchestrator {
+    function executePostRebaseCallbacks() external returns (bool);
+}
+
 /**
- * @title XCAmpleforth Policy
- * @dev This component controls the supply of the XCAmpleforth ERC20 tokens.
+ * @title XCAmpleforth Controller
+ * @dev This component administers the XCAmpleforth ERC20 token contract.
  *      It maintains a set of white-listed bridge gateway contracts which
  *      have the ability to `mint` and `burn` xc-amples. It also performs
  *      rebase on XCAmpleforth, based on updated AMPL supply reported through
  *      the bridge gateway.
  */
-contract XCAmpleforthPolicy is OwnableUpgradeSafe {
+contract XCAmpleforthController is OwnableUpgradeSafe {
     using SafeMath for uint256;
     using SignedSafeMath for int256;
     using UInt256Lib for uint256;
-
-    event RebaseReported(
-        address indexed bridgeGateway,
-        uint256 indexed epoch,
-        uint256 totalSupply,
-        uint256 timestampSec
-    );
 
     event Mint(address indexed bridgeGateway, address indexed recipient, uint256 xcAmplAmount);
 
@@ -48,65 +45,21 @@ contract XCAmpleforthPolicy is OwnableUpgradeSafe {
     // This module orchestrates the rebase execution and downstream notification.
     address public orchestrator;
 
-    // More than this much time must pass before the rebase report from the bridge gateway
-    // can be to execute rebase on the current-chain.
-    uint256 public rebaseReportDelaySec;
-
     // The number of rebase cycles since inception of AMPL.
     uint256 public currentAMPLEpoch;
 
     // The timestamp when xc-ample rebase was executed.
     uint256 public rebaseTimestampSec;
 
-    // The information about the most recent AMPL rebase reported through the bridge gateway
-    uint256 public nextAMPLEpoch;
-    uint256 public nextTotalAMPLSupply;
-    uint256 public rebaseReportTimestampSec;
-
     // White-list of trusted bridge gateway contracts
     mapping(address => bool) public whitelistedBridgeGateways;
-
-    modifier onlyOrchestrator() {
-        require(msg.sender == orchestrator, "XCAmpleforthPolicy: Rebase caller not orchestrator");
-        _;
-    }
 
     modifier onlyBridgeGateway() {
         require(
             whitelistedBridgeGateways[msg.sender],
-            "XCAmpleforthPolicy: Bridge gateway not whitelisted"
+            "XCAmpleforthController: Bridge gateway not whitelisted"
         );
         _;
-    }
-
-    /**
-     * @notice Initiates a new rebase operation, provided the report delay time period has elapsed.
-     * @dev The supply adjustment is inferred as the difference between
-     *      the new totalSupply from the rebase report and the recorded total supply.
-     */
-    function rebase() external onlyOrchestrator {
-        require(
-            now.sub(rebaseReportTimestampSec) >= rebaseReportDelaySec,
-            "XCAmpleforthPolicy: Report too fresh"
-        );
-        require(nextAMPLEpoch > currentAMPLEpoch, "XCAmpleforthPolicy: Epoch not new");
-
-        currentAMPLEpoch = nextAMPLEpoch;
-        int256 recordedTotalSupply = IXCAmpleforth(xcAmpl).totalSupply().toInt256Safe();
-        int256 supplyDelta = nextTotalAMPLSupply.toInt256Safe().sub(recordedTotalSupply);
-        IXCAmpleforth(xcAmpl).rebase(currentAMPLEpoch, nextTotalAMPLSupply);
-
-        rebaseTimestampSec = now;
-
-        emit LogRebase(currentAMPLEpoch, supplyDelta, rebaseTimestampSec);
-    }
-
-    /**
-     * @notice Sets the reference to the orchestrator.
-     * @param orchestrator_ The address of the orchestrator contract.
-     */
-    function setOrchestrator(address orchestrator_) external onlyOwner {
-        orchestrator = orchestrator_;
     }
 
     /**
@@ -126,29 +79,11 @@ contract XCAmpleforthPolicy is OwnableUpgradeSafe {
     }
 
     /**
-     * @notice Sets the rebase report delay.
-     * @param rebaseReportDelaySec_ The new rebase report delay.
+     * @notice Sets the reference to the orchestrator.
+     * @param orchestrator_ The address of the orchestrator contract.
      */
-    function setRebaseReportDelay(uint256 rebaseReportDelaySec_) external onlyOwner {
-        rebaseReportDelaySec = rebaseReportDelaySec_;
-    }
-
-    /**
-     * @notice Upcoming rebase information reported by a bridge is updated in storage.
-     * @param nextAMPLEpoch_ The new epoch.
-     * @param totalSupply The new total supply.
-     */
-    function reportRebase(uint256 nextAMPLEpoch_, uint256 totalSupply) external onlyBridgeGateway {
-        nextAMPLEpoch = nextAMPLEpoch_;
-        nextTotalAMPLSupply = totalSupply;
-        rebaseReportTimestampSec = now;
-
-        emit RebaseReported(
-            msg.sender,
-            nextAMPLEpoch,
-            nextTotalAMPLSupply,
-            rebaseReportTimestampSec
-        );
+    function setOrchestrator(address orchestrator_) external onlyOwner {
+        orchestrator = orchestrator_;
     }
 
     /**
@@ -176,6 +111,33 @@ contract XCAmpleforthPolicy is OwnableUpgradeSafe {
     }
 
     /**
+     * @notice Initiate a new rebase operation.
+     * @param newAMPLEpoch The new epoch after rebase on the master-chain.
+     * @param newTotalAMPLSupply The new AMPL total supply after rebase on the master-chain.
+     * @dev Bridge reports new epoch and total supply, which triggers rebase on the current-chain.
+     *      The supply adjustment is inferred as the difference between the new total AMPL supply
+     *      and the recorded AMPL total supply on the current-chain.
+     *      After rebase, it notifies down-stream platforms by executing post-rebase callbacks
+     *      on the orchestrator.
+     */
+    function rebase(uint256 newAMPLEpoch, uint256 newTotalAMPLSupply) external onlyBridgeGateway {
+        require(newAMPLEpoch > currentAMPLEpoch, "XCAmpleforthController: Epoch not new");
+
+        int256 recordedTotalSupply = IXCAmpleforth(xcAmpl).totalSupply().toInt256Safe();
+        IXCAmpleforth(xcAmpl).rebase(newAMPLEpoch, newTotalAMPLSupply);
+
+        currentAMPLEpoch = newAMPLEpoch;
+        int256 supplyDelta = newTotalAMPLSupply.toInt256Safe().sub(recordedTotalSupply);
+        rebaseTimestampSec = now;
+        emit LogRebase(currentAMPLEpoch, supplyDelta, rebaseTimestampSec);
+
+        // executes callbacks only when the orchestrator reference is set
+        if (orchestrator != address(0)) {
+            require(IXCOrchestrator(orchestrator).executePostRebaseCallbacks());
+        }
+    }
+
+    /**
      * @dev ZOS upgradable contract initialization method.
      *      It is called at the time of contract creation to invoke parent class initializers and
      *      initialize the contract's state variables.
@@ -184,8 +146,6 @@ contract XCAmpleforthPolicy is OwnableUpgradeSafe {
         __Ownable_init();
 
         xcAmpl = xcAmpl_;
-
         currentAMPLEpoch = currentAMPLEpoch_;
-        rebaseReportDelaySec = 15 minutes;
     }
 }

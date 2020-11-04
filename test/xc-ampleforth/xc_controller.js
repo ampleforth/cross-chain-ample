@@ -12,7 +12,7 @@ async function setupContracts() {
     .deploy();
 
   // deploy upgradable token
-  const factory = await ethers.getContractFactory('XCAmpleforthPolicy');
+  const factory = await ethers.getContractFactory('XCAmpleforthController');
   policy = await upgrades.deployProxy(
     factory.connect(deployer),
     [mockToken.address, 1],
@@ -22,8 +22,8 @@ async function setupContracts() {
   );
 }
 
-describe('XCAmpleforthPolicy:Initialization', () => {
-  before('setup XCAmpleforthPolicy contract', setupContracts);
+describe('XCAmpleforthController:Initialization', () => {
+  before('setup XCAmpleforthController contract', setupContracts);
 
   it('should initialize the token reference', async function () {
     expect(await policy.xcAmpl()).to.eq(mockToken.address);
@@ -33,18 +33,14 @@ describe('XCAmpleforthPolicy:Initialization', () => {
     expect(await policy.currentAMPLEpoch()).to.eq(1);
   });
 
-  it('should initialize the rebaseReportDelaySec', async function () {
-    expect(await policy.rebaseReportDelaySec()).to.not.eq(0);
-  });
-
   it('should set the owner', async function () {
     expect(await policy.owner()).to.eq(await deployer.getAddress());
   });
 });
 
-describe('XCAmpleforthPolicy:setOrchestrator', async () => {
+describe('XCAmpleforthController:setOrchestrator', async () => {
   let orchestrator;
-  beforeEach('setup XCAmpleforthPolicy contract', async () => {
+  beforeEach('setup XCAmpleforthController contract', async () => {
     await setupContracts();
     orchestrator = await accounts[1].getAddress();
   });
@@ -66,9 +62,9 @@ describe('XCAmpleforthPolicy:setOrchestrator', async () => {
   });
 });
 
-describe('XCAmpleforthPolicy:addBridgeGateway', async () => {
+describe('XCAmpleforthController:addBridgeGateway', async () => {
   let bridge, other;
-  beforeEach('setup XCAmpleforthPolicy contract', async () => {
+  beforeEach('setup XCAmpleforthController contract', async () => {
     await setupContracts();
     bridge = await accounts[1].getAddress();
     other = await accounts[3].getAddress();
@@ -98,9 +94,9 @@ describe('XCAmpleforthPolicy:addBridgeGateway', async () => {
   });
 });
 
-describe('XCAmpleforthPolicy:removeBridgeGateway', async () => {
+describe('XCAmpleforthController:removeBridgeGateway', async () => {
   let bridge, other;
-  beforeEach('setup XCAmpleforthPolicy contract', async () => {
+  beforeEach('setup XCAmpleforthController contract', async () => {
     await setupContracts();
     bridge = await accounts[1].getAddress();
     other = await accounts[3].getAddress();
@@ -130,25 +126,5 @@ describe('XCAmpleforthPolicy:removeBridgeGateway', async () => {
     await policy.connect(deployer).removeBridgeGateway(bridge);
     expect(await policy.whitelistedBridgeGateways(bridge)).to.be.false;
     expect(await policy.whitelistedBridgeGateways(other)).to.be.true;
-  });
-});
-
-describe('XCAmpleforthPolicy:setRebaseReportDelay', async () => {
-  beforeEach('setup XCAmpleforthPolicy contract', setupContracts);
-
-  it('should NOT be callable by non-owner', async function () {
-    expect(policy.connect(accounts[5]).setRebaseReportDelay(60 * 60)).to.be
-      .reverted;
-  });
-
-  it('should be callable by owner', async function () {
-    expect(policy.connect(deployer).setRebaseReportDelay(60 * 60)).to.not.be
-      .reverted;
-  });
-
-  it('should update the rebaseReportDelaySec', async function () {
-    expect(await policy.rebaseReportDelaySec()).to.be.eq(15 * 60);
-    await policy.connect(deployer).setRebaseReportDelay(60 * 60);
-    expect(await policy.rebaseReportDelaySec()).to.be.eq(60 * 60);
   });
 });

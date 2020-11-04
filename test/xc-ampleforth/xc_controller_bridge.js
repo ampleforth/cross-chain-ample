@@ -21,7 +21,7 @@ async function setupContracts() {
     .deploy();
 
   // deploy upgradable token
-  const factory = await ethers.getContractFactory('XCAmpleforthPolicy');
+  const factory = await ethers.getContractFactory('XCAmpleforthController');
   policy = await upgrades.deployProxy(
     factory.connect(deployer),
     [mockToken.address, 1],
@@ -33,62 +33,15 @@ async function setupContracts() {
   await policy.connect(deployer).addBridgeGateway(bridgeOther.getAddress());
 }
 
-describe('XCAmpleforthPolicy:reportRebase:accessControl', async () => {
-  beforeEach('setup XCAmpleforthPolicy contract', setupContracts);
-
-  it('should NOT be callable by non-bridge', async function () {
-    await expect(
-      policy.connect(deployer).reportRebase(762, 234235445645645),
-    ).to.be.revertedWith('XCAmpleforthPolicy: Bridge gateway not whitelisted');
-  });
-
-  it('should be callable by bridge', async function () {
-    await expect(policy.connect(bridge).reportRebase(762, 234235445645645)).to
-      .not.be.reverted;
-    await expect(policy.connect(bridgeOther).reportRebase(762, 234235445645645))
-      .to.not.be.reverted;
-  });
-});
-
-describe('XCAmpleforthPolicy:reportRebase', async () => {
-  let t, t1, t2;
-  beforeEach('setup XCAmpleforthPolicy contract', setupContracts);
-
-  it('should update the next rebase data', async function () {
-    expect(await policy.nextAMPLEpoch()).to.eq(0);
-    expect(await policy.nextTotalAMPLSupply()).to.eq(0);
-    t = await policy.rebaseReportTimestampSec();
-    expect(t).to.eq(0);
-
-    await policy.connect(bridge).reportRebase(762, 234235445645645);
-    expect(await policy.nextAMPLEpoch()).to.eq(762);
-    expect(await policy.nextTotalAMPLSupply()).to.eq(234235445645645);
-    t1 = await policy.rebaseReportTimestampSec();
-    expect(t1).to.gt(t);
-
-    await policy.connect(bridge).reportRebase(763, 56464566546);
-    expect(await policy.nextAMPLEpoch()).to.eq(763);
-    expect(await policy.nextTotalAMPLSupply()).to.eq(56464566546);
-    t2 = await policy.rebaseReportTimestampSec();
-    expect(t2).to.gte(t1);
-  });
-
-  it('should log the rebase report', async function () {
-    const r = await policy.connect(bridge).reportRebase(762, 234235445645645);
-    t = await policy.rebaseReportTimestampSec();
-    expect((async () => r)())
-      .to.emit(policy, 'RebaseReported')
-      .withArgs(await bridge.getAddress(), 762, 234235445645645, t);
-  });
-});
-
-describe('XCAmpleforthPolicy:mint:accessControl', async () => {
-  beforeEach('setup XCAmpleforthPolicy contract', setupContracts);
+describe('XCAmpleforthController:mint:accessControl', async () => {
+  beforeEach('setup XCAmpleforthController contract', setupContracts);
 
   it('should NOT be callable by non-bridge', async function () {
     await expect(
       policy.connect(deployer).mint(beneficiaryAddress, 1234),
-    ).to.be.revertedWith('XCAmpleforthPolicy: Bridge gateway not whitelisted');
+    ).to.be.revertedWith(
+      'XCAmpleforthController: Bridge gateway not whitelisted',
+    );
   });
 
   it('should be callable by bridge', async function () {
@@ -99,8 +52,8 @@ describe('XCAmpleforthPolicy:mint:accessControl', async () => {
   });
 });
 
-describe('XCAmpleforthPolicy:mint', async () => {
-  beforeEach('setup XCAmpleforthPolicy contract', setupContracts);
+describe('XCAmpleforthController:mint', async () => {
+  beforeEach('setup XCAmpleforthController contract', setupContracts);
 
   describe('when mint amount is small', function () {
     it('should mint correct amount of ampl', async function () {
@@ -116,13 +69,15 @@ describe('XCAmpleforthPolicy:mint', async () => {
   });
 });
 
-describe('XCAmpleforthPolicy:burn:accessControl', async () => {
-  beforeEach('setup XCAmpleforthPolicy contract', setupContracts);
+describe('XCAmpleforthController:burn:accessControl', async () => {
+  beforeEach('setup XCAmpleforthController contract', setupContracts);
 
   it('should NOT be callable by non-bridge', async function () {
     await expect(
       policy.connect(deployer).burn(beneficiaryAddress, 4321),
-    ).to.be.revertedWith('XCAmpleforthPolicy: Bridge gateway not whitelisted');
+    ).to.be.revertedWith(
+      'XCAmpleforthController: Bridge gateway not whitelisted',
+    );
   });
 
   it('should be callable by bridge', async function () {
@@ -133,8 +88,8 @@ describe('XCAmpleforthPolicy:burn:accessControl', async () => {
   });
 });
 
-describe('XCAmpleforthPolicy:burn', async () => {
-  beforeEach('setup XCAmpleforthPolicy contract', setupContracts);
+describe('XCAmpleforthController:burn', async () => {
+  beforeEach('setup XCAmpleforthController contract', setupContracts);
 
   it('should burn correct amount of ampl', async function () {
     await expect(policy.connect(bridge).burn(beneficiaryAddress, 999))
