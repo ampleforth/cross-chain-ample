@@ -46,6 +46,11 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     // MAX_SUPPLY = maximum integer < (sqrt(4*TOTAL_GONS + 1) - 1) / 2
     uint256 private constant MAX_SUPPLY = ~uint128(0); // (2^128) - 1
 
+    // ERC-20 identity attributes
+    string private _name;
+    string private _symbol;
+    uint8 private _decimals;
+
     // The total supply of AMPL
     uint256 public totalAMPLSupply;
     uint256 private _gonsPerAMPL;
@@ -53,15 +58,14 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     // The total supply of xc-ampl, ie) the total xc-ampl currently in circulation
     uint256 private _totalSupply;
 
+    // Gons are an internal denomination to represent wallet balances for rebase safe accounting
+    // The value denotes the wallet's share of the total AMPL supply
+    // public wallet balance = _gonBalances[wallet] * _gonsPerAMPL
     mapping(address => uint256) private _gonBalances;
 
-    // This is denominated in Amples, because the gons-amples conversion might change before
-    // it's fully paid.
-    mapping(address => mapping(address => uint256)) private _allowedAmples;
-
-    string private _name;
-    string private _symbol;
-    uint8 private _decimals;
+    // This is denominated in XCAmpl amount,
+    // because the gons xc-ampl conversion might change before it's fully paid.
+    mapping(address => mapping(address => uint256)) private _allowedXCAmples;
 
     /**
      * @param monetaryPolicy_ The address of the monetary policy contract to use for authentication.
@@ -182,7 +186,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @return The number of tokens still available for the spender.
      */
     function allowance(address owner_, address spender) public view override returns (uint256) {
-        return _allowedAmples[owner_][spender];
+        return _allowedXCAmples[owner_][spender];
     }
 
     /**
@@ -196,7 +200,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
         address to,
         uint256 value
     ) public override validRecipient(to) returns (bool) {
-        _allowedAmples[from][msg.sender] = _allowedAmples[from][msg.sender].sub(value);
+        _allowedXCAmples[from][msg.sender] = _allowedXCAmples[from][msg.sender].sub(value);
 
         uint256 gonValue = value.mul(_gonsPerAMPL);
         _gonBalances[from] = _gonBalances[from].sub(gonValue);
@@ -218,7 +222,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param value The amount of tokens to be spent.
      */
     function approve(address spender, uint256 value) public override returns (bool) {
-        _allowedAmples[msg.sender][spender] = value;
+        _allowedXCAmples[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
     }
@@ -231,8 +235,8 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param addedValue The amount of tokens to increase the allowance by.
      */
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-        _allowedAmples[msg.sender][spender] = _allowedAmples[msg.sender][spender].add(addedValue);
-        emit Approval(msg.sender, spender, _allowedAmples[msg.sender][spender]);
+        _allowedXCAmples[msg.sender][spender] = _allowedXCAmples[msg.sender][spender].add(addedValue);
+        emit Approval(msg.sender, spender, _allowedXCAmples[msg.sender][spender]);
         return true;
     }
 
@@ -243,13 +247,13 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param subtractedValue The amount of tokens to decrease the allowance by.
      */
     function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
-        uint256 oldValue = _allowedAmples[msg.sender][spender];
+        uint256 oldValue = _allowedXCAmples[msg.sender][spender];
         if (subtractedValue >= oldValue) {
-            _allowedAmples[msg.sender][spender] = 0;
+            _allowedXCAmples[msg.sender][spender] = 0;
         } else {
-            _allowedAmples[msg.sender][spender] = oldValue.sub(subtractedValue);
+            _allowedXCAmples[msg.sender][spender] = oldValue.sub(subtractedValue);
         }
-        emit Approval(msg.sender, spender, _allowedAmples[msg.sender][spender]);
+        emit Approval(msg.sender, spender, _allowedXCAmples[msg.sender][spender]);
         return true;
     }
 
