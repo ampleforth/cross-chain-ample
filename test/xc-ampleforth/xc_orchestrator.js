@@ -1,8 +1,8 @@
-const { ethers, upgrades } = require('@nomiclabs/buidler');
+const { ethers } = require('@nomiclabs/buidler');
 const { expect } = require('chai');
 
-let accounts, deployer, user, orchestrator, mockDownstream;
-async function setupContracts() {
+let accounts, deployer, user, orchestrator, mockDownstream, r;
+async function setupContracts () {
   // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
