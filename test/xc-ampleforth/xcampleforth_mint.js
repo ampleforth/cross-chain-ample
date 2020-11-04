@@ -25,7 +25,7 @@ async function setupContracts () {
       initializer: 'initialize(string,string,uint256)'
     },
   );
-  await xcampleforth.setMonetaryPolicy(deployer.getAddress());
+  await xcampleforth.setController(deployer.getAddress());
 
   // fetch initial supply
   initialSupply = await xcampleforth.totalAMPLSupply();
@@ -42,7 +42,7 @@ describe('XCAmpleforth:mint:accessControl', () => {
     ).to.be.reverted;
   });
 
-  it('should be callable by policy', async function () {
+  it('should be callable by controller', async function () {
     await expect(
       xcampleforth
         .connect(deployer)

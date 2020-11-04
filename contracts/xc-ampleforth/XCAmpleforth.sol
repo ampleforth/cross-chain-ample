@@ -19,13 +19,13 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     using SafeMath for uint256;
 
     event LogRebase(uint256 indexed epoch, uint256 totalAMPLSupply);
-    event LogMonetaryPolicyUpdated(address monetaryPolicy);
+    event ControllerUpdated(address controller);
 
     // Used for authentication
-    address public monetaryPolicy;
+    address public controller;
 
-    modifier onlyMonetaryPolicy() {
-        require(msg.sender == monetaryPolicy);
+    modifier onlyController() {
+        require(msg.sender == controller);
         _;
     }
 
@@ -68,11 +68,11 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     mapping(address => mapping(address => uint256)) private _allowedXCAmples;
 
     /**
-     * @param monetaryPolicy_ The address of the monetary policy contract to use for authentication.
+     * @param controller_ The address of the controller contract to use for authentication.
      */
-    function setMonetaryPolicy(address monetaryPolicy_) external onlyOwner {
-        monetaryPolicy = monetaryPolicy_;
-        emit LogMonetaryPolicyUpdated(monetaryPolicy_);
+    function setController(address controller_) external onlyOwner {
+        controller = controller_;
+        emit ControllerUpdated(controller_);
     }
 
     /**
@@ -82,7 +82,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      */
     function rebase(uint256 epoch, uint256 newTotalSupply)
         external
-        onlyMonetaryPolicy
+        onlyController
         returns (uint256)
     {
         if (newTotalSupply == totalAMPLSupply) {
@@ -235,7 +235,9 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param addedValue The amount of tokens to increase the allowance by.
      */
     function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
-        _allowedXCAmples[msg.sender][spender] = _allowedXCAmples[msg.sender][spender].add(addedValue);
+        _allowedXCAmples[msg.sender][spender] = _allowedXCAmples[msg.sender][spender].add(
+            addedValue
+        );
         emit Approval(msg.sender, spender, _allowedXCAmples[msg.sender][spender]);
         return true;
     }
@@ -263,7 +265,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param who The address of the beneficiary.
      * @param xcAmplAmount The amount of xc-ampl tokens to be minted.
      */
-    function mint(address who, uint256 xcAmplAmount) public onlyMonetaryPolicy {
+    function mint(address who, uint256 xcAmplAmount) public onlyController {
         require(who != address(0));
 
         uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);
@@ -282,7 +284,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param who The address of the beneficiary.
      * @param xcAmplAmount The amount of xc-ampl tokens to be burned.
      */
-    function burn(address who, uint256 xcAmplAmount) public onlyMonetaryPolicy {
+    function burn(address who, uint256 xcAmplAmount) public onlyController {
         require(who != address(0));
 
         uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);

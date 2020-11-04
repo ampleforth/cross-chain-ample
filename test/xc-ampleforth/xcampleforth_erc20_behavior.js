@@ -54,7 +54,7 @@ async function upgradeableToken () {
       initializer: 'initialize(string,string,uint256)'
     },
   );
-  await token.setMonetaryPolicy(owner.getAddress());
+  await token.setController(owner.getAddress());
   await token.mint(owner.getAddress(), INITIAL_SUPPLY);
   return { token, owner, recipient, anotherAccount };
 }

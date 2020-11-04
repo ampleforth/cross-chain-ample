@@ -68,53 +68,53 @@ describe('XCAmpleforth:Initialization', () => {
   });
 });
 
-describe('XCAmpleforth:setMonetaryPolicy', async () => {
-  let policy, policyAddress;
+describe('XCAmpleforth:setController', async () => {
+  let controller, controllerAddress;
 
   before('setup XCAmpleforth contract', async () => {
     await setupContracts();
-    policy = accounts[1];
-    policyAddress = await policy.getAddress();
+    controller = accounts[1];
+    controllerAddress = await controller.getAddress();
   });
 
-  it('should set reference to policy contract', async function () {
+  it('should set reference to controller contract', async function () {
     await expect(
-      xcampleforth.connect(deployer).setMonetaryPolicy(policyAddress),
+      xcampleforth.connect(deployer).setController(controllerAddress),
     )
-      .to.emit(xcampleforth, 'LogMonetaryPolicyUpdated')
-      .withArgs(policyAddress);
-    expect(await xcampleforth.monetaryPolicy()).to.eq(policyAddress);
+      .to.emit(xcampleforth, 'ControllerUpdated')
+      .withArgs(controllerAddress);
+    expect(await xcampleforth.controller()).to.eq(controllerAddress);
   });
 });
 
-describe('XCAmpleforth:setMonetaryPolicy:accessControl', async () => {
-  let policy, policyAddress;
+describe('XCAmpleforth:setController:accessControl', async () => {
+  let controller, controllerAddress;
 
   before('setup XCAmpleforth contract', async () => {
     await setupContracts();
-    policy = accounts[1];
-    policyAddress = await policy.getAddress();
+    controller = accounts[1];
+    controllerAddress = await controller.getAddress();
   });
 
   it('should be callable by owner', async function () {
     await expect(
-      xcampleforth.connect(deployer).setMonetaryPolicy(policyAddress),
+      xcampleforth.connect(deployer).setController(controllerAddress),
     ).to.not.be.reverted;
   });
 });
 
-describe('XCAmpleforth:setMonetaryPolicy:accessControl', async () => {
-  let policy, policyAddress, user;
+describe('XCAmpleforth:setController:accessControl', async () => {
+  let controller, controllerAddress, user;
 
   before('setup XCAmpleforth contract', async () => {
     await setupContracts();
-    policy = accounts[1];
+    controller = accounts[1];
     user = accounts[2];
-    policyAddress = await policy.getAddress();
+    controllerAddress = await controller.getAddress();
   });
 
   it('should NOT be callable by non-owner', async function () {
-    await expect(xcampleforth.connect(user).setMonetaryPolicy(policyAddress)).to
+    await expect(xcampleforth.connect(user).setController(controllerAddress)).to
       .be.reverted;
   });
 });
@@ -126,32 +126,32 @@ describe('XCAmpleforth:Rebase:accessControl', async () => {
     await setupContracts();
     user = accounts[1];
     userAddress = await user.getAddress();
-    await xcampleforth.connect(deployer).setMonetaryPolicy(userAddress);
+    await xcampleforth.connect(deployer).setController(userAddress);
   });
 
   it('should not be callable by others', async function () {
     await expect(xcampleforth.connect(deployer).rebase(1, 1)).to.be.reverted;
   });
 
-  it('should be callable by monetary policy', async function () {
+  it('should be callable by controller', async function () {
     await expect(xcampleforth.connect(user).rebase(1, 1)).to.not.be.reverted;
   });
 });
 
 describe('XCAmpleforth:Rebase:Expansion', async () => {
   // Rebase +5M (10%), with starting balances A:750 and B:250.
-  let A, B, policy;
+  let A, B, controller;
 
   before('setup XCAmpleforth contract', async function () {
     await setupContracts();
     A = accounts[2];
     B = accounts[3];
-    policy = accounts[1];
+    controller = accounts[1];
     await xcampleforth
       .connect(deployer)
-      .setMonetaryPolicy(await policy.getAddress());
+      .setController(await controller.getAddress());
     await xcampleforth
-      .connect(policy)
+      .connect(controller)
       .mint(deployer.getAddress(), INITIAL_XCAMPL_SUPPLY);
     await xcampleforth
       .connect(deployer)
@@ -162,7 +162,9 @@ describe('XCAmpleforth:Rebase:Expansion', async () => {
   });
 
   it('should emit Rebase', async function () {
-    await expect(xcampleforth.connect(policy).rebase(1, EXPANDED_AMPL_SUPPLY))
+    await expect(
+      xcampleforth.connect(controller).rebase(1, EXPANDED_AMPL_SUPPLY),
+    )
       .to.emit(xcampleforth, 'LogRebase')
       .withArgs(1, EXPANDED_AMPL_SUPPLY);
   });
@@ -186,27 +188,27 @@ describe('XCAmpleforth:Rebase:Expansion', async () => {
 
   it('should return the new AMPL supply', async function () {
     const returnVal = await xcampleforth
-      .connect(policy)
+      .connect(controller)
       .callStatic.rebase(2, EXPANDED_AMPL_SUPPLY);
-    await xcampleforth.connect(policy).rebase(2, EXPANDED_AMPL_SUPPLY);
+    await xcampleforth.connect(controller).rebase(2, EXPANDED_AMPL_SUPPLY);
     expect(await xcampleforth.totalAMPLSupply()).to.eq(returnVal);
   });
 });
 
 describe('XCAmpleforth:Rebase:NoChange', function () {
   // Rebase (0%), with starting balances A:750 and B:250.
-  let A, B, policy;
+  let A, B, controller;
 
   before('setup XCAmpleforth contract', async function () {
     await setupContracts();
     A = accounts[2];
     B = accounts[3];
-    policy = accounts[1];
+    controller = accounts[1];
     await xcampleforth
       .connect(deployer)
-      .setMonetaryPolicy(await policy.getAddress());
+      .setController(await controller.getAddress());
     await xcampleforth
-      .connect(policy)
+      .connect(controller)
       .mint(deployer.getAddress(), INITIAL_XCAMPL_SUPPLY);
     await xcampleforth
       .connect(deployer)
@@ -217,7 +219,9 @@ describe('XCAmpleforth:Rebase:NoChange', function () {
   });
 
   it('should emit Rebase', async function () {
-    await expect(xcampleforth.connect(policy).rebase(1, INITIAL_AMPL_SUPPLY))
+    await expect(
+      xcampleforth.connect(controller).rebase(1, INITIAL_AMPL_SUPPLY),
+    )
       .to.emit(xcampleforth, 'LogRebase')
       .withArgs(1, INITIAL_AMPL_SUPPLY);
   });
@@ -242,18 +246,18 @@ describe('XCAmpleforth:Rebase:NoChange', function () {
 
 describe('XCAmpleforth:Rebase:Contraction', function () {
   // Rebase -5M (-10%), with starting balances A:750 and B:250.
-  let A, B, policy;
+  let A, B, controller;
 
   before('setup XCAmpleforth contract', async function () {
     await setupContracts();
     A = accounts[2];
     B = accounts[3];
-    policy = accounts[1];
+    controller = accounts[1];
     await xcampleforth
       .connect(deployer)
-      .setMonetaryPolicy(await policy.getAddress());
+      .setController(await controller.getAddress());
     await xcampleforth
-      .connect(policy)
+      .connect(controller)
       .mint(deployer.getAddress(), INITIAL_XCAMPL_SUPPLY);
     await xcampleforth
       .connect(deployer)
@@ -264,7 +268,9 @@ describe('XCAmpleforth:Rebase:Contraction', function () {
   });
 
   it('should emit Rebase', async function () {
-    await expect(xcampleforth.connect(policy).rebase(1, CONTRACTED_AMPL_SUPPLY))
+    await expect(
+      xcampleforth.connect(controller).rebase(1, CONTRACTED_AMPL_SUPPLY),
+    )
       .to.emit(xcampleforth, 'LogRebase')
       .withArgs(1, CONTRACTED_AMPL_SUPPLY);
   });
@@ -297,7 +303,7 @@ describe('XCAmpleforth:Transfer', function () {
     C = accounts[4];
     await xcampleforth
       .connect(deployer)
-      .setMonetaryPolicy(await deployer.getAddress());
+      .setController(await deployer.getAddress());
     await xcampleforth
       .connect(deployer)
       .mint(deployer.getAddress(), INITIAL_XCAMPL_SUPPLY);
