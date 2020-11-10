@@ -25,13 +25,13 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
     address public controller;
 
     modifier onlyController() {
-        require(msg.sender == controller);
+        require(msg.sender == controller, "XCAmpleforth: caller not controller");
         _;
     }
 
     modifier validRecipient(address to) {
-        require(to != address(0x0));
-        require(to != address(this));
+        require(to != address(0x0), "XCAmpleforth: recipient zero address");
+        require(to != address(this), "XCAmpleforth: recipient token address");
         _;
     }
 
@@ -77,22 +77,22 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
 
     /**
      * @dev Notifies Amples contract about a new rebase cycle.
-     * @param newTotalSupply The new total supply from the master chain.
+     * @param newTotalAMPLSupply The new total supply of AMPL from the master chain.
      * @return The total number of amples after the supply adjustment.
      */
-    function rebase(uint256 epoch, uint256 newTotalSupply)
+    function rebase(uint256 epoch, uint256 newTotalAMPLSupply)
         external
         onlyController
         returns (uint256)
     {
-        if (newTotalSupply == totalAMPLSupply) {
+        if (newTotalAMPLSupply == totalAMPLSupply) {
             emit LogRebase(epoch, totalAMPLSupply);
             return totalAMPLSupply;
         }
 
-        _totalSupply = _totalSupply.mul(newTotalSupply).div(totalAMPLSupply);
+        _totalSupply = _totalSupply.mul(newTotalAMPLSupply).div(totalAMPLSupply);
 
-        totalAMPLSupply = newTotalSupply;
+        totalAMPLSupply = newTotalAMPLSupply;
 
         _gonsPerAMPL = TOTAL_GONS.div(totalAMPLSupply);
 
@@ -266,14 +266,17 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param xcAmplAmount The amount of xc-ampl tokens to be minted.
      */
     function mint(address who, uint256 xcAmplAmount) public onlyController {
-        require(who != address(0));
+        require(who != address(0), "XCAmpleforth: mint address zero address");
 
         uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].add(gonValue);
         _totalSupply = _totalSupply.add(xcAmplAmount);
 
-        require(_totalSupply <= totalAMPLSupply);
-        require(_totalSupply <= MAX_SUPPLY);
+        require(
+            _totalSupply <= totalAMPLSupply,
+            "XCAmpleforth: total mint exceeded total ampl supply"
+        );
+        require(_totalSupply <= MAX_SUPPLY, "XCAmpleforth: total mint exceeded max supply");
 
         emit Transfer(address(0), who, xcAmplAmount);
     }
@@ -285,7 +288,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param xcAmplAmount The amount of xc-ampl tokens to be burned.
      */
     function burn(address who, uint256 xcAmplAmount) public onlyController {
-        require(who != address(0));
+        require(who != address(0), "XCAmpleforth: burn address zero address");
 
         uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].sub(gonValue);
