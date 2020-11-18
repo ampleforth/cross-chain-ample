@@ -265,9 +265,7 @@ contract XCAmpleforth is IERC20, OwnableUpgradeSafe {
      * @param who The address of the beneficiary.
      * @param xcAmplAmount The amount of xc-ampl tokens to be minted.
      */
-    function mint(address who, uint256 xcAmplAmount) public onlyController {
-        require(who != address(0), "XCAmpleforth: mint address zero address");
-
+    function mint(address who, uint256 xcAmplAmount) public onlyController validRecipient(who) {
         uint256 gonValue = xcAmplAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].add(gonValue);
         _totalSupply = _totalSupply.add(xcAmplAmount);

@@ -64,6 +64,16 @@ describe('XCAmpleforth:mint', () => {
     });
   });
 
+  describe('when mint address is contract address', () => {
+    it('should revert', async function () {
+      await expect(
+        xcampleforth
+          .connect(deployer)
+          .mint(xcampleforth.address, unitTokenAmount),
+      ).to.be.reverted;
+    });
+  });
+
   describe('when mint value > totalAMPLSupply', () => {
     it('should revert', async function () {
       const mintAmt = initialSupply.add(unitTokenAmount);
