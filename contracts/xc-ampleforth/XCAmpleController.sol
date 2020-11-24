@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
 import "../lib/UInt256Lib.sol";
 
+// TODO: Move all interfaces to separate source files
 interface IXCAmple {
     function totalSupply() external returns (uint256);
 
@@ -57,11 +58,12 @@ contract XCAmpleController is OwnableUpgradeSafe {
     // Reference to the cross-chain ample token contract.
     address public xcAmple;
 
-    // This module executes downstream notifications.
+    // This module executes downstream notifications and
+    // returns if all the notifications were executed successfully.
     address public rebaseRelayer;
 
     // The number of rebase cycles since inception of AMPL.
-    uint256 public currentAMPLEpoch;
+    uint256 public globalAmpleforthEpoch;
 
     // The timestamp when xcAmple rebase was executed.
     uint256 public lastRebaseTimestampSec;
@@ -127,6 +129,7 @@ contract XCAmpleController is OwnableUpgradeSafe {
         emit GatewayBurn(msg.sender, depositor, xcAmpleAmount);
     }
 
+    // TODO: Move to a 2 phase rebase, https://github.com/ampleforth/ampl-bridge-solidity/commit/6095ec82fc8ca3f36af180215c9c610f23caeb28
     /**
      * @notice Initiate a new rebase operation.
      * @param newAMPLEpoch The new epoch after rebase on the master-chain.
@@ -138,15 +141,15 @@ contract XCAmpleController is OwnableUpgradeSafe {
      *      on the rebase relayer.
      */
     function rebase(uint256 newAMPLEpoch, uint256 newTotalAMPLSupply) external onlyBridgeGateway {
-        require(newAMPLEpoch > currentAMPLEpoch, "XCAmpleController: Epoch not new");
+        require(newAMPLEpoch > globalAmpleforthEpoch, "XCAmpleController: Epoch not new");
 
         int256 recordedTotalSupply = IXCAmple(xcAmple).totalSupply().toInt256Safe();
         IXCAmple(xcAmple).rebase(newAMPLEpoch, newTotalAMPLSupply);
 
-        currentAMPLEpoch = newAMPLEpoch;
+        globalAmpleforthEpoch = newAMPLEpoch;
         int256 supplyDelta = newTotalAMPLSupply.toInt256Safe().sub(recordedTotalSupply);
         lastRebaseTimestampSec = now;
-        emit GatewayRebase(msg.sender, currentAMPLEpoch, supplyDelta, lastRebaseTimestampSec);
+        emit GatewayRebase(msg.sender, globalAmpleforthEpoch, supplyDelta, lastRebaseTimestampSec);
 
         // executes callbacks only when the rebaseRelayer reference is set
         if (rebaseRelayer != address(0)) {
@@ -159,10 +162,10 @@ contract XCAmpleController is OwnableUpgradeSafe {
      *      It is called at the time of contract creation to invoke parent class initializers and
      *      initialize the contract's state variables.
      */
-    function initialize(address xcAmple_, uint256 currentAMPLEpoch_) public initializer {
+    function initialize(address xcAmple_, uint256 globalAmpleforthEpoch_) public initializer {
         __Ownable_init();
 
         xcAmple = xcAmple_;
-        currentAMPLEpoch = currentAMPLEpoch_;
+        globalAmpleforthEpoch = globalAmpleforthEpoch_;
     }
 }

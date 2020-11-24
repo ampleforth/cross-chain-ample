@@ -30,7 +30,7 @@ describe('XCAmpleController:Initialization', () => {
   });
 
   it('should initialize the epoch', async function () {
-    expect(await controller.currentAMPLEpoch()).to.eq(1);
+    expect(await controller.globalAmpleforthEpoch()).to.eq(1);
   });
 
   it('should set the owner', async function () {

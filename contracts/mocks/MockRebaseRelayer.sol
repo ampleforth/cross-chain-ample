@@ -1,21 +1,24 @@
 pragma solidity 0.6.4;
 
 contract MockRebaseRelayer {
-    uint256 private state;
+    enum State {Failure, Revert, Success}
+    State private state;
 
     function executeAll() external view returns (bool) {
-        if (state == 0) {
+        if (state == State.Failure) {
             return false;
         }
 
-        if (state == 1) {
+        if (state == State.Revert) {
             require(false);
         }
 
-        return true;
+        if (state == State.Success) {
+            return true;
+        }
     }
 
-    function updateSuccessState(uint256 state_) external {
+    function updateSuccessState(State state_) external {
         state = state_;
     }
 }

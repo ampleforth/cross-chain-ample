@@ -56,7 +56,7 @@ describe('XCAmpleController:mint', async () => {
   describe('when mint amount is small', function () {
     it('should mint correct amount of ampl', async function () {
       await expect(controller.connect(bridge).mint(beneficiaryAddress, 1001))
-        .to.emit(mockToken, 'MockMint')
+        .to.emit(mockToken, 'MintCalled')
         .withArgs(beneficiaryAddress, 1001);
     });
     it('should log Mint event', async function () {
@@ -89,7 +89,7 @@ describe('XCAmpleController:burn', async () => {
 
   it('should burn correct amount of ampl', async function () {
     await expect(controller.connect(bridge).burn(beneficiaryAddress, 999))
-      .to.emit(mockToken, 'MockBurn')
+      .to.emit(mockToken, 'BurnCalled')
       .withArgs(beneficiaryAddress, 999);
   });
 

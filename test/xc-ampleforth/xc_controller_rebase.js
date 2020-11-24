@@ -95,7 +95,7 @@ describe('XCAmpleController:rebase', async () => {
 
   it('should update epoch', async function () {
     await controller.connect(bridge).rebase(2, 50626634);
-    expect(await controller.currentAMPLEpoch()).to.eq(2);
+    expect(await controller.globalAmpleforthEpoch()).to.eq(2);
   });
 
   it('should update lastRebaseTimestampSec', async function () {
@@ -112,7 +112,7 @@ describe('XCAmpleController:rebase', async () => {
 
   it('should invoke rebase on the token contract', async function () {
     await expect(controller.connect(bridge).rebase(2, 50626634))
-      .to.emit(mockToken, 'MockRebase')
+      .to.emit(mockToken, 'LogRebase')
       .withArgs(2, 50626634);
   });
 
