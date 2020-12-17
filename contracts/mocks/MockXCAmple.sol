@@ -1,17 +1,17 @@
 pragma solidity 0.6.4;
 
 contract MockXCAmple {
-    uint256 private _totalSupply;
+    uint256 private _totalAMPLSupply;
     event LogRebase(uint256 epoch, uint256 totalSupply);
     event MintCalled(address who, uint256 value);
     event BurnCalled(address who, uint256 value);
 
-    function totalSupply() public view returns (uint256) {
-        return _totalSupply;
+    function totalAMPLSupply() public view returns (uint256) {
+        return _totalAMPLSupply;
     }
 
-    function rebase(uint256 epoch, uint256 totalSupply_) external returns (uint256) {
-        emit LogRebase(epoch, totalSupply_);
+    function rebase(uint256 epoch, uint256 totalAMPLSupply) external returns (uint256) {
+        emit LogRebase(epoch, totalAMPLSupply);
     }
 
     function mint(address who, uint256 value) external {
@@ -22,7 +22,7 @@ contract MockXCAmple {
         emit BurnCalled(who, value);
     }
 
-    function updateTotalSupply(uint256 totalSupply_) external {
-        _totalSupply = totalSupply_;
+    function updateTotalSupply(uint256 totalAMPLSupply) external {
+        _totalAMPLSupply = totalAMPLSupply;
     }
 }

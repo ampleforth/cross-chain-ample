@@ -33,6 +33,10 @@ async function setupContracts () {
   await controller.connect(deployer).addBridgeGateway(bridgeOther.getAddress());
 }
 
+async function getBlockTime (b = 'latest') {
+  return (await ethers.provider.getBlock(b)).timestamp;
+}
+
 describe('XCAmpleController:mint:accessControl', async () => {
   beforeEach('setup XCAmpleController contract', setupContracts);
 
@@ -97,5 +101,67 @@ describe('XCAmpleController:burn', async () => {
     await expect(controller.connect(bridge).burn(beneficiaryAddress, 999))
       .to.emit(controller, 'GatewayBurn')
       .withArgs(await bridge.getAddress(), beneficiaryAddress, 999);
+  });
+});
+
+describe('XCAmpleController:reportRebase:accessControl', async () => {
+  beforeEach('setup XCAmpleController contract', setupContracts);
+
+  it('should NOT be callable by non-bridge', async function () {
+    await expect(
+      controller.connect(deployer).reportRebase(762, 234235445645645),
+    ).to.be.revertedWith('XCAmpleController: Bridge gateway not whitelisted');
+  });
+
+  it('should be callable by bridge', async function () {
+    await expect(controller.connect(bridge).reportRebase(762, 234235445645645))
+      .to.not.be.reverted;
+    await expect(
+      controller.connect(bridgeOther).reportRebase(762, 234235445645645),
+    ).to.not.be.reverted;
+  });
+});
+
+describe('XCAmpleController:reportRebase', async () => {
+  beforeEach('setup XCAmpleController contract', setupContracts);
+
+  it('should update the next rebase data', async function () {
+    expect(await controller.nextAmpleforthEpoch()).to.eq(0);
+    expect(await controller.nextTotalAMPLSupply()).to.eq(0);
+
+    await controller.connect(bridge).reportRebase(762, 234235445645645);
+    expect(await controller.nextAmpleforthEpoch()).to.eq(762);
+    expect(await controller.nextTotalAMPLSupply()).to.eq(234235445645645);
+
+    await controller.connect(bridge).reportRebase(763, 56464566546);
+    expect(await controller.nextAmpleforthEpoch()).to.eq(763);
+    expect(await controller.nextTotalAMPLSupply()).to.eq(56464566546);
+  });
+
+  it('should log the rebase report', async function () {
+    const r = await controller
+      .connect(bridge)
+      .reportRebase(762, 234235445645645);
+    const t = await getBlockTime(r.blockNumber);
+    expect((async () => r)())
+      .to.emit(controller, 'GatewayRebaseReported')
+      .withArgs(await bridge.getAddress(), 762, 234235445645645, t);
+  });
+});
+
+describe('XCAmpleController:mint:accessControl', async () => {
+  beforeEach('setup XCAmpleController contract', setupContracts);
+
+  it('should NOT be callable by non-bridge', async function () {
+    await expect(
+      controller.connect(deployer).mint(beneficiaryAddress, 1234),
+    ).to.be.revertedWith('XCAmpleController: Bridge gateway not whitelisted');
+  });
+
+  it('should be callable by bridge', async function () {
+    await expect(controller.connect(bridge).mint(beneficiaryAddress, 1234)).to
+      .not.be.reverted;
+    await expect(controller.connect(bridgeOther).mint(beneficiaryAddress, 1234))
+      .to.not.be.reverted;
   });
 });
