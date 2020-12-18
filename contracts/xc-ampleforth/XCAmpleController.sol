@@ -8,7 +8,7 @@ import "../lib/UInt256Lib.sol";
 
 // TODO: Move all interfaces to separate source files
 interface IXCAmple {
-    function totalSupply() external returns (uint256);
+    function totalAMPLSupply() external returns (uint256);
 
     function rebase(uint256 epoch, uint256 totalSupply_) external returns (uint256);
 
@@ -46,12 +46,14 @@ contract XCAmpleController is OwnableUpgradeSafe {
         uint256 xcAmpleAmount
     );
 
-    event GatewayRebase(
+    event GatewayRebaseReported(
         address indexed bridgeGateway,
         uint256 indexed epoch,
-        int256 requestedSupplyAdjustment,
+        uint256 totalAMPLSupply,
         uint256 timestampSec
     );
+
+    event LogRebase(uint256 indexed epoch, int256 requestedSupplyAdjustment, uint256 timestampSec);
 
     event GatewayWhitelistUpdated(address indexed bridgeGateway, bool active);
 
@@ -67,6 +69,10 @@ contract XCAmpleController is OwnableUpgradeSafe {
 
     // The timestamp when xcAmple rebase was executed.
     uint256 public lastRebaseTimestampSec;
+
+    // The information about the most recent AMPL rebase reported through the bridge gateway
+    uint256 public nextAmpleforthEpoch;
+    uint256 public nextTotalAMPLSupply;
 
     // White-list of trusted bridge gateway contracts
     mapping(address => bool) public whitelistedBridgeGateways;
@@ -129,27 +135,48 @@ contract XCAmpleController is OwnableUpgradeSafe {
         emit GatewayBurn(msg.sender, depositor, xcAmpleAmount);
     }
 
-    // TODO: Move to a 2 phase rebase, https://github.com/ampleforth/ampl-bridge-solidity/commit/6095ec82fc8ca3f36af180215c9c610f23caeb28
+    /**
+     * @notice Upcoming rebase information reported by a bridge gateway and updated in storage.
+     * @param nextAmpleforthEpoch_ The new epoch after rebase on the master-chain.
+     * @param nextTotalAMPLSupply_ The new AMPL total supply after rebase on the master-chain.
+     */
+    function reportRebase(uint256 nextAmpleforthEpoch_, uint256 nextTotalAMPLSupply_)
+        external
+        onlyBridgeGateway
+    {
+        nextAmpleforthEpoch = nextAmpleforthEpoch_;
+        nextTotalAMPLSupply = nextTotalAMPLSupply_;
+
+        emit GatewayRebaseReported(msg.sender, nextAmpleforthEpoch, nextTotalAMPLSupply, now);
+    }
+
     /**
      * @notice Initiate a new rebase operation.
-     * @param newAMPLEpoch The new epoch after rebase on the master-chain.
-     * @param newTotalAMPLSupply The new AMPL total supply after rebase on the master-chain.
-     * @dev Bridge reports new epoch and total supply, which triggers rebase on the current-chain.
+     * @dev Once the Bridge gateway reports new epoch and total supply Rebase can be triggered on the current-chain.
      *      The supply delta is calculated as the difference between the new total AMPL supply
      *      and the recorded AMPL total supply on the current-chain.
      *      After rebase, it notifies down-stream platforms by executing post-rebase callbacks
      *      on the rebase relayer.
      */
-    function rebase(uint256 newAMPLEpoch, uint256 newTotalAMPLSupply) external onlyBridgeGateway {
-        require(newAMPLEpoch > globalAmpleforthEpoch, "XCAmpleController: Epoch not new");
+    function rebase() public {
+        // recently reported epoch needs to be more than current globalEpoch in storage
+        require(nextAmpleforthEpoch > globalAmpleforthEpoch, "XCAmpleController: Epoch not new");
 
-        int256 recordedTotalSupply = IXCAmple(xcAmple).totalSupply().toInt256Safe();
-        IXCAmple(xcAmple).rebase(newAMPLEpoch, newTotalAMPLSupply);
+        // the totalAMPLSupply recorded on the current-chain
+        int256 recordedTotalAMPLSupply = IXCAmple(xcAmple).totalAMPLSupply().toInt256Safe();
 
-        globalAmpleforthEpoch = newAMPLEpoch;
-        int256 supplyDelta = newTotalAMPLSupply.toInt256Safe().sub(recordedTotalSupply);
+        // execute rebase on the current-chain
+        IXCAmple(xcAmple).rebase(nextAmpleforthEpoch, nextTotalAMPLSupply);
+
+        // calculate supply delta
+        int256 supplyDelta = nextTotalAMPLSupply.toInt256Safe().sub(recordedTotalAMPLSupply);
+
+        // update state variables on the current-chain
+        globalAmpleforthEpoch = nextAmpleforthEpoch;
         lastRebaseTimestampSec = now;
-        emit GatewayRebase(msg.sender, globalAmpleforthEpoch, supplyDelta, lastRebaseTimestampSec);
+
+        // log rebase event
+        emit LogRebase(globalAmpleforthEpoch, supplyDelta, lastRebaseTimestampSec);
 
         // executes callbacks only when the rebaseRelayer reference is set
         if (rebaseRelayer != address(0)) {
