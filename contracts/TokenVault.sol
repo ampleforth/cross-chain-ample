@@ -58,6 +58,11 @@ contract TokenVault is Ownable {
      * @param bridgeGateway The address of the bridge gateway contract.
      */
     function addBridgeGateway(address bridgeGateway) external onlyOwner {
+        require(
+            !whitelistedBridgeGateways[bridgeGateway],
+            "TokenVault: Bridge gateway already whitelisted"
+        );
+
         whitelistedBridgeGateways[bridgeGateway] = true;
         emit GatewayWhitelistUpdated(bridgeGateway, true);
     }
@@ -67,6 +72,11 @@ contract TokenVault is Ownable {
      * @param bridgeGateway The address of the bridge gateway contract.
      */
     function removeBridgeGateway(address bridgeGateway) external onlyOwner {
+        require(
+            whitelistedBridgeGateways[bridgeGateway],
+            "TokenVault: Bridge gateway not whitelisted"
+        );
+
         delete whitelistedBridgeGateways[bridgeGateway];
         emit GatewayWhitelistUpdated(bridgeGateway, false);
     }

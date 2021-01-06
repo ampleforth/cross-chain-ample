@@ -56,6 +56,13 @@ describe('TokenVault:addBridgeGateway', async () => {
     expect(await vault.whitelistedBridgeGateways(bridgeAddress)).to.be.true;
   });
 
+  it('should fail on re-add', async function () {
+    await vault.connect(deployer).addBridgeGateway(bridgeAddress);
+    await expect(
+      vault.connect(deployer).addBridgeGateway(bridgeAddress),
+    ).to.be.revertedWith('TokenVault: Bridge gateway already whitelisted');
+  });
+
   it('should NOT affect others', async function () {
     expect(await vault.whitelistedBridgeGateways(otherBridgeAddress)).to.be
       .false;
@@ -78,6 +85,13 @@ describe('TokenVault:removeBridgeGateway', async () => {
     await expect(
       vault.connect(accounts[5]).removeBridgeGateway(bridgeAddress),
     ).to.be.revertedWith('Ownable: caller is not the owner');
+  });
+
+  it('should fail on re-remove', async function () {
+    await vault.connect(deployer).removeBridgeGateway(bridgeAddress);
+    await expect(
+      vault.connect(deployer).removeBridgeGateway(bridgeAddress),
+    ).to.be.revertedWith('TokenVault: Bridge gateway not whitelisted');
   });
 
   it('should be callable by owner', async function () {
