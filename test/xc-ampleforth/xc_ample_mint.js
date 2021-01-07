@@ -28,7 +28,7 @@ async function setupContracts () {
   await xcAmple.setController(deployer.getAddress());
 
   // fetch initial supply
-  initialSupply = await xcAmple.totalAMPLSupply();
+  initialSupply = await xcAmple.globalAMPLSupply();
 }
 
 describe('XCAmple:mint:accessControl', () => {
@@ -68,7 +68,7 @@ describe('XCAmple:mint', () => {
     });
   });
 
-  describe('when mint value > totalAMPLSupply', () => {
+  describe('when mint value > globalAMPLSupply', () => {
     it('should revert', async function () {
       const mintAmt = initialSupply.add(unitTokenAmount);
       await expect(
@@ -77,7 +77,7 @@ describe('XCAmple:mint', () => {
     });
   });
 
-  describe('when total supply > totalAMPLSupply', () => {
+  describe('when total supply > globalAMPLSupply', () => {
     it('should revert', async function () {
       await xcAmple
         .connect(deployer)

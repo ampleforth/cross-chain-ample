@@ -1,25 +1,13 @@
-pragma solidity 0.6.4;
+// SPDX-License-Identifier: GPL-3.0-or-later
+pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SignedSafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
 import "../lib/UInt256Lib.sol";
-
-// TODO: Move all interfaces to separate source files
-interface IXCAmple {
-    function totalAMPLSupply() external returns (uint256);
-
-    function rebase(uint256 epoch, uint256 totalSupply_) external returns (uint256);
-
-    function mint(address who, uint256 value) external;
-
-    function burn(address who, uint256 value) external;
-}
-
-interface IBatchTxExecutor {
-    function executeAll() external returns (bool);
-}
+import "../bridge-interfaces/IXCAmple.sol";
+import "../bridge-interfaces/IBatchTxExecutor.sol";
 
 /**
  * @title XC(Cross-Chain)Ample Controller
@@ -49,7 +37,7 @@ contract XCAmpleController is OwnableUpgradeSafe {
     event GatewayRebaseReported(
         address indexed bridgeGateway,
         uint256 indexed epoch,
-        uint256 totalAMPLSupply,
+        uint256 globalAMPLSupply,
         uint256 timestampSec
     );
 
@@ -71,8 +59,8 @@ contract XCAmpleController is OwnableUpgradeSafe {
     uint256 public lastRebaseTimestampSec;
 
     // The information about the most recent AMPL rebase reported through the bridge gateway
-    uint256 public nextAmpleforthEpoch;
-    uint256 public nextTotalAMPLSupply;
+    uint256 public nextGlobalAmpleforthEpoch;
+    uint256 public nextGlobalAMPLSupply;
 
     // White-list of trusted bridge gateway contracts
     mapping(address => bool) public whitelistedBridgeGateways;
@@ -137,17 +125,17 @@ contract XCAmpleController is OwnableUpgradeSafe {
 
     /**
      * @notice Upcoming rebase information reported by a bridge gateway and updated in storage.
-     * @param nextAmpleforthEpoch_ The new epoch after rebase on the master-chain.
-     * @param nextTotalAMPLSupply_ The new AMPL total supply after rebase on the master-chain.
+     * @param nextGlobalAmpleforthEpoch_ The new epoch after rebase on the master-chain.
+     * @param nextGlobalAMPLSupply_ The new AMPL total supply after rebase on the master-chain.
      */
-    function reportRebase(uint256 nextAmpleforthEpoch_, uint256 nextTotalAMPLSupply_)
+    function reportRebase(uint256 nextGlobalAmpleforthEpoch_, uint256 nextGlobalAMPLSupply_)
         external
         onlyBridgeGateway
     {
-        nextAmpleforthEpoch = nextAmpleforthEpoch_;
-        nextTotalAMPLSupply = nextTotalAMPLSupply_;
+        nextGlobalAmpleforthEpoch = nextGlobalAmpleforthEpoch_;
+        nextGlobalAMPLSupply = nextGlobalAMPLSupply_;
 
-        emit GatewayRebaseReported(msg.sender, nextAmpleforthEpoch, nextTotalAMPLSupply, now);
+        emit GatewayRebaseReported(msg.sender, nextGlobalAmpleforthEpoch, nextGlobalAMPLSupply, now);
     }
 
     /**
@@ -160,19 +148,19 @@ contract XCAmpleController is OwnableUpgradeSafe {
      */
     function rebase() public {
         // recently reported epoch needs to be more than current globalEpoch in storage
-        require(nextAmpleforthEpoch > globalAmpleforthEpoch, "XCAmpleController: Epoch not new");
+        require(nextGlobalAmpleforthEpoch > globalAmpleforthEpoch, "XCAmpleController: Epoch not new");
 
-        // the totalAMPLSupply recorded on the current-chain
-        int256 recordedTotalAMPLSupply = IXCAmple(xcAmple).totalAMPLSupply().toInt256Safe();
+        // the globalAMPLSupply recorded on the current-chain
+        int256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply().toInt256Safe();
 
         // execute rebase on the current-chain
-        IXCAmple(xcAmple).rebase(nextAmpleforthEpoch, nextTotalAMPLSupply);
+        IXCAmple(xcAmple).rebase(nextGlobalAmpleforthEpoch, nextGlobalAMPLSupply);
 
         // calculate supply delta
-        int256 supplyDelta = nextTotalAMPLSupply.toInt256Safe().sub(recordedTotalAMPLSupply);
+        int256 supplyDelta = nextGlobalAMPLSupply.toInt256Safe().sub(recordedGlobalAMPLSupply);
 
         // update state variables on the current-chain
-        globalAmpleforthEpoch = nextAmpleforthEpoch;
+        globalAmpleforthEpoch = nextGlobalAmpleforthEpoch;
         lastRebaseTimestampSec = now;
 
         // log rebase event

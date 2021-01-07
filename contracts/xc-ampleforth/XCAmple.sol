@@ -1,4 +1,5 @@
-pragma solidity 0.6.4;
+// SPDX-License-Identifier: GPL-3.0-or-later
+pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
@@ -13,13 +14,12 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
  *
  *      Additionally, the XCAmple contract lets the XCAmpleController
  *      `mint` or `burn` tokens.
- *
  */
 contract XCAmple is IERC20, OwnableUpgradeSafe {
     // PLEASE EXERCISE CAUTION BEFORE CHANGING ANY ACCOUNTING OR MATH
     using SafeMath for uint256;
 
-    event LogRebase(uint256 indexed epoch, uint256 totalAMPLSupply);
+    event LogRebase(uint256 indexed epoch, uint256 globalAMPLSupply);
     event ControllerUpdated(address controller);
 
     // Used for authentication
@@ -52,8 +52,10 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
     string private _symbol;
     uint8 private _decimals;
 
-    // The total supply of AMPL
-    uint256 public totalAMPLSupply;
+    // The total supply of AMPL token
+    uint256 public globalAMPLSupply;
+
+    // AMPL's internal scalar, co-efficient of expansion/contraction
     uint256 private _gonsPerAMPL;
 
     // The total supply of xcAmple, ie) the total xcAmple currently in circulation
@@ -78,27 +80,27 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
 
     /**
      * @dev XCAmpleController notifies this contract about a new rebase cycle.
-     * @param newTotalAMPLSupply The new total supply of AMPL from the master chain.
+     * @param newGlobalAMPLSupply The new total supply of AMPL from the master chain.
      * @return The new total AMPL supply.
      */
-    function rebase(uint256 epoch, uint256 newTotalAMPLSupply)
+    function rebase(uint256 epoch, uint256 newGlobalAMPLSupply)
         external
         onlyController
         returns (uint256)
     {
-        if (newTotalAMPLSupply == totalAMPLSupply) {
-            emit LogRebase(epoch, totalAMPLSupply);
-            return totalAMPLSupply;
+        if (newGlobalAMPLSupply == globalAMPLSupply) {
+            emit LogRebase(epoch, globalAMPLSupply);
+            return globalAMPLSupply;
         }
 
-        _totalSupply = _totalSupply.mul(newTotalAMPLSupply).div(totalAMPLSupply);
+        _totalSupply = _totalSupply.mul(newGlobalAMPLSupply).div(globalAMPLSupply);
 
-        totalAMPLSupply = newTotalAMPLSupply;
+        globalAMPLSupply = newGlobalAMPLSupply;
 
-        _gonsPerAMPL = TOTAL_GONS.div(totalAMPLSupply);
+        _gonsPerAMPL = TOTAL_GONS.div(globalAMPLSupply);
 
-        emit LogRebase(epoch, totalAMPLSupply);
-        return totalAMPLSupply;
+        emit LogRebase(epoch, globalAMPLSupply);
+        return globalAMPLSupply;
     }
 
     /**
@@ -109,7 +111,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
     function initialize(
         string memory name,
         string memory symbol,
-        uint256 totalAMPLSupply_
+        uint256 globalAMPLSupply_
     ) public initializer {
         __Ownable_init();
 
@@ -117,10 +119,10 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
         _symbol = symbol;
         _decimals = uint8(DECIMALS);
 
-        totalAMPLSupply = totalAMPLSupply_;
+        globalAMPLSupply = globalAMPLSupply_;
         _totalSupply = 0;
 
-        _gonsPerAMPL = TOTAL_GONS.div(totalAMPLSupply);
+        _gonsPerAMPL = TOTAL_GONS.div(globalAMPLSupply);
     }
 
     /**
@@ -271,7 +273,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
         _gonBalances[who] = _gonBalances[who].add(gonValue);
         _totalSupply = _totalSupply.add(xcAmpleAmount);
 
-        require(_totalSupply <= totalAMPLSupply, "XCAmple: total mint exceeded total ampl supply");
+        require(_totalSupply <= globalAMPLSupply, "XCAmple: total mint exceeded total ampl supply");
         require(_totalSupply <= MAX_SUPPLY, "XCAmple: total mint exceeded max supply");
 
         emit Transfer(address(0), who, xcAmpleAmount);

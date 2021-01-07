@@ -1,5 +1,6 @@
 const { ethers, upgrades } = require('@nomiclabs/buidler');
 const { expect } = require('chai');
+const { increaseTime } = require('../helpers/ethers_helpers');
 
 let accounts,
   deployer,
@@ -18,7 +19,7 @@ async function setupContracts () {
   mockToken = await (await ethers.getContractFactory('MockXCAmple'))
     .connect(deployer)
     .deploy();
-  await mockToken.updateTotalSupply(1000);
+  await mockToken.updateGlobalAMPLSupply(1000);
 
   mockRebaseRelayer = await (
     await ethers.getContractFactory('MockRebaseRelayer')
@@ -39,18 +40,6 @@ async function setupContracts () {
   await controller
     .connect(deployer)
     .setRebaseRelayer(ethers.constants.AddressZero);
-}
-
-async function getBlockTime () {
-  return (await ethers.provider.getBlock('latest')).timestamp;
-}
-
-async function increaseTime (seconds) {
-  await ethers.provider.send('evm_mine', [
-    ethers.BigNumber.from(seconds)
-      .add(await getBlockTime())
-      .toNumber()
-  ]);
 }
 
 describe('XCAmpleController:rebase:epoch', async () => {
@@ -77,7 +66,7 @@ describe('XCAmpleController:rebase:epoch', async () => {
 describe('XCAmpleController:rebase', async () => {
   beforeEach('setup XCAmpleController contract', async () => {
     await setupContracts();
-    await mockToken.updateTotalSupply(39992123);
+    await mockToken.updateGlobalAMPLSupply(39992123);
   });
 
   it('should update epoch', async function () {
@@ -103,7 +92,7 @@ describe('XCAmpleController:rebase', async () => {
   it('should invoke rebase on the token contract', async function () {
     await controller.connect(bridge).reportRebase(2, 50626634);
     await expect(controller.connect(rebaseCaller).rebase())
-      .to.emit(mockToken, 'LogRebase')
+      .to.emit(mockToken, 'Rebase')
       .withArgs(2, 50626634);
   });
 
@@ -137,7 +126,7 @@ describe('XCAmpleController:rebase', async () => {
 describe('XCAmpleController:rebase:contraction', async () => {
   beforeEach('setup XCAmpleController contract', async () => {
     await setupContracts();
-    await mockToken.updateTotalSupply(39992123);
+    await mockToken.updateGlobalAMPLSupply(39992123);
   });
 
   it('should log Rebase with supply delta', async function () {
@@ -153,7 +142,7 @@ describe('XCAmpleController:rebase:contraction', async () => {
 describe('XCAmpleController:rebase:noChange', async () => {
   beforeEach('setup XCAmpleController contract', async () => {
     await setupContracts();
-    await mockToken.updateTotalSupply(39992123);
+    await mockToken.updateGlobalAMPLSupply(39992123);
   });
 
   it('should log Rebase with supply delta', async function () {

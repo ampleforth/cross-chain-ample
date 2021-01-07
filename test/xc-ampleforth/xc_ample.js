@@ -49,8 +49,8 @@ describe('XCAmple', () => {
 describe('XCAmple:Initialization', () => {
   before('setup XCAmple contract', setupContracts);
 
-  it('should set the totalAMPLSupply', async function () {
-    expect(await xcAmple.totalAMPLSupply()).to.eq(INITIAL_AMPL_SUPPLY);
+  it('should set the globalAMPLSupply', async function () {
+    expect(await xcAmple.globalAMPLSupply()).to.eq(INITIAL_AMPL_SUPPLY);
   });
 
   it('should set the totalSupply', async function () {
@@ -164,8 +164,8 @@ describe('XCAmple:Rebase:Expansion', async () => {
       .withArgs(1, EXPANDED_AMPL_SUPPLY);
   });
 
-  it('should increase the totalAMPLSupply', async function () {
-    expect(await xcAmple.totalAMPLSupply()).to.eq(EXPANDED_AMPL_SUPPLY);
+  it('should increase the globalAMPLSupply', async function () {
+    expect(await xcAmple.globalAMPLSupply()).to.eq(EXPANDED_AMPL_SUPPLY);
   });
 
   it('should increase the totalSupply', async function () {
@@ -186,7 +186,7 @@ describe('XCAmple:Rebase:Expansion', async () => {
       .connect(controller)
       .callStatic.rebase(2, EXPANDED_AMPL_SUPPLY);
     await xcAmple.connect(controller).rebase(2, EXPANDED_AMPL_SUPPLY);
-    expect(await xcAmple.totalAMPLSupply()).to.eq(returnVal);
+    expect(await xcAmple.globalAMPLSupply()).to.eq(returnVal);
   });
 });
 
@@ -219,8 +219,8 @@ describe('XCAmple:Rebase:NoChange', function () {
       .withArgs(1, INITIAL_AMPL_SUPPLY);
   });
 
-  it('should NOT CHANGE the totalAMPLSupply', async function () {
-    expect(await xcAmple.totalAMPLSupply()).to.eq(INITIAL_AMPL_SUPPLY);
+  it('should NOT CHANGE the globalAMPLSupply', async function () {
+    expect(await xcAmple.globalAMPLSupply()).to.eq(INITIAL_AMPL_SUPPLY);
   });
 
   it('should NOT CHANGE the totalSupply', async function () {
@@ -266,8 +266,8 @@ describe('XCAmple:Rebase:Contraction', function () {
       .withArgs(1, CONTRACTED_AMPL_SUPPLY);
   });
 
-  it('should decrease the totalAMPLSupply', async function () {
-    expect(await xcAmple.totalAMPLSupply()).to.eq(CONTRACTED_AMPL_SUPPLY);
+  it('should decrease the globalAMPLSupply', async function () {
+    expect(await xcAmple.globalAMPLSupply()).to.eq(CONTRACTED_AMPL_SUPPLY);
   });
 
   it('should decrease the totalSupply', async function () {
