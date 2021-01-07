@@ -23,7 +23,9 @@ async function setupContracts () {
   xcAmpl = await (await ethers.getContractFactory('MockXCAmpl'))
     .connect(deployer)
     .deploy();
-  xcController = await (await ethers.getContractFactory('MockXCAmpleController'))
+  xcController = await (
+    await ethers.getContractFactory('MockXCAmpleController')
+  )
     .connect(deployer)
     .deploy();
 

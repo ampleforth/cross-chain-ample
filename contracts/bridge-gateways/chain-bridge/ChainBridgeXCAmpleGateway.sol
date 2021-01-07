@@ -78,16 +78,10 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         uint256 amount,
         uint256 globalAMPLSupply
     ) external onlyOwner returns (bool) {
-
         uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmpl).globalAMPLSupply();
         uint256 mintAmount = amount.mul(recordedGlobalAMPLSupply).div(globalAMPLSupply);
 
-        emit XCTransferIn(
-            recipient,
-            globalAMPLSupply,
-            mintAmount,
-            recordedGlobalAMPLSupply
-        );
+        emit XCTransferIn(recipient, globalAMPLSupply, mintAmount, recordedGlobalAMPLSupply);
 
         IXCAmpleController(xcController).mint(recipient, mintAmount);
 
@@ -107,7 +101,6 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         uint256 amount,
         uint256 globalAMPLSupply
     ) external onlyOwner returns (bool) {
-
         uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmpl).globalAMPLSupply();
         require(
             globalAMPLSupply == recordedGlobalAMPLSupply,

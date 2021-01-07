@@ -135,7 +135,12 @@ contract XCAmpleController is OwnableUpgradeSafe {
         nextGlobalAmpleforthEpoch = nextGlobalAmpleforthEpoch_;
         nextGlobalAMPLSupply = nextGlobalAMPLSupply_;
 
-        emit GatewayRebaseReported(msg.sender, nextGlobalAmpleforthEpoch, nextGlobalAMPLSupply, now);
+        emit GatewayRebaseReported(
+            msg.sender,
+            nextGlobalAmpleforthEpoch,
+            nextGlobalAMPLSupply,
+            now
+        );
     }
 
     /**
@@ -148,7 +153,10 @@ contract XCAmpleController is OwnableUpgradeSafe {
      */
     function rebase() public {
         // recently reported epoch needs to be more than current globalEpoch in storage
-        require(nextGlobalAmpleforthEpoch > globalAmpleforthEpoch, "XCAmpleController: Epoch not new");
+        require(
+            nextGlobalAmpleforthEpoch > globalAmpleforthEpoch,
+            "XCAmpleController: Epoch not new"
+        );
 
         // the globalAMPLSupply recorded on the current-chain
         int256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply().toInt256Safe();

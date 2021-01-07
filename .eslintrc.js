@@ -20,6 +20,7 @@ module.exports = {
   rules: {
     'prettier/prettier': 0,
     'require-jsdoc': 0,
+    'guard-for-in': 0,
     semi: [2, 'always'],
     'prefer-const': 2,
     'no-unused-expressions': 0,
@@ -133,6 +134,7 @@ module.exports = {
           'str',
           'cpi',
           'len',
+          'cmp',
 
           // project-specific
           'rebase',
@@ -169,6 +171,9 @@ module.exports = {
           'chainbridge',
           'amples',
           'xcampl',
+          'acala',
+          'rebasing',
+          'depositer',
 
           // names
           'nithin',

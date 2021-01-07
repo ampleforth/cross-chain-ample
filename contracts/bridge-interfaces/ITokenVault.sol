@@ -2,7 +2,15 @@
 pragma solidity 0.6.12;
 
 interface ITokenVault {
-    function lock(address token, address depositor, uint256 amount) external;
+    function lock(
+        address token,
+        address depositor,
+        uint256 amount
+    ) external;
 
-    function unlock(address token, address recipient, uint256 amount) external;
+    function unlock(
+        address token,
+        address recipient,
+        uint256 amount
+    ) external;
 }

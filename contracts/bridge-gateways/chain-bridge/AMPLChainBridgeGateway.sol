@@ -52,7 +52,6 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         onlyOwner
         returns (bool)
     {
-
         uint256 recordedGlobalAmpleforthEpoch = IAmpleforthPolicy(policy).epoch();
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
 
@@ -115,12 +114,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
         uint256 unlockAmount = amount.mul(recordedGlobalAMPLSupply).div(globalAMPLSupply);
 
-        emit XCTransferIn(
-            recipient,
-            globalAMPLSupply,
-            unlockAmount,
-            recordedGlobalAMPLSupply
-        );
+        emit XCTransferIn(recipient, globalAMPLSupply, unlockAmount, recordedGlobalAMPLSupply);
 
         ITokenVault(vault).unlock(ampl, recipient, unlockAmount);
 
