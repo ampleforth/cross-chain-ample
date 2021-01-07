@@ -9,11 +9,13 @@ Currently supports integration with ChainSafe's [chain-bridge](https://github.co
 ### Working Bridges
   * [ChainBridge](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-ChainBridge)
 
-## Components
+## Contracts
 
 1. [XC-Ampleforth](./contracts/xc-ampleforth) - Satellite chain
 2. [BridgeGateways](./contracts/bridge-gateways/chain-bridge) - Base chain & Satellite chain
 3. [TokenVault](./contracts/TokenVault.sol) - Base chain
+
+End to end architecture is described [here](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-Bridge-Architecture).
 
 ## Getting Started
 
