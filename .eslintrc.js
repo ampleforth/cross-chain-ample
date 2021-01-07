@@ -95,6 +95,11 @@ module.exports = {
           'dns',
           'Srv',
           'ethersproject',
+          'hexlify',
+          'utf8',
+          'Utf8Bytes',
+          'keccak256',
+          'Sighash',
 
           // shorthand
           'eth',
@@ -126,6 +131,8 @@ module.exports = {
           'opcode',
           'aprox',
           'str',
+          'cpi',
+          'len',
 
           // project-specific
           'rebase',
@@ -161,12 +168,13 @@ module.exports = {
           'chainsafe',
           'chainbridge',
           'amples',
+          'xcampl',
 
           // names
           'nithin',
           'naguib',
         ],
-        skipIfMatch: ['http(s)?://[^s]*', 'Sha3', '0x*'],
+        skipIfMatch: ['http(s)?://[^s]*', 'Sha3', '0x*', 'Utf8'],
         minLength: 3,
       },
     ],
