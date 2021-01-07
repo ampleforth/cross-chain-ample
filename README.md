@@ -4,7 +4,7 @@ Solidity contracts for cross-chain AMPL through bridges.
 
 Currently supports integration with ChainSafe's [chain-bridge](https://github.com/ChainSafe/chainbridge-solidity). However it could work with any bridge which supports generic data transfer. To integrate with a new bridge, custom bridge specific 'bridge-gateway' contracts need to be implemented which deals with bridge specific ABIs and data parsing.
 
-[Read more](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-Bridge-Primer)
+[Get up to speed](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-Bridge-Primer).
 
 ### Working Bridges
   * [ChainBridge](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-ChainBridge)
