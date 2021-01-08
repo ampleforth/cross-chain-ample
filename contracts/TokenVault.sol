@@ -7,16 +7,16 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title TokenVault
- * @dev This is a holder contract for Tokens which will be deployed on the 'master' chain (Ethereum).
+ * @dev This is a holder contract for Tokens which will be deployed on the base chain (Ethereum).
  *
- *      When a user transfers Tokens from the master chain to another chain
- *      through a bridge, Tokens are 'locked' in this vault contract
- *      and 'bridge-secured' Tokens (xc-tokens) are 'mint' on the other chain.
+ *      When a user transfers Tokens from the base to a satellite chain
+ *      Tokens are 'locked' in this vault contract
+ *      and 'bridge-secured' Tokens (xc-tokens) are 'mint' on the satellite chain.
  *      This vault contract transfers Tokens from the depositor's wallet to itself.
  *
- *      When a user transfers xc-tokens from another chain back to the master chain
- *      through a chain-bridge instance, xc-tokens are 'burnt' on the other chain
- *      and locked Tokens are 'unlocked' from this vault contract on the master chain.
+ *      When a user transfers xc-tokens from a satellite chain back to the base chain
+ *      through a chain-bridge instance, xc-tokens are 'burnt' on a satellite chain
+ *      and locked Tokens are 'unlocked' from this vault contract on the base chain.
  *      The vault contract transfers Tokens from itself to the recipient's wallet.
  *
  *      The vault owner curates a list of bridge-gateways which are allowed to
