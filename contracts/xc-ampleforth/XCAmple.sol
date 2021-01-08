@@ -8,8 +8,8 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 /**
  * @title XC(cross-chain)Ample ERC20 token
  *
- * @dev This is a 'bridge-secured' implementation of the AMPL ERC20 token on
- *      EVM compilable chains. XCAmple behaves exactly the same as the AMPL does
+ * @dev This is a 'bridge-secured' implementation of the AMPL ERC20 token deployed on
+ *      EVM compilable satellite chains. XCAmple behaves exactly the same as the AMPL does
  *      on Ethereum, wrt. rebasing and balance changes.
  *
  *      Additionally, the XCAmple contract lets the XCAmpleController
@@ -80,7 +80,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
 
     /**
      * @dev XCAmpleController notifies this contract about a new rebase cycle.
-     * @param newGlobalAMPLSupply The new total supply of AMPL from the master chain.
+     * @param newGlobalAMPLSupply The new total supply of AMPL from the base chain.
      * @return The new total AMPL supply.
      */
     function rebase(uint256 epoch, uint256 newGlobalAMPLSupply)
@@ -104,9 +104,9 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
     }
 
     /**
-     * @dev ZOS upgradable contract initialization method.
+     * @dev ZOS upgradeable contract initialization method.
      *      It is called at the time of contract creation to invoke parent class initializers and
-     *      initialize the contract's state variables.
+     *      initialize the contract state variables.
      */
     function initialize(
         string memory name,

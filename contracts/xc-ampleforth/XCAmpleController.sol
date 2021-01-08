@@ -101,10 +101,10 @@ contract XCAmpleController is OwnableUpgradeSafe {
 
     /**
      * @notice Mint xcAmples to a recipient.
-     * @dev Bridge locks AMPLs on the master-chain and mints xcAmples on the current-chain.
+     * @dev Bridge mints xcAmples on this satellite chain.
      *
      * @param recipient The address of the recipient.
-     * @param xcAmpleAmount The amount of xcAmples to be mint on the current-chain.
+     * @param xcAmpleAmount The amount of xcAmples to be mint on this chain.
      */
     function mint(address recipient, uint256 xcAmpleAmount) external onlyBridgeGateway {
         IXCAmple(xcAmple).mint(recipient, xcAmpleAmount);
@@ -113,10 +113,10 @@ contract XCAmpleController is OwnableUpgradeSafe {
 
     /**
      * @notice Burn xcAmples from depositor.
-     * @dev Bridge burns xcAmples on the current-chain and unlocks AMPLs on the master-chain.
+     * @dev Bridge burns xcAmples on this satellite chain.
      *
      * @param depositor The address of the depositor.
-     * @param xcAmpleAmount The amount of xcAmples to be burnt on the current-chain.
+     * @param xcAmpleAmount The amount of xcAmples to be burnt on this chain.
      */
     function burn(address depositor, uint256 xcAmpleAmount) external onlyBridgeGateway {
         IXCAmple(xcAmple).burn(depositor, xcAmpleAmount);
@@ -125,8 +125,8 @@ contract XCAmpleController is OwnableUpgradeSafe {
 
     /**
      * @notice Upcoming rebase information reported by a bridge gateway and updated in storage.
-     * @param nextGlobalAmpleforthEpoch_ The new epoch after rebase on the master-chain.
-     * @param nextGlobalAMPLSupply_ The new AMPL total supply after rebase on the master-chain.
+     * @param nextGlobalAmpleforthEpoch_ The new epoch after rebase on the base chain.
+     * @param nextGlobalAMPLSupply_ The new globalAMPLSupply after rebase on the base chain.
      */
     function reportRebase(uint256 nextGlobalAmpleforthEpoch_, uint256 nextGlobalAMPLSupply_)
         external
@@ -145,9 +145,9 @@ contract XCAmpleController is OwnableUpgradeSafe {
 
     /**
      * @notice Initiate a new rebase operation.
-     * @dev Once the Bridge gateway reports new epoch and total supply Rebase can be triggered on the current-chain.
-     *      The supply delta is calculated as the difference between the new total AMPL supply
-     *      and the recorded AMPL total supply on the current-chain.
+     * @dev Once the Bridge gateway reports new epoch and total supply Rebase can be triggered on this satellite chain.
+     *      The supply delta is calculated as the difference between the new reported globalAMPLSupply
+     *      and the recordedGlobalAMPLSupply on this chain.
      *      After rebase, it notifies down-stream platforms by executing post-rebase callbacks
      *      on the rebase relayer.
      */
@@ -158,16 +158,16 @@ contract XCAmpleController is OwnableUpgradeSafe {
             "XCAmpleController: Epoch not new"
         );
 
-        // the globalAMPLSupply recorded on the current-chain
+        // the globalAMPLSupply recorded on this chain
         int256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply().toInt256Safe();
 
-        // execute rebase on the current-chain
+        // execute rebase on this chain
         IXCAmple(xcAmple).rebase(nextGlobalAmpleforthEpoch, nextGlobalAMPLSupply);
 
         // calculate supply delta
         int256 supplyDelta = nextGlobalAMPLSupply.toInt256Safe().sub(recordedGlobalAMPLSupply);
 
-        // update state variables on the current-chain
+        // update state variables on this chain
         globalAmpleforthEpoch = nextGlobalAmpleforthEpoch;
         lastRebaseTimestampSec = now;
 

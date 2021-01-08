@@ -65,7 +65,7 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
 
     /**
      * @dev Calculates the amount of xc-amples to be mint based on the amount and the total supply
-     *      on the master chain when the transaction was initiated
+     *      on the base chain when the transaction was initiated
      *      and mints xc-amples to the recipient.
      * @param senderAddressInSourceChain Address of the sender wallet in the transaction originating chain.
      * @param recipient Address of the recipient wallet in the current chain (target chain).
