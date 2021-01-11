@@ -67,14 +67,20 @@ async function setupMasterBridgeContracts (
   )
     .connect(deployer)
     .deploy();
-  const bridge = await (await ethers.getContractFactory('Bridge'))
+  const bridge = await (
+    await ethers.getContractFactory(
+      'chainbridge-solidity/contracts/Bridge.sol:Bridge',
+    )
+  )
     .connect(deployer)
     .deploy(chainID, [], RELAYER_TRESHOLD, 0, 100);
   await bridge.adminAddRelayer(deployerAddress);
   await bridge.adminAddRelayer(relayerAddress);
 
   const bridgeHandler = await (
-    await ethers.getContractFactory('GenericHandler')
+    await ethers.getContractFactory(
+      'chainbridge-solidity/contracts/handlers/GenericHandler.sol:GenericHandler',
+    )
   )
     .connect(deployer)
     .deploy(bridge.address, [], [], [], [], []);
@@ -141,22 +147,28 @@ async function setupMasterBridgeContracts (
 async function setupOtherBridgeContracts (
   deployer,
   relayer,
-  xcAmplContracts,
+  xcAmpleContracts,
   chainID,
 ) {
   const deployerAddress = await deployer.getAddress();
   const relayerAddress = await relayer.getAddress();
 
-  const { xcAmpl, xcController } = xcAmplContracts;
+  const { xcAmple, xcController } = xcAmpleContracts;
 
-  const bridge = await (await ethers.getContractFactory('Bridge'))
+  const bridge = await (
+    await ethers.getContractFactory(
+      'chainbridge-solidity/contracts/Bridge.sol:Bridge',
+    )
+  )
     .connect(deployer)
     .deploy(chainID, [], RELAYER_TRESHOLD, 0, 100);
   await bridge.adminAddRelayer(deployerAddress);
   await bridge.adminAddRelayer(relayerAddress);
 
   const bridgeHandler = await (
-    await ethers.getContractFactory('GenericHandler')
+    await ethers.getContractFactory(
+      'chainbridge-solidity/contracts/handlers/GenericHandler.sol:GenericHandler',
+    )
   )
     .connect(deployer)
     .deploy(bridge.address, [], [], [], [], []);
@@ -167,7 +179,7 @@ async function setupOtherBridgeContracts (
     )
   )
     .connect(deployer)
-    .deploy(bridgeHandler.address, xcAmpl.address, xcController.address);
+    .deploy(bridgeHandler.address, xcAmple.address, xcController.address);
 
   await xcController.connect(deployer).addBridgeGateway(rebaseGateway.address);
 
@@ -188,7 +200,7 @@ async function setupOtherBridgeContracts (
     )
   )
     .connect(deployer)
-    .deploy(bridgeHandler.address, xcAmpl.address, xcController.address);
+    .deploy(bridgeHandler.address, xcAmple.address, xcController.address);
 
   await xcController
     .connect(deployer)

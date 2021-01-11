@@ -8,7 +8,7 @@ let accounts,
   recipientAddress,
   bridge,
   bridgeAddress,
-  xcAmpl,
+  xcAmple,
   xcController,
   gateway;
 async function setupContracts () {
@@ -20,7 +20,7 @@ async function setupContracts () {
   recipient = accounts[2];
   recipientAddress = await recipient.getAddress();
 
-  xcAmpl = await (
+  xcAmple = await (
     await ethers.getContractFactory(
       'contracts/_mocks/MockXCAmple.sol:MockXCAmple',
     )
@@ -41,17 +41,17 @@ async function setupContracts () {
     )
   )
     .connect(deployer)
-    .deploy(bridgeAddress, xcAmpl.address, xcController.address);
+    .deploy(bridgeAddress, xcAmple.address, xcController.address);
 
   await xcController.updateAMPLEpoch(1);
-  await xcAmpl.updateGlobalAMPLSupply(50000);
+  await xcAmple.updateGlobalAMPLSupply(50000);
 }
 
 describe('ChainBridgeXCAmpleGateway:Initialization', () => {
   before('setup ChainBridgeXCAmpleGateway contract', setupContracts);
 
   it('should initialize the references', async function () {
-    expect(await gateway.xcAmpl()).to.eq(xcAmpl.address);
+    expect(await gateway.xcAmple()).to.eq(xcAmple.address);
     expect(await gateway.xcController()).to.eq(xcController.address);
   });
 
@@ -204,7 +204,7 @@ describe('ChainBridgeXCAmpleGateway:mint', () => {
     const MAX_SUPPLY = ethers.BigNumber.from(2).pow(128).sub(1);
     const HALF_MAX_SUPPLY = MAX_SUPPLY.div(2);
     it('should mint correct number of ampls', async function () {
-      await xcAmpl.updateGlobalAMPLSupply(HALF_MAX_SUPPLY);
+      await xcAmple.updateGlobalAMPLSupply(HALF_MAX_SUPPLY);
       await expect(
         gateway
           .connect(bridge)
@@ -218,7 +218,7 @@ describe('ChainBridgeXCAmpleGateway:mint', () => {
         .to.emit(xcController, 'Mint')
         .withArgs(recipientAddress, '49999999999999999999');
 
-      await xcAmpl.updateGlobalAMPLSupply(MAX_SUPPLY);
+      await xcAmple.updateGlobalAMPLSupply(MAX_SUPPLY);
       await expect(
         gateway
           .connect(bridge)

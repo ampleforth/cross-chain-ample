@@ -14,7 +14,7 @@ async function setupAMPLContracts (deployer) {
   const ampl = await upgrades.deployProxy(
     (
       await ethers.getContractFactory(
-        'contracts/_external/uFragments/UFragments.sol:UFragments',
+        'uFragments/contracts/UFragments.sol:UFragments',
       )
     ).connect(deployer),
     [await deployer.getAddress()],
@@ -24,7 +24,7 @@ async function setupAMPLContracts (deployer) {
   );
   const rateOracle = await (
     await ethers.getContractFactory(
-      'contracts/_external/uFragments/MedianOracle.sol:MedianOracle',
+      'market-oracle/contracts/MedianOracle.sol:MedianOracle',
     )
   )
     .connect(deployer)
@@ -33,7 +33,7 @@ async function setupAMPLContracts (deployer) {
   await rateOracle.connect(deployer).pushReport(BASE_RATE);
   const cpiOracle = await (
     await ethers.getContractFactory(
-      'contracts/_external/uFragments/MedianOracle.sol:MedianOracle',
+      'market-oracle/contracts/MedianOracle.sol:MedianOracle',
     )
   )
     .connect(deployer)
@@ -43,7 +43,7 @@ async function setupAMPLContracts (deployer) {
   const policy = await upgrades.deployProxy(
     (
       await ethers.getContractFactory(
-        'contracts/_external/uFragments/UFragmentsPolicy.sol:UFragmentsPolicy',
+        'uFragments/contracts/UFragmentsPolicy.sol:UFragmentsPolicy',
       )
     ).connect(deployer),
     [await deployer.getAddress(), ampl.address, BASE_CPI.toString()],
@@ -58,7 +58,7 @@ async function setupAMPLContracts (deployer) {
   await ampl.connect(deployer).setMonetaryPolicy(policy.address);
   const orchestrator = await (
     await ethers.getContractFactory(
-      'contracts/_external/uFragments/Orchestrator.sol:Orchestrator',
+      'uFragments/contracts/Orchestrator.sol:Orchestrator',
     )
   )
     .connect(deployer)
@@ -106,7 +106,7 @@ async function setupAMPLContracts (deployer) {
 }
 
 async function setupXCAMPLContracts (deployer) {
-  const xcAmpl = await upgrades.deployProxy(
+  const xcAmple = await upgrades.deployProxy(
     (
       await ethers.getContractFactory(
         'contracts/xc-ampleforth/XCAmple.sol:XCAmple',
@@ -124,12 +124,12 @@ async function setupXCAMPLContracts (deployer) {
         'contracts/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
       )
     ).connect(deployer),
-    [xcAmpl.address, 1],
+    [xcAmple.address, 1],
     {
       initializer: 'initialize(address,uint256)'
     },
   );
-  await xcAmpl.setController(xcController.address);
+  await xcAmple.setController(xcController.address);
 
   const xcRebaseRelayer = await (
     await ethers.getContractFactory(
@@ -142,11 +142,11 @@ async function setupXCAMPLContracts (deployer) {
 
   const getCurrentState = async () => {
     const epoch = await xcController.globalAmpleforthEpoch();
-    const totalSupply = await xcAmpl.globalAMPLSupply();
+    const totalSupply = await xcAmple.globalAMPLSupply();
     return { epoch, totalSupply };
   };
 
-  return { xcRebaseRelayer, xcController, xcAmpl, getCurrentState };
+  return { xcRebaseRelayer, xcController, xcAmple, getCurrentState };
 }
 
 module.exports = {

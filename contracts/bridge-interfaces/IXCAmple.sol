@@ -8,7 +8,7 @@ interface IXCAmple {
 
     function burn(address who, uint256 value) external;
 
-    function rebase(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)
+    function rebase(uint256 globalAmpleforthEpoch_, uint256 globalAMPLSupply_)
         external
         returns (uint256);
 }

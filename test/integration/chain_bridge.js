@@ -153,22 +153,22 @@ async function getBalancesAndSupply () {
     await userBBaseChainWallet.getAddress(),
   );
 
-  const userATronBal = await satChain1AmplContracts.xcAmpl.balanceOf(
+  const userATronBal = await satChain1AmplContracts.xcAmple.balanceOf(
     await userASatChain1Wallet.getAddress(),
   );
-  const userBTronBal = await satChain1AmplContracts.xcAmpl.balanceOf(
+  const userBTronBal = await satChain1AmplContracts.xcAmple.balanceOf(
     await userBSatChain1Wallet.getAddress(),
   );
 
-  const userAAcalaBal = await satChain2AmplContracts.xcAmpl.balanceOf(
+  const userAAcalaBal = await satChain2AmplContracts.xcAmple.balanceOf(
     await userASatChain2Wallet.getAddress(),
   );
-  const userBAcalaBal = await satChain2AmplContracts.xcAmpl.balanceOf(
+  const userBAcalaBal = await satChain2AmplContracts.xcAmple.balanceOf(
     await userBSatChain2Wallet.getAddress(),
   );
 
-  const sat1Supply = await satChain1AmplContracts.xcAmpl.totalSupply();
-  const sat2Supply = await satChain2AmplContracts.xcAmpl.totalSupply();
+  const sat1Supply = await satChain1AmplContracts.xcAmple.totalSupply();
+  const sat2Supply = await satChain2AmplContracts.xcAmple.totalSupply();
 
   return {
     baseBalances: [userAEthBal, userBEthBal],

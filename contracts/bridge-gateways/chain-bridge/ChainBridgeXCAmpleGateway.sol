@@ -33,7 +33,7 @@ import "../../bridge-interfaces/IXCAmple.sol";
 contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
     using SafeMath for uint256;
 
-    address public xcAmpl;
+    address public xcAmple;
     address public xcController;
 
     /**
@@ -49,7 +49,7 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         uint256 recordedGlobalAmpleforthEpoch = IXCAmpleController(xcController)
             .globalAmpleforthEpoch();
 
-        uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmpl).globalAMPLSupply();
+        uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply();
 
         emit XCRebaseReportIn(
             globalAmpleforthEpoch,
@@ -78,7 +78,7 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         uint256 amount,
         uint256 globalAMPLSupply
     ) external onlyOwner returns (bool) {
-        uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmpl).globalAMPLSupply();
+        uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply();
         uint256 mintAmount = amount.mul(recordedGlobalAMPLSupply).div(globalAMPLSupply);
 
         emit XCTransferIn(recipient, globalAMPLSupply, mintAmount, recordedGlobalAMPLSupply);
@@ -101,7 +101,7 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         uint256 amount,
         uint256 globalAMPLSupply
     ) external onlyOwner returns (bool) {
-        uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmpl).globalAMPLSupply();
+        uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply();
         require(
             globalAMPLSupply == recordedGlobalAMPLSupply,
             "ChainBridgeXCAmpleGateway: total supply not consistent"
@@ -116,10 +116,10 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
 
     constructor(
         address bridgeHandler,
-        address xcAmpl_,
+        address xcAmple_,
         address xcController_
     ) public {
-        xcAmpl = xcAmpl_;
+        xcAmple = xcAmple_;
         xcController = xcController_;
 
         transferOwnership(bridgeHandler);
