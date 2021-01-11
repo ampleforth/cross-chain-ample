@@ -1,4 +1,4 @@
-const { ethers } = require('@nomiclabs/buidler');
+const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 let accounts, deployer, user, batchExecutor, mockDownstream, r;
@@ -8,7 +8,11 @@ async function setupContracts () {
   deployer = accounts[0];
   user = accounts[1];
 
-  batchExecutor = await (await ethers.getContractFactory('BatchTxExecutor'))
+  batchExecutor = await (
+    await ethers.getContractFactory(
+      'contracts/utilities/BatchTxExecutor.sol:BatchTxExecutor',
+    )
+  )
     .connect(deployer)
     .deploy();
 

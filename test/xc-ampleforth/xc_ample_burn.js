@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require('@nomiclabs/buidler');
+const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
 const DECIMALS = 9;
@@ -17,7 +17,9 @@ async function setupContracts () {
   otherUser = accounts[1];
 
   // deploy upgradable token
-  const factory = await ethers.getContractFactory('XCAmple');
+  const factory = await ethers.getContractFactory(
+    'contracts/xc-ampleforth/XCAmple.sol:XCAmple',
+  );
   xcAmple = await upgrades.deployProxy(
     factory.connect(deployer),
     ['XCAmple', 'xcAMPL', INITIAL_SUPPLY],

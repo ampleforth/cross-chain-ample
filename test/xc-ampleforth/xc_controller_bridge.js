@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require('@nomiclabs/buidler');
+const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
 let accounts,
@@ -16,12 +16,18 @@ async function setupContracts () {
   bridgeOther = accounts[2];
   beneficiaryAddress = await accounts[3].getAddress();
 
-  mockToken = await (await ethers.getContractFactory('MockXCAmple'))
+  mockToken = await (
+    await ethers.getContractFactory(
+      'contracts/_mocks/MockXCAmple.sol:MockXCAmple',
+    )
+  )
     .connect(deployer)
     .deploy();
 
   // deploy upgradable token
-  const factory = await ethers.getContractFactory('XCAmpleController');
+  const factory = await ethers.getContractFactory(
+    'contracts/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
+  );
   controller = await upgrades.deployProxy(
     factory.connect(deployer),
     [mockToken.address, 1],

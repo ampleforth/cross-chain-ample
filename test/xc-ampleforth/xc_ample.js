@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require('@nomiclabs/buidler');
+const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
 // NOTE: This is a copy of all the test-cases for the core ampleforth token
@@ -26,13 +26,13 @@ async function setupContracts () {
   accounts = await ethers.getSigners();
   deployer = accounts[0];
   // deploy upgradable token
-  const factory = await ethers.getContractFactory('XCAmple');
+  const factory = await ethers.getContractFactory(
+    'contracts/xc-ampleforth/XCAmple.sol:XCAmple',
+  );
   xcAmple = await upgrades.deployProxy(
     factory.connect(deployer),
     ['XCAmple', 'xcAMPL', INITIAL_AMPL_SUPPLY],
-    {
-      initializer: 'initialize(string,string,uint256)'
-    },
+    { initializer: 'initialize(string,string,uint256)' },
   );
 }
 

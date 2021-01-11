@@ -1,4 +1,4 @@
-const { ethers } = require('@nomiclabs/buidler');
+const { ethers } = require('hardhat');
 const AbiCoder = ethers.utils.defaultAbiCoder;
 const { parseEventFromLogs } = require('./ethers_helpers');
 
@@ -62,7 +62,9 @@ async function setupMasterBridgeContracts (
   const relayerAddress = await relayer.getAddress();
 
   const { ampl, policy } = amplContracts;
-  const amplVault = await (await ethers.getContractFactory('TokenVault'))
+  const amplVault = await (
+    await ethers.getContractFactory('contracts/TokenVault.sol:TokenVault')
+  )
     .connect(deployer)
     .deploy();
   const bridge = await (await ethers.getContractFactory('Bridge'))
@@ -78,7 +80,9 @@ async function setupMasterBridgeContracts (
     .deploy(bridge.address, [], [], [], [], []);
 
   const rebaseGateway = await (
-    await ethers.getContractFactory('AMPLChainBridgeGateway')
+    await ethers.getContractFactory(
+      'contracts/bridge-gateways/chain-bridge/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
+    )
   )
     .connect(deployer)
     .deploy(
@@ -100,7 +104,9 @@ async function setupMasterBridgeContracts (
     );
 
   const transferGateway = await (
-    await ethers.getContractFactory('AMPLChainBridgeGateway')
+    await ethers.getContractFactory(
+      'contracts/bridge-gateways/chain-bridge/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
+    )
   )
     .connect(deployer)
     .deploy(
@@ -156,7 +162,9 @@ async function setupOtherBridgeContracts (
     .deploy(bridge.address, [], [], [], [], []);
 
   const rebaseGateway = await (
-    await ethers.getContractFactory('ChainBridgeXCAmpleGateway')
+    await ethers.getContractFactory(
+      'contracts/bridge-gateways/chain-bridge/ChainBridgeXCAmpleGateway.sol:ChainBridgeXCAmpleGateway',
+    )
   )
     .connect(deployer)
     .deploy(bridgeHandler.address, xcAmpl.address, xcController.address);
@@ -175,7 +183,9 @@ async function setupOtherBridgeContracts (
     );
 
   const transferGateway = await (
-    await ethers.getContractFactory('ChainBridgeXCAmpleGateway')
+    await ethers.getContractFactory(
+      'contracts/bridge-gateways/chain-bridge/ChainBridgeXCAmpleGateway.sol:ChainBridgeXCAmpleGateway',
+    )
   )
     .connect(deployer)
     .deploy(bridgeHandler.address, xcAmpl.address, xcController.address);

@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require('@nomiclabs/buidler');
+const { ethers, upgrades } = require('hardhat');
 const { getBlockTime, increaseTime } = require('./ethers_helpers');
 
 const AMPL_DECIMALS = 9;
@@ -12,24 +12,40 @@ const BASE_CPI = ethers.utils.parseUnits('100', DECIMALS);
 async function setupAMPLContracts (deployer) {
   const deployerAddress = await deployer.getAddress();
   const ampl = await upgrades.deployProxy(
-    (await ethers.getContractFactory('UFragments')).connect(deployer),
+    (
+      await ethers.getContractFactory(
+        'contracts/_external/uFragments/UFragments.sol:UFragments',
+      )
+    ).connect(deployer),
     [await deployer.getAddress()],
     {
       initializer: 'initialize(address)'
     },
   );
-  const rateOracle = await (await ethers.getContractFactory('MedianOracle'))
+  const rateOracle = await (
+    await ethers.getContractFactory(
+      'contracts/_external/uFragments/MedianOracle.sol:MedianOracle',
+    )
+  )
     .connect(deployer)
     .deploy(3600 * 24 * 365, 0, 1);
   await rateOracle.connect(deployer).addProvider(deployerAddress);
   await rateOracle.connect(deployer).pushReport(BASE_RATE);
-  const cpiOracle = await (await ethers.getContractFactory('MedianOracle'))
+  const cpiOracle = await (
+    await ethers.getContractFactory(
+      'contracts/_external/uFragments/MedianOracle.sol:MedianOracle',
+    )
+  )
     .connect(deployer)
     .deploy(3600 * 24 * 365, 0, 1);
   await cpiOracle.addProvider(deployerAddress);
   await cpiOracle.connect(deployer).pushReport(BASE_CPI);
   const policy = await upgrades.deployProxy(
-    (await ethers.getContractFactory('UFragmentsPolicy')).connect(deployer),
+    (
+      await ethers.getContractFactory(
+        'contracts/_external/uFragments/UFragmentsPolicy.sol:UFragmentsPolicy',
+      )
+    ).connect(deployer),
     [await deployer.getAddress(), ampl.address, BASE_CPI.toString()],
     {
       initializer: 'initialize(address,address,uint256)'
@@ -40,7 +56,11 @@ async function setupAMPLContracts (deployer) {
   await policy.connect(deployer).setRebaseLag(1);
   await policy.connect(deployer).setRebaseTimingParameters(1, 0, 3600);
   await ampl.connect(deployer).setMonetaryPolicy(policy.address);
-  const orchestrator = await (await ethers.getContractFactory('Orchestrator'))
+  const orchestrator = await (
+    await ethers.getContractFactory(
+      'contracts/_external/uFragments/Orchestrator.sol:Orchestrator',
+    )
+  )
     .connect(deployer)
     .deploy(policy.address);
   await policy.setOrchestrator(orchestrator.address);
@@ -87,7 +107,11 @@ async function setupAMPLContracts (deployer) {
 
 async function setupXCAMPLContracts (deployer) {
   const xcAmpl = await upgrades.deployProxy(
-    (await ethers.getContractFactory('XCAmple')).connect(deployer),
+    (
+      await ethers.getContractFactory(
+        'contracts/xc-ampleforth/XCAmple.sol:XCAmple',
+      )
+    ).connect(deployer),
     ['XCAmple', 'xcAMPL', INITIAL_SUPPLY],
     {
       initializer: 'initialize(string,string,uint256)'
@@ -95,7 +119,11 @@ async function setupXCAMPLContracts (deployer) {
   );
 
   const xcController = await upgrades.deployProxy(
-    (await ethers.getContractFactory('XCAmpleController')).connect(deployer),
+    (
+      await ethers.getContractFactory(
+        'contracts/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
+      )
+    ).connect(deployer),
     [xcAmpl.address, 1],
     {
       initializer: 'initialize(address,uint256)'
@@ -104,7 +132,9 @@ async function setupXCAMPLContracts (deployer) {
   await xcAmpl.setController(xcController.address);
 
   const xcRebaseRelayer = await (
-    await ethers.getContractFactory('BatchTxExecutor')
+    await ethers.getContractFactory(
+      'contracts/utilities/BatchTxExecutor.sol:BatchTxExecutor',
+    )
   )
     .connect(deployer)
     .deploy();

@@ -26,7 +26,7 @@
   These test cases are inspired from OpenZepplin's ERC20 unit test.
   https://github.com/OpenZeppelin/openzeppelin-solidity/blob/master/test/token/ERC20/ERC20.test.js
 */
-const { ethers, upgrades, waffle } = require('@nomiclabs/buidler');
+const { ethers, upgrades, waffle } = require('hardhat');
 const { expect } = require('chai');
 
 function toUFrgDenomination (x) {
@@ -46,7 +46,9 @@ const transferAmountMinusOne = transferAmount.sub(unitTokenAmount);
 let token, owner, anotherAccount, recipient;
 async function upgradeableToken () {
   const [owner, recipient, anotherAccount] = await ethers.getSigners();
-  const factory = await ethers.getContractFactory('XCAmple');
+  const factory = await ethers.getContractFactory(
+    'contracts/xc-ampleforth/XCAmple.sol:XCAmple',
+  );
   token = await upgrades.deployProxy(
     factory.connect(owner),
     ['XCAmple', 'xcAMPL', INITIAL_SUPPLY],

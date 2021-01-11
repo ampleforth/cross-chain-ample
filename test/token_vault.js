@@ -1,4 +1,4 @@
-const { ethers } = require('@nomiclabs/buidler');
+const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 let accounts,
@@ -19,11 +19,15 @@ async function setupContracts () {
   bridgeAddress = await bridge.getAddress();
   otherBridgeAddress = await otherBridge.getAddress();
 
-  mockToken = await (await ethers.getContractFactory('MockERC20'))
+  mockToken = await (
+    await ethers.getContractFactory('contracts/_mocks/MockERC20.sol:MockERC20')
+  )
     .connect(deployer)
     .deploy('MockToken', 'MOCK');
 
-  vault = await (await ethers.getContractFactory('TokenVault'))
+  vault = await (
+    await ethers.getContractFactory('contracts/TokenVault.sol:TokenVault')
+  )
     .connect(deployer)
     .deploy();
 }

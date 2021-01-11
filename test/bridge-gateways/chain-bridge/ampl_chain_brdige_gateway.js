@@ -1,4 +1,4 @@
-const { ethers } = require('@nomiclabs/buidler');
+const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 let accounts,
@@ -21,17 +21,29 @@ async function setupContracts () {
   bridge = accounts[2];
   bridgeAddress = await bridge.getAddress();
 
-  ampl = await (await ethers.getContractFactory('MockAmpl'))
+  ampl = await (
+    await ethers.getContractFactory('contracts/_mocks/MockAmpl.sol:MockAmpl')
+  )
     .connect(deployer)
     .deploy();
-  policy = await (await ethers.getContractFactory('MockAmplPolicy'))
+  policy = await (
+    await ethers.getContractFactory(
+      'contracts/_mocks/MockAmplPolicy.sol:MockAmplPolicy',
+    )
+  )
     .connect(deployer)
     .deploy();
-  vault = await (await ethers.getContractFactory('MockVault'))
+  vault = await (
+    await ethers.getContractFactory('contracts/_mocks/MockVault.sol:MockVault')
+  )
     .connect(deployer)
     .deploy();
 
-  gateway = await (await ethers.getContractFactory('AMPLChainBridgeGateway'))
+  gateway = await (
+    await ethers.getContractFactory(
+      'contracts/bridge-gateways/chain-bridge/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
+    )
+  )
     .connect(deployer)
     .deploy(bridgeAddress, ampl.address, policy.address, vault.address);
 

@@ -1,4 +1,4 @@
-const { ethers } = require('@nomiclabs/buidler');
+const { ethers } = require('hardhat');
 
 async function getBlockTime () {
   return (await ethers.provider.getBlock('latest')).timestamp;
