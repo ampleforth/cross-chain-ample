@@ -1,3 +1,6 @@
 module.exports = {
-  skipFiles: ['_external'],
+  skipFiles: ['_external', '_mocks'],
+  mocha: {
+    timeout: 100000
+  },
 };
