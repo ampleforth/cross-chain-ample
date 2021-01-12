@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title TokenVault
@@ -26,14 +26,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract TokenVault is Ownable {
     using SafeMath for uint256;
 
-    event Locked(
+    event GatewayLocked(
         address indexed bridgeGateway,
         address indexed token,
         address indexed depositor,
         uint256 amount
     );
 
-    event Unlocked(
+    event GatewayUnlocked(
         address indexed bridgeGateway,
         address indexed token,
         address indexed recipient,
@@ -83,6 +83,9 @@ contract TokenVault is Ownable {
 
     /**
      * @notice Transfers specified amount from the depositor's wallet and locks it in the gateway contract.
+     * @param token address of the token to lock.
+     * @param depositor address of wallet to transfer specified token from
+     * @param amount amount of tokens to transfer
      */
     function lock(
         address token,
@@ -90,11 +93,14 @@ contract TokenVault is Ownable {
         uint256 amount
     ) external onlyBridgeGateway {
         require(IERC20(token).transferFrom(depositor, address(this), amount));
-        emit Locked(msg.sender, token, depositor, amount);
+        emit GatewayLocked(msg.sender, token, depositor, amount);
     }
 
     /**
      * @notice Unlocks the specified amount from the gateway contract and transfers it to the recipient.
+     * @param token address of the token to unlock.
+     * @param recipient address of wallet to transfer specified token to
+     * @param amount amount of tokens to transfer
      */
     function unlock(
         address token,
@@ -102,13 +108,14 @@ contract TokenVault is Ownable {
         uint256 amount
     ) external onlyBridgeGateway {
         require(IERC20(token).transfer(recipient, amount));
-        emit Unlocked(msg.sender, token, recipient, amount);
+        emit GatewayUnlocked(msg.sender, token, recipient, amount);
     }
 
     /**
-     * @notice Total token balance secured by the gateway contract.
+     * @notice Total balance of the specified token, held by this vault.
+     * @param token address of the token to check.
      */
-    function totalLocked(address token) public view returns (uint256) {
+    function totalLocked(address token) external view returns (uint256) {
         return IERC20(token).balanceOf(address(this));
     }
 }

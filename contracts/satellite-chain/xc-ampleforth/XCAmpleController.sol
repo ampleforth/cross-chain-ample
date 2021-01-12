@@ -1,13 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SignedSafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import {
+    SafeMathUpgradeable
+} from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import {
+    SignedSafeMathUpgradeable
+} from "@openzeppelin/contracts-upgradeable/math/SignedSafeMathUpgradeable.sol";
+import {
+    OwnableUpgradeable
+} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import "./UInt256Lib.sol";
-import "../../_interfaces/IXCAmple.sol";
-import "../../_interfaces/IBatchTxExecutor.sol";
+import {UInt256Lib} from "./UInt256Lib.sol";
+import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
+import {IBatchTxExecutor} from "../../_interfaces/IBatchTxExecutor.sol";
 
 /**
  * @title XC(Cross-Chain)Ample Controller
@@ -17,9 +23,9 @@ import "../../_interfaces/IBatchTxExecutor.sol";
  *      rebase on XCAmple, based on updated AMPL supply reported through
  *      the bridge gateway.
  */
-contract XCAmpleController is OwnableUpgradeSafe {
-    using SafeMath for uint256;
-    using SignedSafeMath for int256;
+contract XCAmpleController is OwnableUpgradeable {
+    using SafeMathUpgradeable for uint256;
+    using SignedSafeMathUpgradeable for int256;
     using UInt256Lib for uint256;
 
     event GatewayMint(
@@ -151,7 +157,7 @@ contract XCAmpleController is OwnableUpgradeSafe {
      *      After rebase, it notifies down-stream platforms by executing post-rebase callbacks
      *      on the rebase relayer.
      */
-    function rebase() public {
+    function rebase() external {
         // recently reported epoch needs to be more than current globalEpoch in storage
         require(
             nextGlobalAmpleforthEpoch > globalAmpleforthEpoch,
@@ -184,8 +190,10 @@ contract XCAmpleController is OwnableUpgradeSafe {
      * @dev ZOS upgradable contract initialization method.
      *      It is called at the time of contract creation to invoke parent class initializers and
      *      initialize the contract's state variables.
+     * @param xcAmple_ reference to the cross-chain ample token erc-20 contract
+     * @param globalAmpleforthEpoch_ the epoch number from monetary policy on the base chain
      */
-    function initialize(address xcAmple_, uint256 globalAmpleforthEpoch_) public initializer {
+    function initialize(address xcAmple_, uint256 globalAmpleforthEpoch_) external initializer {
         __Ownable_init();
 
         xcAmple = xcAmple_;

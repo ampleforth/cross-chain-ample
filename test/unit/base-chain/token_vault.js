@@ -173,7 +173,7 @@ describe('TokenVault:lock', async () => {
     await expect(
       vault.connect(bridge).lock(mockToken.address, deployerAddress, 999),
     )
-      .to.emit(vault, 'Locked')
+      .to.emit(vault, 'GatewayLocked')
       .withArgs(
         await bridge.getAddress(),
         mockToken.address,
@@ -236,7 +236,7 @@ describe('TokenVault:unlock', async () => {
     await expect(
       vault.connect(bridge).unlock(mockToken.address, deployerAddress, 999),
     )
-      .to.emit(vault, 'Unlocked')
+      .to.emit(vault, 'GatewayUnlocked')
       .withArgs(
         await bridge.getAddress(),
         mockToken.address,

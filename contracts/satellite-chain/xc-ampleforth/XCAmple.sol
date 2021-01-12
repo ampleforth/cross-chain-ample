@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import {
+    SafeMathUpgradeable
+} from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import {
+    IERC20Upgradeable
+} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {
+    OwnableUpgradeable
+} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * @title XC(cross-chain)Ample ERC20 token
@@ -15,9 +21,9 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
  *      Additionally, the XCAmple contract lets the XCAmpleController
  *      `mint` or `burn` tokens.
  */
-contract XCAmple is IERC20, OwnableUpgradeSafe {
+contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     // PLEASE EXERCISE CAUTION BEFORE CHANGING ANY ACCOUNTING OR MATH
-    using SafeMath for uint256;
+    using SafeMathUpgradeable for uint256;
 
     event LogRebase(uint256 indexed epoch, uint256 globalAMPLSupply);
     event ControllerUpdated(address controller);
@@ -80,6 +86,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
 
     /**
      * @dev XCAmpleController notifies this contract about a new rebase cycle.
+     * @param epoch The rebase epoch number.
      * @param newGlobalAMPLSupply The new total supply of AMPL from the base chain.
      * @return The new total AMPL supply.
      */
@@ -128,7 +135,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
     /**
      * @dev Returns the name of the token.
      */
-    function name() public view returns (string memory) {
+    function name() external view returns (string memory) {
         return _name;
     }
 
@@ -136,7 +143,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @dev Returns the symbol of the token, usually a shorter version of the
      * name.
      */
-    function symbol() public view returns (string memory) {
+    function symbol() external view returns (string memory) {
         return _symbol;
     }
 
@@ -149,14 +156,14 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * no way affects any of the arithmetic of the contract, including
      * {IERC20-balanceOf} and {IERC20-transfer}.
      */
-    function decimals() public view returns (uint8) {
+    function decimals() external view returns (uint8) {
         return _decimals;
     }
 
     /**
      * @return The total supply of xcAmples.
      */
-    function totalSupply() public view override returns (uint256) {
+    function totalSupply() external view override returns (uint256) {
         return _totalSupply;
     }
 
@@ -164,7 +171,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @param who The address to query.
      * @return The balance of the specified address.
      */
-    function balanceOf(address who) public view override returns (uint256) {
+    function balanceOf(address who) external view override returns (uint256) {
         return _gonBalances[who].div(_gonsPerAMPL);
     }
 
@@ -174,7 +181,12 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @param value The amount to be transferred.
      * @return True on success, false otherwise.
      */
-    function transfer(address to, uint256 value) public override validRecipient(to) returns (bool) {
+    function transfer(address to, uint256 value)
+        external
+        override
+        validRecipient(to)
+        returns (bool)
+    {
         uint256 gonValue = value.mul(_gonsPerAMPL);
         _gonBalances[msg.sender] = _gonBalances[msg.sender].sub(gonValue);
         _gonBalances[to] = _gonBalances[to].add(gonValue);
@@ -188,7 +200,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @param spender The address which will spend the funds.
      * @return The number of tokens still available for the spender.
      */
-    function allowance(address owner_, address spender) public view override returns (uint256) {
+    function allowance(address owner_, address spender) external view override returns (uint256) {
         return _allowedXCAmples[owner_][spender];
     }
 
@@ -202,7 +214,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
         address from,
         address to,
         uint256 value
-    ) public override validRecipient(to) returns (bool) {
+    ) external override validRecipient(to) returns (bool) {
         _allowedXCAmples[from][msg.sender] = _allowedXCAmples[from][msg.sender].sub(value);
 
         uint256 gonValue = value.mul(_gonsPerAMPL);
@@ -224,7 +236,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to be spent.
      */
-    function approve(address spender, uint256 value) public override returns (bool) {
+    function approve(address spender, uint256 value) external override returns (bool) {
         _allowedXCAmples[msg.sender][spender] = value;
         emit Approval(msg.sender, spender, value);
         return true;
@@ -237,7 +249,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @param spender The address which will spend the funds.
      * @param addedValue The amount of tokens to increase the allowance by.
      */
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue) external returns (bool) {
         _allowedXCAmples[msg.sender][spender] = _allowedXCAmples[msg.sender][spender].add(
             addedValue
         );
@@ -251,7 +263,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @param spender The address which will spend the funds.
      * @param subtractedValue The amount of tokens to decrease the allowance by.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+    function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool) {
         uint256 oldValue = _allowedXCAmples[msg.sender][spender];
         if (subtractedValue >= oldValue) {
             _allowedXCAmples[msg.sender][spender] = 0;
@@ -268,7 +280,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @param who The address of the beneficiary.
      * @param xcAmpleAmount The amount of xcAmple tokens to be minted.
      */
-    function mint(address who, uint256 xcAmpleAmount) public onlyController validRecipient(who) {
+    function mint(address who, uint256 xcAmpleAmount) external onlyController validRecipient(who) {
         uint256 gonValue = xcAmpleAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].add(gonValue);
         _totalSupply = _totalSupply.add(xcAmpleAmount);
@@ -285,7 +297,7 @@ contract XCAmple is IERC20, OwnableUpgradeSafe {
      * @param who The address of the beneficiary.
      * @param xcAmpleAmount The amount of xcAmple tokens to be burned.
      */
-    function burn(address who, uint256 xcAmpleAmount) public onlyController {
+    function burn(address who, uint256 xcAmpleAmount) external onlyController {
         require(who != address(0), "XCAmple: burn address zero address");
 
         uint256 gonValue = xcAmpleAmount.mul(_gonsPerAMPL);
