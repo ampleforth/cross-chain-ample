@@ -19,10 +19,10 @@
   ],
   "dependencies": {
     "@openzeppelin/contracts": "^3.2.0",
-    "@openzeppelin/contracts-ethereum-package": "^3.0.0",
+    "@openzeppelin/contracts-upgradeable": "^3.3.0",
     "chainbridge-solidity": "https://github.com/ChainSafe/chainbridge-solidity#master",
-    "uFragments": "https://github.com/ampleforth/uFragments#master",
-    "market-oracle": "https://github.com/ampleforth/market-oracle#master"
+    "market-oracle": "https://github.com/ampleforth/market-oracle#master",
+    "uFragments": "https://github.com/ampleforth/uFragments#master"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",

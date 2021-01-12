@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SignedSafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/math/SignedSafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "./UInt256Lib.sol";
 import "../../_interfaces/IXCAmple.sol";
@@ -17,9 +17,9 @@ import "../../_interfaces/IBatchTxExecutor.sol";
  *      rebase on XCAmple, based on updated AMPL supply reported through
  *      the bridge gateway.
  */
-contract XCAmpleController is OwnableUpgradeSafe {
-    using SafeMath for uint256;
-    using SignedSafeMath for int256;
+contract XCAmpleController is OwnableUpgradeable {
+    using SafeMathUpgradeable for uint256;
+    using SignedSafeMathUpgradeable for int256;
     using UInt256Lib for uint256;
 
     event GatewayMint(

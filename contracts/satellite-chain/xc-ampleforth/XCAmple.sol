@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * @title XC(cross-chain)Ample ERC20 token
@@ -15,9 +15,9 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
  *      Additionally, the XCAmple contract lets the XCAmpleController
  *      `mint` or `burn` tokens.
  */
-contract XCAmple is IERC20, OwnableUpgradeSafe {
+contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     // PLEASE EXERCISE CAUTION BEFORE CHANGING ANY ACCOUNTING OR MATH
-    using SafeMath for uint256;
+    using SafeMathUpgradeable for uint256;
 
     event LogRebase(uint256 indexed epoch, uint256 globalAMPLSupply);
     event ControllerUpdated(address controller);
