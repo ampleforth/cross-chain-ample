@@ -6,11 +6,12 @@
   "author": "eng@ampleforth.org",
   "scripts": {
     "compile": "yarn hardhat compile",
-    "coverage": "yarn hardhat coverage --testfiles 'test/unit/*.ts'",
+    "coverage": "yarn hardhat coverage --testfiles 'test/unit/**/*.js'",
     "format": "yarn prettier --config .prettierrc --write '**/*.js' 'contracts/**/*.sol'",
     "lint": "yarn solhint 'contracts/**/*.sol' && yarn eslint ./test *.js --cache --fix",
     "test": "yarn hardhat test",
-    "test-ganache": "yarn hardhat test --network ganache"
+    "test-ganache": "yarn hardhat test --network ganache",
+    "profile": "REPORT_GAS=true yarn hardhat test"
   },
   "pre-commit": [
     "format",
@@ -48,13 +49,14 @@
     "ethereum-waffle": "^3.2.1",
     "ethers": "^5.0.13",
     "hardhat": "^2.0.7",
+    "hardhat-gas-reporter": "^1.0.3",
     "pre-commit": "^1.2.2",
     "prettier": "^2.1.1",
     "prettier-plugin-solidity": "^1.0.0-alpha.57",
     "solc": "0.6.4",
     "solhint": "^3.2.0",
     "solhint-plugin-prettier": "^0.0.5",
-    "solidity-coverage": "^0.7.10",
+    "solidity-coverage": "^0.7.12",
     "stochasm": "^0.5.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.2"

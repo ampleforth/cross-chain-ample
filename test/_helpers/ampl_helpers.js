@@ -109,7 +109,7 @@ async function setupXCAMPLContracts (deployer) {
   const xcAmple = await upgrades.deployProxy(
     (
       await ethers.getContractFactory(
-        'contracts/xc-ampleforth/XCAmple.sol:XCAmple',
+        'contracts/satellite-chain/xc-ampleforth/XCAmple.sol:XCAmple',
       )
     ).connect(deployer),
     ['XCAmple', 'xcAMPL', INITIAL_SUPPLY],
@@ -121,7 +121,7 @@ async function setupXCAMPLContracts (deployer) {
   const xcController = await upgrades.deployProxy(
     (
       await ethers.getContractFactory(
-        'contracts/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
+        'contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
       )
     ).connect(deployer),
     [xcAmple.address, 1],
@@ -133,7 +133,7 @@ async function setupXCAMPLContracts (deployer) {
 
   const xcRebaseRelayer = await (
     await ethers.getContractFactory(
-      'contracts/utilities/BatchTxExecutor.sol:BatchTxExecutor',
+      'contracts/_utilities/BatchTxExecutor.sol:BatchTxExecutor',
     )
   )
     .connect(deployer)

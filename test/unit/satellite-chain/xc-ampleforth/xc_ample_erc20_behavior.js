@@ -47,7 +47,7 @@ let token, owner, anotherAccount, recipient;
 async function upgradeableToken () {
   const [owner, recipient, anotherAccount] = await ethers.getSigners();
   const factory = await ethers.getContractFactory(
-    'contracts/xc-ampleforth/XCAmple.sol:XCAmple',
+    'contracts/satellite-chain/xc-ampleforth/XCAmple.sol:XCAmple',
   );
   token = await upgrades.deployProxy(
     factory.connect(owner),

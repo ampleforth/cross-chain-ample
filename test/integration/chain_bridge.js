@@ -5,7 +5,7 @@ const {
   setupAMPLContracts,
   setupXCAMPLContracts,
   toAmplDenomination
-} = require('../helpers/ampl_helpers');
+} = require('../_helpers/ampl_helpers');
 
 const {
   ETH_CHAIN_ID,
@@ -18,7 +18,7 @@ const {
   packXCTransferData,
   transferResource,
   executeBridgeTx
-} = require('../helpers/chain_bridge_helpers');
+} = require('../_helpers/chain_bridge_helpers');
 
 let accounts,
   deployer,

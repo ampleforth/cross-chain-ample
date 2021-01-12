@@ -63,7 +63,9 @@ async function setupMasterBridgeContracts (
 
   const { ampl, policy } = amplContracts;
   const amplVault = await (
-    await ethers.getContractFactory('contracts/TokenVault.sol:TokenVault')
+    await ethers.getContractFactory(
+      'contracts/base-chain/TokenVault.sol:TokenVault',
+    )
   )
     .connect(deployer)
     .deploy();
@@ -87,7 +89,7 @@ async function setupMasterBridgeContracts (
 
   const rebaseGateway = await (
     await ethers.getContractFactory(
-      'contracts/bridge-gateways/chain-bridge/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
+      'contracts/base-chain/bridge-gateways/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
     )
   )
     .connect(deployer)
@@ -111,7 +113,7 @@ async function setupMasterBridgeContracts (
 
   const transferGateway = await (
     await ethers.getContractFactory(
-      'contracts/bridge-gateways/chain-bridge/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
+      'contracts/base-chain/bridge-gateways/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
     )
   )
     .connect(deployer)
@@ -175,7 +177,7 @@ async function setupOtherBridgeContracts (
 
   const rebaseGateway = await (
     await ethers.getContractFactory(
-      'contracts/bridge-gateways/chain-bridge/ChainBridgeXCAmpleGateway.sol:ChainBridgeXCAmpleGateway',
+      'contracts/satellite-chain/bridge-gateways/ChainBridgeXCAmpleGateway.sol:ChainBridgeXCAmpleGateway',
     )
   )
     .connect(deployer)
@@ -196,7 +198,7 @@ async function setupOtherBridgeContracts (
 
   const transferGateway = await (
     await ethers.getContractFactory(
-      'contracts/bridge-gateways/chain-bridge/ChainBridgeXCAmpleGateway.sol:ChainBridgeXCAmpleGateway',
+      'contracts/satellite-chain/bridge-gateways/ChainBridgeXCAmpleGateway.sol:ChainBridgeXCAmpleGateway',
     )
   )
     .connect(deployer)

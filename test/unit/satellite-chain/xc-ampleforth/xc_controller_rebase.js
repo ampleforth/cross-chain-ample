@@ -1,6 +1,6 @@
 const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
-const { increaseTime } = require('../helpers/ethers_helpers');
+const { increaseTime } = require('../../../_helpers/ethers_helpers');
 
 let accounts,
   deployer,
@@ -33,7 +33,7 @@ async function setupContracts () {
 
   // deploy upgradable token
   const factory = await ethers.getContractFactory(
-    'contracts/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
+    'contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
   );
   controller = await upgrades.deployProxy(
     factory.connect(deployer),

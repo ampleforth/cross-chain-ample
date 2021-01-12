@@ -17,7 +17,7 @@ async function setupContracts () {
 
   // deploy upgradable token
   const factory = await ethers.getContractFactory(
-    'contracts/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
+    'contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
   );
   controller = await upgrades.deployProxy(
     factory.connect(deployer),

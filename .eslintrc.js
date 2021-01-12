@@ -174,6 +174,7 @@ module.exports = {
           'acala',
           'rebasing',
           'depositer',
+          'coinmarketcap',
 
           // names
           'nithin',

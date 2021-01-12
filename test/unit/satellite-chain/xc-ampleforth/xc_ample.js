@@ -27,7 +27,7 @@ async function setupContracts () {
   deployer = accounts[0];
   // deploy upgradable token
   const factory = await ethers.getContractFactory(
-    'contracts/xc-ampleforth/XCAmple.sol:XCAmple',
+    'contracts/satellite-chain/xc-ampleforth/XCAmple.sol:XCAmple',
   );
   xcAmple = await upgrades.deployProxy(
     factory.connect(deployer),

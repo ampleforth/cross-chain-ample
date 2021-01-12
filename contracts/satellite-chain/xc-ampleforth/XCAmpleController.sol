@@ -5,9 +5,9 @@ import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SignedSafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
-import "../lib/UInt256Lib.sol";
-import "../bridge-interfaces/IXCAmple.sol";
-import "../bridge-interfaces/IBatchTxExecutor.sol";
+import "./UInt256Lib.sol";
+import "../../_interfaces/IXCAmple.sol";
+import "../../_interfaces/IBatchTxExecutor.sol";
 
 /**
  * @title XC(Cross-Chain)Ample Controller

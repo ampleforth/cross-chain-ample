@@ -41,7 +41,7 @@ async function setupContracts () {
 
   gateway = await (
     await ethers.getContractFactory(
-      'contracts/bridge-gateways/chain-bridge/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
+      'contracts/base-chain/bridge-gateways/AMPLChainBridgeGateway.sol:AMPLChainBridgeGateway',
     )
   )
     .connect(deployer)

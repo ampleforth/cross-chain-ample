@@ -26,7 +26,9 @@ async function setupContracts () {
     .deploy('MockToken', 'MOCK');
 
   vault = await (
-    await ethers.getContractFactory('contracts/TokenVault.sol:TokenVault')
+    await ethers.getContractFactory(
+      'contracts/base-chain/TokenVault.sol:TokenVault',
+    )
   )
     .connect(deployer)
     .deploy();

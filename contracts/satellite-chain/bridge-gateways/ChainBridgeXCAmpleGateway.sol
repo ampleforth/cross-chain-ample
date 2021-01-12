@@ -3,9 +3,9 @@ pragma solidity 0.6.12;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "../../bridge-interfaces/IBridgeGateway.sol";
-import "../../bridge-interfaces/IXCAmpleController.sol";
-import "../../bridge-interfaces/IXCAmple.sol";
+import "../../_interfaces/IBridgeGateway.sol";
+import "../../_interfaces/IXCAmpleController.sol";
+import "../../_interfaces/IXCAmple.sol";
 
 /**
  * @title ChainBridgeXCAmpleGateway

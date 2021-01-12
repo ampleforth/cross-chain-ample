@@ -37,7 +37,7 @@ async function setupContracts () {
 
   gateway = await (
     await ethers.getContractFactory(
-      'contracts/bridge-gateways/chain-bridge/ChainBridgeXCAmpleGateway.sol:ChainBridgeXCAmpleGateway',
+      'contracts/satellite-chain/bridge-gateways/ChainBridgeXCAmpleGateway.sol:ChainBridgeXCAmpleGateway',
     )
   )
     .connect(deployer)

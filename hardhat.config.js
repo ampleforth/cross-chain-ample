@@ -2,6 +2,8 @@ require('@nomiclabs/hardhat-ethers');
 require('@nomiclabs/hardhat-waffle');
 require('@nomiclabs/hardhat-ganache');
 require('@openzeppelin/hardhat-upgrades');
+require('hardhat-gas-reporter');
+require('solidity-coverage');
 
 module.exports = {
   solidity: {
@@ -22,5 +24,11 @@ module.exports = {
   },
   mocha: {
     timeout: 100000
+  },
+  gasReporter: {
+    currency: 'USD',
+    enabled: !!process.env.REPORT_GAS,
+    excludeContracts: ['_mocks', '_external', 'uFragments'],
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY
   }
 };

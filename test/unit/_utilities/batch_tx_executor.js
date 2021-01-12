@@ -10,7 +10,7 @@ async function setupContracts () {
 
   batchExecutor = await (
     await ethers.getContractFactory(
-      'contracts/utilities/BatchTxExecutor.sol:BatchTxExecutor',
+      'contracts/_utilities/BatchTxExecutor.sol:BatchTxExecutor',
     )
   )
     .connect(deployer)
