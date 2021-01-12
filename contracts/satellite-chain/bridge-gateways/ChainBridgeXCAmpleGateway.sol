@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "../../_interfaces/IBridgeGateway.sol";
-import "../../_interfaces/IXCAmpleController.sol";
-import "../../_interfaces/IXCAmple.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+
+import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
+import {IXCAmpleController} from "../../_interfaces/IXCAmpleController.sol";
+import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
 
 /**
  * @title ChainBridgeXCAmpleGateway

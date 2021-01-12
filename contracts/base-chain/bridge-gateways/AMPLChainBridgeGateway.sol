@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../../_interfaces/IAmpleforthPolicy.sol";
-import "../../_interfaces/ITokenVault.sol";
-import "../../_interfaces/IBridgeGateway.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IAmpleforthPolicy} from "../../_interfaces/IAmpleforthPolicy.sol";
+import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
+import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
 
 /**
  * @title AMPLChainBridgeGateway: AMPL-ChainBridge Gateway Contract
@@ -48,7 +49,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
      * @param globalAMPLSupply AMPL ERC-20 total supply.
      */
     function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)
-        public
+        external
         onlyOwner
         returns (bool)
     {
@@ -82,7 +83,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         address recipientAddressInTargetChain,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) public onlyOwner returns (bool) {
+    ) external onlyOwner returns (bool) {
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
 
         require(
@@ -110,7 +111,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         address recipient,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) public onlyOwner returns (bool) {
+    ) external onlyOwner returns (bool) {
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
         uint256 unlockAmount = amount.mul(recordedGlobalAMPLSupply).div(globalAMPLSupply);
 

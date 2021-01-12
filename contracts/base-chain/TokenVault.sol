@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title TokenVault
@@ -108,7 +108,7 @@ contract TokenVault is Ownable {
     /**
      * @notice Total token balance secured by the gateway contract.
      */
-    function totalLocked(address token) public view returns (uint256) {
+    function totalLocked(address token) external view returns (uint256) {
         return IERC20(token).balanceOf(address(this));
     }
 }
