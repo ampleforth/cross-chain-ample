@@ -26,14 +26,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract TokenVault is Ownable {
     using SafeMath for uint256;
 
-    event Locked(
+    event GatewayLocked(
         address indexed bridgeGateway,
         address indexed token,
         address indexed depositor,
         uint256 amount
     );
 
-    event Unlocked(
+    event GatewayUnlocked(
         address indexed bridgeGateway,
         address indexed token,
         address indexed recipient,
@@ -90,7 +90,7 @@ contract TokenVault is Ownable {
         uint256 amount
     ) external onlyBridgeGateway {
         require(IERC20(token).transferFrom(depositor, address(this), amount));
-        emit Locked(msg.sender, token, depositor, amount);
+        emit GatewayLocked(msg.sender, token, depositor, amount);
     }
 
     /**
@@ -102,7 +102,7 @@ contract TokenVault is Ownable {
         uint256 amount
     ) external onlyBridgeGateway {
         require(IERC20(token).transfer(recipient, amount));
-        emit Unlocked(msg.sender, token, recipient, amount);
+        emit GatewayUnlocked(msg.sender, token, recipient, amount);
     }
 
     /**
