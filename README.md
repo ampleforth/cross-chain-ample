@@ -11,17 +11,33 @@ Currently supports integration with ChainSafe's [chain-bridge](https://github.co
 
 ## Contracts
 
-1. [XC-Ampleforth](./contracts/xc-ampleforth) - Satellite chain
-2. [BridgeGateways](./contracts/bridge-gateways/chain-bridge) - Base chain & Satellite chain
-3. [TokenVault](./contracts/TokenVault.sol) - Base chain
+1. [Base Chain](./contracts/base-chain)
+    * [TokenVault](./contracts/base-chain/TokenVault.sol)
+    * [AMPL-Bridge-Gateway](./contracts/base-chain/bridge-gateways)
+
+2. Satellite Chain
+    * [XC-Ampleforth](./contracts/satellite-chain/xc-ampleforth)
+    * [Bridge-XCAmple-Gateway](./contracts/satellite-chain/bridge-gateways)
 
 End to end architecture is described [here](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-Bridge-Architecture).
 
 ## Getting Started
 
 ```
-yarn install
-yarn test
+# Compile contracts
+yarn compile
+
+# Lint code
+yarn lint
+
+# Format code
+yarn format
+
+# Run solidity coverage report (compatible with node v12)
+yarn coverage
+
+# Run solidity gas usage report
+yarn profile
 ```
 
 ## Contract Integration Tests

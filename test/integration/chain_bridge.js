@@ -1,11 +1,11 @@
-const { ethers } = require('@nomiclabs/buidler');
+const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 const {
   setupAMPLContracts,
   setupXCAMPLContracts,
   toAmplDenomination
-} = require('../helpers/ampl_helpers');
+} = require('../_helpers/ampl_helpers');
 
 const {
   ETH_CHAIN_ID,
@@ -18,7 +18,7 @@ const {
   packXCTransferData,
   transferResource,
   executeBridgeTx
-} = require('../helpers/chain_bridge_helpers');
+} = require('../_helpers/chain_bridge_helpers');
 
 let accounts,
   deployer,
@@ -153,22 +153,22 @@ async function getBalancesAndSupply () {
     await userBBaseChainWallet.getAddress(),
   );
 
-  const userATronBal = await satChain1AmplContracts.xcAmpl.balanceOf(
+  const userATronBal = await satChain1AmplContracts.xcAmple.balanceOf(
     await userASatChain1Wallet.getAddress(),
   );
-  const userBTronBal = await satChain1AmplContracts.xcAmpl.balanceOf(
+  const userBTronBal = await satChain1AmplContracts.xcAmple.balanceOf(
     await userBSatChain1Wallet.getAddress(),
   );
 
-  const userAAcalaBal = await satChain2AmplContracts.xcAmpl.balanceOf(
+  const userAAcalaBal = await satChain2AmplContracts.xcAmple.balanceOf(
     await userASatChain2Wallet.getAddress(),
   );
-  const userBAcalaBal = await satChain2AmplContracts.xcAmpl.balanceOf(
+  const userBAcalaBal = await satChain2AmplContracts.xcAmple.balanceOf(
     await userBSatChain2Wallet.getAddress(),
   );
 
-  const sat1Supply = await satChain1AmplContracts.xcAmpl.totalSupply();
-  const sat2Supply = await satChain2AmplContracts.xcAmpl.totalSupply();
+  const sat1Supply = await satChain1AmplContracts.xcAmple.totalSupply();
+  const sat2Supply = await satChain2AmplContracts.xcAmple.totalSupply();
 
   return {
     baseBalances: [userAEthBal, userBEthBal],
