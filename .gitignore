@@ -81,3 +81,7 @@ yarn-error.log
 # artifacts
 artifacts
 cache
+
+
+#env
+.env
