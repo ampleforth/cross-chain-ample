@@ -1,6 +1,6 @@
 ## AMPL Bridge Solidity
 
-[![Build Status](https://travis-ci.com/ampleforth/uFragments.svg?branch=master)](https://travis-ci.com/ampleforth/uFragments)
+[![Build Status](https://travis-ci.com/ampleforth/ampl-bridge-solidity.svg?token=xxNsLhLrTiyG3pc78i5v&branch=master)](https://travis-ci.com/ampleforth/ampl-bridge-solidity)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/ampleforth/ampl-bridge-solidity/badge.svg?branch=master&t=QkPsQb)](https://coveralls.io/github/ampleforth/ampl-bridge-solidity?branch=master)
 
 Solidity contracts for cross-chain AMPL through bridges.
 
