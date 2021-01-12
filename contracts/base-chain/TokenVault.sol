@@ -83,6 +83,9 @@ contract TokenVault is Ownable {
 
     /**
      * @notice Transfers specified amount from the depositor's wallet and locks it in the gateway contract.
+     * @param token address of the token to lock.
+     * @param depositor address of wallet to transfer specified token from
+     * @param amount amount of tokens to transfer
      */
     function lock(
         address token,
@@ -95,6 +98,9 @@ contract TokenVault is Ownable {
 
     /**
      * @notice Unlocks the specified amount from the gateway contract and transfers it to the recipient.
+     * @param token address of the token to unlock.
+     * @param recipient address of wallet to transfer specified token to
+     * @param amount amount of tokens to transfer
      */
     function unlock(
         address token,
@@ -106,7 +112,8 @@ contract TokenVault is Ownable {
     }
 
     /**
-     * @notice Total token balance secured by the gateway contract.
+     * @notice Total balance of the specified token, held by this vault.
+     * @param token address of the token to check.
      */
     function totalLocked(address token) external view returns (uint256) {
         return IERC20(token).balanceOf(address(this));
