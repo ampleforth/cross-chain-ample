@@ -17,9 +17,9 @@ Currently supports integration with ChainSafe's [chain-bridge](https://github.co
     * [TokenVault](./contracts/base-chain/TokenVault.sol)
     * [AMPL-Bridge-Gateway](./contracts/base-chain/bridge-gateways)
 
-2. Satellite Chain
-    * [XC-Ampleforth](./contracts/satellite-chain/xc-ampleforth)
+2. [Satellite Chain](./contracts/satellite-chain)
     * [Bridge-XCAmple-Gateway](./contracts/satellite-chain/bridge-gateways)
+    * [XC-Ampleforth](./contracts/satellite-chain/xc-ampleforth)
 
 End to end architecture is described [here](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-Bridge-Architecture).
 
