@@ -52,7 +52,7 @@ const packXCTransferData = (depositor, recipient, amount, totalSupply) => {
   );
 };
 
-async function setupMasterBridgeContracts (
+async function setupBaseBridgeContracts (
   deployer,
   relayer,
   amplContracts,
@@ -146,7 +146,7 @@ async function setupMasterBridgeContracts (
   };
 }
 
-async function setupOtherBridgeContracts (
+async function setupSatelliteBridgeContracts (
   deployer,
   relayer,
   xcAmpleContracts,
@@ -305,8 +305,8 @@ module.exports = {
   ACALA_CHAIN_ID,
   rebaseResource,
   transferResource,
-  setupMasterBridgeContracts,
-  setupOtherBridgeContracts,
+  setupBaseBridgeContracts,
+  setupSatelliteBridgeContracts,
   propagateXCRebase,
   propagateXCTransfer,
   packXCTransferData,

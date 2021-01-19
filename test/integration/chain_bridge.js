@@ -11,8 +11,8 @@ const {
   ETH_CHAIN_ID,
   TRON_CHAIN_ID,
   ACALA_CHAIN_ID,
-  setupMasterBridgeContracts,
-  setupOtherBridgeContracts,
+  setupBaseBridgeContracts,
+  setupSatelliteBridgeContracts,
   propagateXCRebase,
   propagateXCTransfer,
   packXCTransferData,
@@ -52,7 +52,7 @@ async function setupContracts () {
   userBSatChain2Wallet = accounts[7];
 
   baseChainAmplContracts = await setupAMPLContracts(deployer);
-  baseChainBridgeContracts = await setupMasterBridgeContracts(
+  baseChainBridgeContracts = await setupBaseBridgeContracts(
     deployer,
     relayer,
     baseChainAmplContracts,
@@ -60,7 +60,7 @@ async function setupContracts () {
   );
 
   satChain1AmplContracts = await setupXCAMPLContracts(deployer);
-  satChain1BridgeContracts = await setupOtherBridgeContracts(
+  satChain1BridgeContracts = await setupSatelliteBridgeContracts(
     deployer,
     relayer,
     satChain1AmplContracts,
@@ -68,7 +68,7 @@ async function setupContracts () {
   );
 
   satChain2AmplContracts = await setupXCAMPLContracts(deployer);
-  satChain2BridgeContracts = await setupOtherBridgeContracts(
+  satChain2BridgeContracts = await setupSatelliteBridgeContracts(
     deployer,
     relayer,
     satChain2AmplContracts,
