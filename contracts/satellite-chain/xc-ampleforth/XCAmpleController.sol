@@ -13,6 +13,7 @@ import {
 
 import {UInt256Lib} from "./UInt256Lib.sol";
 import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
+import {IXCAmpleSupplyPolicy} from "../../_interfaces/IXCAmpleSupplyPolicy.sol";
 import {IBatchTxExecutor} from "../../_interfaces/IBatchTxExecutor.sol";
 
 /**
@@ -113,7 +114,7 @@ contract XCAmpleController is OwnableUpgradeable {
      * @param xcAmpleAmount The amount of xcAmples to be mint on this chain.
      */
     function mint(address recipient, uint256 xcAmpleAmount) external onlyBridgeGateway {
-        IXCAmple(xcAmple).mint(recipient, xcAmpleAmount);
+        IXCAmpleSupplyPolicy(xcAmple).mint(recipient, xcAmpleAmount);
         emit GatewayMint(msg.sender, recipient, xcAmpleAmount);
     }
 
@@ -125,7 +126,7 @@ contract XCAmpleController is OwnableUpgradeable {
      * @param xcAmpleAmount The amount of xcAmples to be burnt on this chain.
      */
     function burn(address depositor, uint256 xcAmpleAmount) external onlyBridgeGateway {
-        IXCAmple(xcAmple).burn(depositor, xcAmpleAmount);
+        IXCAmpleSupplyPolicy(xcAmple).burn(depositor, xcAmpleAmount);
         emit GatewayBurn(msg.sender, depositor, xcAmpleAmount);
     }
 
@@ -150,6 +151,19 @@ contract XCAmpleController is OwnableUpgradeable {
     }
 
     /**
+     * @notice A multi-chain AMPL interface method. The Ampleforth monetary policy contract
+     *         on the base-chain and XCAmpleController contracts on the satellite-chains
+     *         implement this method. It atomically returns two values:
+     *         what the current contract believes to be,
+     *         the globalAmpleforthEpoch and globalAMPLSupply.
+     * @return globalAmpleforthEpoch The recorded global Ampleforth epoch.
+     * @return globalAMPLSupply The recorded global AMPL supply.
+     */
+    function globalAmpleforthEpochAndAMPLSupply() external view returns (uint256, uint256) {
+        return (globalAmpleforthEpoch, IXCAmple(xcAmple).globalAMPLSupply());
+    }
+
+    /**
      * @notice Initiate a new rebase operation.
      * @dev Once the Bridge gateway reports new epoch and total supply Rebase can be triggered on this satellite chain.
      *      The supply delta is calculated as the difference between the new reported globalAMPLSupply
@@ -168,7 +182,7 @@ contract XCAmpleController is OwnableUpgradeable {
         int256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply().toInt256Safe();
 
         // execute rebase on this chain
-        IXCAmple(xcAmple).rebase(nextGlobalAmpleforthEpoch, nextGlobalAMPLSupply);
+        IXCAmpleSupplyPolicy(xcAmple).rebase(nextGlobalAmpleforthEpoch, nextGlobalAMPLSupply);
 
         // calculate supply delta
         int256 supplyDelta = nextGlobalAMPLSupply.toInt256Safe().sub(recordedGlobalAMPLSupply);
