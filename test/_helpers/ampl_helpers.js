@@ -87,8 +87,9 @@ async function setupAMPLContracts (deployer) {
   };
 
   const getCurrentState = async () => {
-    const epoch = await policy.epoch();
-    const totalSupply = await ampl.totalSupply();
+    const r = await policy.globalAmpleforthEpochAndAMPLSupply();
+    const epoch = r[0];
+    const totalSupply = r[1];
     return { epoch, totalSupply };
   };
 
@@ -141,8 +142,9 @@ async function setupXCAMPLContracts (deployer) {
   await xcController.setRebaseRelayer(xcRebaseRelayer.address);
 
   const getCurrentState = async () => {
-    const epoch = await xcController.globalAmpleforthEpoch();
-    const totalSupply = await xcAmple.globalAMPLSupply();
+    const r = await xcController.globalAmpleforthEpochAndAMPLSupply();
+    const epoch = r[0];
+    const totalSupply = r[1];
     return { epoch, totalSupply };
   };
 
