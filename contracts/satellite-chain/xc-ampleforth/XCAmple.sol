@@ -76,6 +76,20 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     // because the gons xcAmple conversion might change before it's fully paid.
     mapping(address => mapping(address => uint256)) private _allowedXCAmples;
 
+    // EIP-2612: permit – 712-signed approvals
+    // https://eips.ethereum.org/EIPS/eip-2612
+    bytes public constant EIP712_REVISION = "1";
+    bytes32 public constant EIP712_DOMAIN = keccak256(
+        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+    );
+    bytes32 public constant PERMIT_TYPEHASH = keccak256(
+        "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+    );
+    bytes32 public DOMAIN_SEPARATOR;
+
+    // EIP-2612: keeps track of number of permits per address
+    mapping(address => uint256) private _nonces;
+
     /**
      * @param controller_ The address of the controller contract to use for authentication.
      */
@@ -130,6 +144,20 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         _totalSupply = 0;
 
         _gonsPerAMPL = TOTAL_GONS.div(globalAMPLSupply);
+
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+        DOMAIN_SEPARATOR = keccak256(
+            abi.encode(
+                EIP712_DOMAIN,
+                keccak256(bytes(name)),
+                keccak256(EIP712_REVISION),
+                chainId,
+                address(this)
+            )
+        );
     }
 
     /**
@@ -176,6 +204,28 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     }
 
     /**
+     * @param who The address to query.
+     * @return The gon balance of the specified address.
+     */
+    function scaledBalanceOf(address who) external view returns (uint256) {
+        return _gonBalances[who];
+    }
+
+    /**
+     * @return the total number of gons.
+     */
+    function scaledTotalSupply() external pure returns (uint256) {
+        return TOTAL_GONS;
+    }
+
+    /**
+     * @return The number of successful permits by the specified address.
+     */
+    function nonces(address who) public view returns (uint256) {
+        return _nonces[who];
+    }
+
+    /**
      * @dev Transfer tokens to a specified address.
      * @param to The address to transfer to.
      * @param value The amount to be transferred.
@@ -188,8 +238,26 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         returns (bool)
     {
         uint256 gonValue = value.mul(_gonsPerAMPL);
+
         _gonBalances[msg.sender] = _gonBalances[msg.sender].sub(gonValue);
         _gonBalances[to] = _gonBalances[to].add(gonValue);
+
+        emit Transfer(msg.sender, to, value);
+        return true;
+    }
+
+    /**
+     * @dev Transfer all of the sender's wallet balance to a specified address.
+     * @param to The address to transfer to.
+     * @return True on success, false otherwise.
+     */
+    function transferAll(address to) external validRecipient(to) returns (bool) {
+        uint256 gonValue = _gonBalances[msg.sender];
+        uint256 value = gonValue.div(_gonsPerAMPL);
+
+        delete _gonBalances[msg.sender];
+        _gonBalances[to] = _gonBalances[to].add(gonValue);
+
         emit Transfer(msg.sender, to, value);
         return true;
     }
@@ -218,10 +286,29 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         _allowedXCAmples[from][msg.sender] = _allowedXCAmples[from][msg.sender].sub(value);
 
         uint256 gonValue = value.mul(_gonsPerAMPL);
+
         _gonBalances[from] = _gonBalances[from].sub(gonValue);
         _gonBalances[to] = _gonBalances[to].add(gonValue);
-        emit Transfer(from, to, value);
 
+        emit Transfer(from, to, value);
+        return true;
+    }
+
+    /**
+     * @dev Transfer all balance tokens from one address to another.
+     * @param from The address you want to send tokens from.
+     * @param to The address you want to transfer to.
+     */
+    function transferAllFrom(address from, address to) external validRecipient(to) returns (bool) {
+        uint256 gonValue = _gonBalances[from];
+        uint256 value = gonValue.div(_gonsPerAMPL);
+
+        _allowedXCAmples[from][msg.sender] = _allowedXCAmples[from][msg.sender].sub(value);
+
+        delete _gonBalances[from];
+        _gonBalances[to] = _gonBalances[to].add(gonValue);
+
+        emit Transfer(from, to, value);
         return true;
     }
 
@@ -238,6 +325,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
      */
     function approve(address spender, uint256 value) external override returns (bool) {
         _allowedXCAmples[msg.sender][spender] = value;
+
         emit Approval(msg.sender, spender, value);
         return true;
     }
@@ -253,6 +341,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         _allowedXCAmples[msg.sender][spender] = _allowedXCAmples[msg.sender][spender].add(
             addedValue
         );
+
         emit Approval(msg.sender, spender, _allowedXCAmples[msg.sender][spender]);
         return true;
     }
@@ -270,6 +359,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         } else {
             _allowedXCAmples[msg.sender][spender] = oldValue.sub(subtractedValue);
         }
+
         emit Approval(msg.sender, spender, _allowedXCAmples[msg.sender][spender]);
         return true;
     }
@@ -305,5 +395,42 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         _totalSupply = _totalSupply.sub(xcAmpleAmount);
 
         emit Transfer(who, address(0), xcAmpleAmount);
+    }
+
+    /**
+     * @dev Allows for approvals to be made via secp256k1 signatures.
+     * @param owner The owner of the funds
+     * @param spender The spender
+     * @param value The amount
+     * @param deadline The deadline timestamp, type(uint256).max for max deadline
+     * @param v Signature param
+     * @param s Signature param
+     * @param r Signature param
+     */
+    function permit(
+        address owner,
+        address spender,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
+        require(block.timestamp <= deadline);
+
+        uint256 ownerNonce = _nonces[owner];
+        bytes32 permitDataDigest = keccak256(
+            abi.encode(PERMIT_TYPEHASH, owner, spender, value, ownerNonce, deadline)
+        );
+        bytes32 digest = keccak256(
+            abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, permitDataDigest)
+        );
+
+        require(owner == ecrecover(digest, v, r, s));
+
+        _nonces[owner] = ownerNonce.add(1);
+
+        _allowedXCAmples[owner][spender] = value;
+        emit Approval(owner, spender, value);
     }
 }
