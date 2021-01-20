@@ -101,6 +101,8 @@ module.exports = {
           'Utf8Bytes',
           'keccak256',
           'Sighash',
+          'hre',
+          'ecsign',
 
           // shorthand
           'eth',
@@ -175,6 +177,7 @@ module.exports = {
           'rebasing',
           'depositer',
           'coinmarketcap',
+          'nonces',
 
           // names
           'nithin',
