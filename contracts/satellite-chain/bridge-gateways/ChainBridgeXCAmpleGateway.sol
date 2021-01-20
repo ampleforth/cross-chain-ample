@@ -6,6 +6,7 @@ import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
 import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
 import {IXCAmpleController} from "../../_interfaces/IXCAmpleController.sol";
+import {IXCAmpleControllerGateway} from "../../_interfaces/IXCAmpleControllerGateway.sol";
 import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
 
 /**
@@ -45,7 +46,6 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
     function reportRebase(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)
         external
         onlyOwner
-        returns (bool)
     {
         uint256 recordedGlobalAmpleforthEpoch = IXCAmpleController(xcController)
             .globalAmpleforthEpoch();
@@ -59,9 +59,10 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
             recordedGlobalAMPLSupply
         );
 
-        IXCAmpleController(xcController).reportRebase(globalAmpleforthEpoch, globalAMPLSupply);
-
-        return true;
+        IXCAmpleControllerGateway(xcController).reportRebase(
+            globalAmpleforthEpoch,
+            globalAMPLSupply
+        );
     }
 
     /**
@@ -78,15 +79,13 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         address recipient,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) external onlyOwner returns (bool) {
+    ) external onlyOwner {
         uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply();
         uint256 mintAmount = amount.mul(recordedGlobalAMPLSupply).div(globalAMPLSupply);
 
         emit XCTransferIn(recipient, globalAMPLSupply, mintAmount, recordedGlobalAMPLSupply);
 
-        IXCAmpleController(xcController).mint(recipient, mintAmount);
-
-        return true;
+        IXCAmpleControllerGateway(xcController).mint(recipient, mintAmount);
     }
 
     /**
@@ -101,18 +100,16 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         address recipientAddressInTargetChain,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) external onlyOwner returns (bool) {
+    ) external onlyOwner {
         uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply();
         require(
             globalAMPLSupply == recordedGlobalAMPLSupply,
             "ChainBridgeXCAmpleGateway: total supply not consistent"
         );
 
-        IXCAmpleController(xcController).burn(sender, amount);
+        IXCAmpleControllerGateway(xcController).burn(sender, amount);
 
         emit XCTransferOut(sender, amount, recordedGlobalAMPLSupply);
-
-        return true;
     }
 
     constructor(

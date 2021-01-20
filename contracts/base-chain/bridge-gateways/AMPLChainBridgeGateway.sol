@@ -5,7 +5,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IAmpleforthPolicy} from "../../_interfaces/IAmpleforthPolicy.sol";
+import {IAmpleforth} from "../../_interfaces/IAmpleforth.sol";
 import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
 import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
 
@@ -51,9 +51,8 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
     function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)
         external
         onlyOwner
-        returns (bool)
     {
-        uint256 recordedGlobalAmpleforthEpoch = IAmpleforthPolicy(policy).epoch();
+        uint256 recordedGlobalAmpleforthEpoch = IAmpleforth(policy).epoch();
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
 
         require(
@@ -66,8 +65,6 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         );
 
         emit XCRebaseReportOut(globalAmpleforthEpoch, globalAMPLSupply);
-
-        return true;
     }
 
     /**
@@ -83,7 +80,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         address recipientAddressInTargetChain,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) external onlyOwner returns (bool) {
+    ) external onlyOwner {
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
 
         require(
@@ -94,8 +91,6 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         ITokenVault(vault).lock(ampl, sender, amount);
 
         emit XCTransferOut(sender, amount, recordedGlobalAMPLSupply);
-
-        return true;
     }
 
     /**
@@ -111,15 +106,13 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         address recipient,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) external onlyOwner returns (bool) {
+    ) external onlyOwner {
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
         uint256 unlockAmount = amount.mul(recordedGlobalAMPLSupply).div(globalAMPLSupply);
 
         emit XCTransferIn(recipient, globalAMPLSupply, unlockAmount, recordedGlobalAMPLSupply);
 
         ITokenVault(vault).unlock(ampl, recipient, unlockAmount);
-
-        return true;
     }
 
     constructor(
