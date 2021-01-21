@@ -9060,7 +9060,7 @@ typewiselite@~1.0.0:
 
 "uFragments@https://github.com/ampleforth/uFragments#master":
   version "0.0.1"
-  resolved "https://github.com/ampleforth/uFragments#6dde1cc08bc2febcf1b6b51e414727a35b66d11f"
+  resolved "https://github.com/ampleforth/uFragments#d64668761d6d39727a5c4f4b77f35a7d9fc2625b"
   dependencies:
     hardhat-gas-reporter "^1.0.4"
     openzeppelin-eth "2.0.2-standalone"

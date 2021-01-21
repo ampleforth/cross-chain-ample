@@ -5,7 +5,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IAmpleforth} from "../../_interfaces/IAmpleforth.sol";
+import {IAmpleforth} from "uFragments/contracts/interfaces/IAmpleforth.sol";
 import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
 import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
 
