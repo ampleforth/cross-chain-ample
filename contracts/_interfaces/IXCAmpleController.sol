@@ -2,11 +2,11 @@
 pragma solidity 0.6.12;
 
 interface IXCAmpleController {
-    function globalAmpleforthEpoch() external returns (uint256);
+    function rebase() external;
 
-    function mint(address recipient, uint256 xcAmplAmount) external;
+    function lastRebaseTimestampSec() external view returns (uint256);
 
-    function burn(address depositor, uint256 xcAmplAmount) external;
+    function globalAmpleforthEpoch() external view returns (uint256);
 
-    function reportRebase(uint256 nextGlobalAmpleforthEpoch, uint256 nextGlobalAMPLSupply) external;
+    function globalAmpleforthEpochAndAMPLSupply() external view returns (uint256, uint256);
 }

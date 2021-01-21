@@ -18,6 +18,7 @@ contract MockXCAmple {
     }
 
     function rebase(uint256 globalEpoch, uint256 globalAMPLSupply_) external returns (uint256) {
+        globalAMPLSupply = globalAMPLSupply_;
         emit Rebase(globalEpoch, globalAMPLSupply_);
     }
 

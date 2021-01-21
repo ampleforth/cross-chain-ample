@@ -1,14 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.6.12;
 
-interface IXCAmple {
-    function globalAMPLSupply() external returns (uint256);
+import "uFragments/contracts/interfaces/IAMPL.sol";
 
-    function mint(address who, uint256 value) external;
-
-    function burn(address who, uint256 value) external;
-
-    function rebase(uint256 globalAmpleforthEpoch_, uint256 globalAMPLSupply_)
-        external
-        returns (uint256);
+interface IXCAmple is IAMPL {
+    function globalAMPLSupply() external view returns (uint256);
 }

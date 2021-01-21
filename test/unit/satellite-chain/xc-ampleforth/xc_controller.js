@@ -15,6 +15,8 @@ async function setupContracts () {
     .connect(deployer)
     .deploy();
 
+  await mockToken.updateGlobalAMPLSupply(39992123);
+
   // deploy upgradable token
   const factory = await ethers.getContractFactory(
     'contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:XCAmpleController',
@@ -41,6 +43,12 @@ describe('XCAmpleController:Initialization', () => {
 
   it('should set the owner', async function () {
     expect(await controller.owner()).to.eq(await deployer.getAddress());
+  });
+
+  it('should return the globalAmpleforthEpochAndAMPLSupply', async function () {
+    const r = await controller.globalAmpleforthEpochAndAMPLSupply();
+    expect(r[0]).to.eq(1);
+    expect(r[1]).to.eq('39992123');
   });
 });
 

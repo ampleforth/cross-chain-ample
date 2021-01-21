@@ -28,7 +28,7 @@ async function setupContracts () {
     .deploy();
   policy = await (
     await ethers.getContractFactory(
-      'contracts/_mocks/MockAmplPolicy.sol:MockAmplPolicy',
+      'contracts/_mocks/MockAmpleforth.sol:MockAmpleforth',
     )
   )
     .connect(deployer)

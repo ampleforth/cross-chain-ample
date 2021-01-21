@@ -81,6 +81,14 @@ describe('XCAmpleController:rebase', async () => {
     expect(await controller.globalAmpleforthEpoch()).to.eq(2);
   });
 
+  it('should update globalAmpleforthEpochAndAMPLSupply', async function () {
+    await controller.connect(bridge).reportRebase(2, 50626634);
+    await controller.connect(rebaseCaller).rebase();
+    const r = await controller.globalAmpleforthEpochAndAMPLSupply();
+    expect(r[0]).to.eq('2');
+    expect(r[1]).to.eq('50626634');
+  });
+
   it('should update lastRebaseTimestampSec', async function () {
     const t1 = await controller.lastRebaseTimestampSec();
     await increaseTime(3600);
