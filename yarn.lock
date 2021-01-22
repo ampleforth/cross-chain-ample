@@ -2400,7 +2400,7 @@ chai@^4.2.0:
     pathval "^1.1.0"
     type-detect "^4.0.5"
 
-"chainbridge-solidity@https://github.com/ChainSafe/chainbridge-solidity#master":
+"chainbridge-solidity@https://github.com/ChainSafe/chainbridge-solidity#1d5bfa3570c8bf6b87bcb579e0216601ab68bf20":
   version "1.0.2"
   resolved "https://github.com/ChainSafe/chainbridge-solidity#1d5bfa3570c8bf6b87bcb579e0216601ab68bf20"
 
@@ -6280,9 +6280,9 @@ markdown-table@^1.1.3:
   resolved "https://registry.yarnpkg.com/markdown-table/-/markdown-table-1.1.3.tgz#9fcb69bcfdb8717bfd0398c6ec2d93036ef8de60"
   integrity sha512-1RUZVgQlpJSPWYbFSpmudq5nHY1doEIv89gBtF0s4gW1GF2XorxcA/70M5vq7rLv0a6mhOUccRsqkwhwLCIQ2Q==
 
-"market-oracle@https://github.com/ampleforth/market-oracle#master":
+"market-oracle@https://github.com/ampleforth/market-oracle#v1.0.1":
   version "0.0.1"
-  resolved "https://github.com/ampleforth/market-oracle#72f37d22493d6e5b6f010cade4965525d09242e3"
+  resolved "https://github.com/ampleforth/market-oracle#5e7fd1506784f074748ab6bd5df740ca2227b14f"
   dependencies:
     app-root-path "~2.1.0"
     frg-ethereum-runners "https://github.com/ampleforth/frg-ethereum-runners.git"
@@ -9058,7 +9058,7 @@ typewiselite@~1.0.0:
   resolved "https://registry.yarnpkg.com/typewiselite/-/typewiselite-1.0.0.tgz#c8882fa1bb1092c06005a97f34ef5c8508e3664e"
   integrity sha1-yIgvobsQksBgBal/NO9chQjjZk4=
 
-"uFragments@https://github.com/ampleforth/uFragments#master":
+"uFragments@https://github.com/ampleforth/uFragments#v1.0.5-alpha":
   version "0.0.1"
   resolved "https://github.com/ampleforth/uFragments#d64668761d6d39727a5c4f4b77f35a7d9fc2625b"
   dependencies:
