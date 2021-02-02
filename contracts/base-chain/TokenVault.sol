@@ -4,6 +4,7 @@ pragma solidity 0.6.12;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
 /**
  * @title TokenVault
@@ -25,6 +26,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  */
 contract TokenVault is Ownable {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     event GatewayLocked(
         address indexed bridgeGateway,
@@ -92,7 +94,7 @@ contract TokenVault is Ownable {
         address depositor,
         uint256 amount
     ) external onlyBridgeGateway {
-        require(IERC20(token).transferFrom(depositor, address(this), amount));
+        IERC20(token).safeTransferFrom(depositor, address(this), amount);
         emit GatewayLocked(msg.sender, token, depositor, amount);
     }
 
@@ -107,7 +109,7 @@ contract TokenVault is Ownable {
         address recipient,
         uint256 amount
     ) external onlyBridgeGateway {
-        require(IERC20(token).transfer(recipient, amount));
+        IERC20(token).safeTransfer(recipient, amount);
         emit GatewayUnlocked(msg.sender, token, recipient, amount);
     }
 
