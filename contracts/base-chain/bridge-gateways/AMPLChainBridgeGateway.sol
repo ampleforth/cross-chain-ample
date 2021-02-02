@@ -38,9 +38,9 @@ import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
 contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
     using SafeMath for uint256;
 
-    address public ampl;
-    address public policy;
-    address public vault;
+    address public immutable ampl;
+    address public immutable policy;
+    address public immutable vault;
 
     /**
      * @dev Validates if the data from the handler is consistent with the
