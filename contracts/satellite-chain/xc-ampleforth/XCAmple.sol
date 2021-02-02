@@ -85,7 +85,6 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     bytes32 public constant PERMIT_TYPEHASH = keccak256(
         "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
     );
-    bytes32 public DOMAIN_SEPARATOR;
 
     // EIP-2612: keeps track of number of permits per address
     mapping(address => uint256) private _nonces;
@@ -149,20 +148,6 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         _totalSupply = 0;
 
         _gonsPerAMPL = TOTAL_GONS.div(globalAMPLSupply);
-
-        uint256 chainId;
-        assembly {
-            chainId := chainid()
-        }
-        DOMAIN_SEPARATOR = keccak256(
-            abi.encode(
-                EIP712_DOMAIN,
-                keccak256(bytes(name)),
-                keccak256(EIP712_REVISION),
-                chainId,
-                address(this)
-            )
-        );
     }
 
     /**
@@ -191,6 +176,27 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
      */
     function decimals() external view returns (uint8) {
         return _decimals;
+    }
+
+    /**
+     * @dev Returns the computed DOMAIN_SEPARATOR to be used off-chain services
+     *      which implement EIP-2612.
+     */
+    function DOMAIN_SEPARATOR() public view returns (bytes32) {
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+        return
+            keccak256(
+                abi.encode(
+                    EIP712_DOMAIN,
+                    keccak256(bytes(_name)),
+                    keccak256(EIP712_REVISION),
+                    chainId,
+                    address(this)
+                )
+            );
     }
 
     /**
@@ -429,7 +435,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
             abi.encode(PERMIT_TYPEHASH, owner, spender, value, ownerNonce, deadline)
         );
         bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, permitDataDigest)
+            abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), permitDataDigest)
         );
 
         require(owner == ecrecover(digest, v, r, s), "XCAmple: signature invalid");
