@@ -43,7 +43,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     }
 
     uint256 private constant DECIMALS = 9;
-    uint256 private constant MAX_UINT256 = ~uint256(0);
+    uint256 private constant MAX_UINT256 = type(uint256).max; // (2^256) - 1
     uint256 private constant INITIAL_AMPL_SUPPLY = 50 * 10**6 * 10**DECIMALS;
 
     // TOTAL_GONS is a multiple of INITIAL_AMPL_SUPPLY so that _gonsPerAMPL is an integer.
@@ -51,7 +51,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     uint256 private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_AMPL_SUPPLY);
 
     // MAX_SUPPLY = maximum integer < (sqrt(4*TOTAL_GONS + 1) - 1) / 2
-    uint256 private constant MAX_SUPPLY = ~uint128(0); // (2^128) - 1
+    uint256 private constant MAX_SUPPLY = type(uint128).max; // (2^128) - 1
 
     // ERC-20 identity attributes
     string private _name;
@@ -109,19 +109,24 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         onlyController
         returns (uint256)
     {
-        if (newGlobalAMPLSupply == globalAMPLSupply) {
-            emit LogRebase(epoch, globalAMPLSupply);
-            return globalAMPLSupply;
+        uint256 prevGlobalAMPLSupply = globalAMPLSupply;
+        if (newGlobalAMPLSupply == prevGlobalAMPLSupply) {
+            emit LogRebase(epoch, prevGlobalAMPLSupply);
+            return prevGlobalAMPLSupply;
         }
 
-        _totalSupply = _totalSupply.mul(newGlobalAMPLSupply).div(globalAMPLSupply);
+        // update xc-ample total supply
+        _totalSupply = _totalSupply.mul(newGlobalAMPLSupply).div(prevGlobalAMPLSupply);
 
+        // update AMPL global supply
         globalAMPLSupply = newGlobalAMPLSupply;
 
-        _gonsPerAMPL = TOTAL_GONS.div(globalAMPLSupply);
+        // update scalar
+        _gonsPerAMPL = TOTAL_GONS.div(newGlobalAMPLSupply);
 
-        emit LogRebase(epoch, globalAMPLSupply);
-        return globalAMPLSupply;
+        emit LogRebase(epoch, newGlobalAMPLSupply);
+
+        return newGlobalAMPLSupply;
     }
 
     /**
@@ -319,6 +324,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
      * Changing an allowance with this method brings the risk that someone may transfer both
      * the old and the new allowance - if they are both greater than zero - if a transfer
      * transaction is mined before the later approve() call is mined.
+     * Approvals are denominated in xc-amples and do NOT change with underlying balances.
      *
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to be spent.
@@ -416,7 +422,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         bytes32 r,
         bytes32 s
     ) public {
-        require(block.timestamp <= deadline);
+        require(block.timestamp <= deadline, "XCAmple: surpassed permit deadline");
 
         uint256 ownerNonce = _nonces[owner];
         bytes32 permitDataDigest = keccak256(
@@ -426,7 +432,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
             abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, permitDataDigest)
         );
 
-        require(owner == ecrecover(digest, v, r, s));
+        require(owner == ecrecover(digest, v, r, s), "XCAmple: signature invalid");
 
         _nonces[owner] = ownerNonce.add(1);
 

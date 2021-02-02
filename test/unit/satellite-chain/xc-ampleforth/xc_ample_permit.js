@@ -145,7 +145,7 @@ describe('XCAmple:EIP-2612 Permit', () => {
         xcAmple
           .connect(deployer)
           .permit(ownerAddress, spenderAddress, amt, MAX_DEADLINE, v, r, s),
-      ).to.be.reverted;
+      ).to.be.revertedWith('XCAmple: signature invalid');
     });
 
     it('rejects other signature', async function () {
@@ -161,7 +161,7 @@ describe('XCAmple:EIP-2612 Permit', () => {
         xcAmple
           .connect(deployer)
           .permit(ownerAddress, spenderAddress, amt, MAX_DEADLINE, v, r, s),
-      ).to.be.reverted;
+      ).to.be.revertedWith('XCAmple: signature invalid');
     });
 
     it('rejects expired permit', async function () {
@@ -180,7 +180,7 @@ describe('XCAmple:EIP-2612 Permit', () => {
         xcAmple
           .connect(deployer)
           .permit(ownerAddress, spenderAddress, amt, deadline, v, r, s),
-      ).to.be.reverted;
+      ).to.be.revertedWith('XCAmple: surpassed permit deadline');
     });
   });
 });
