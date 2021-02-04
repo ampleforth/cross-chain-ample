@@ -35,8 +35,8 @@ import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
 contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
     using SafeMath for uint256;
 
-    address public xcAmple;
-    address public xcController;
+    address public immutable xcAmple;
+    address public immutable xcController;
 
     /**
      * @dev Forwards the most recent rebase information from the bridge handler to the xc-ample controller.
