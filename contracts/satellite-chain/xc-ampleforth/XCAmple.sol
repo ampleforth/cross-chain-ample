@@ -78,7 +78,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
 
     // EIP-2612: permit – 712-signed approvals
     // https://eips.ethereum.org/EIPS/eip-2612
-    bytes public constant EIP712_REVISION = "1";
+    string public constant EIP712_REVISION = "1";
     bytes32 public constant EIP712_DOMAIN = keccak256(
         "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
     );
@@ -192,7 +192,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
                 abi.encode(
                     EIP712_DOMAIN,
                     keccak256(bytes(_name)),
-                    keccak256(EIP712_REVISION),
+                    keccak256(bytes(EIP712_REVISION)),
                     chainId,
                     address(this)
                 )

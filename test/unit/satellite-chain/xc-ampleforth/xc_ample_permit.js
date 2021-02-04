@@ -58,7 +58,7 @@ describe('XCAmple:Initialization', () => {
   before('setup XCAmple contract', setupContracts);
 
   it('should set the EIP2612 parameters', async function () {
-    expect(await xcAmple.EIP712_REVISION()).to.eq('0x31');
+    expect(await xcAmple.EIP712_REVISION()).to.eq('1');
     expect(await xcAmple.EIP712_DOMAIN()).to.eq(EIP712_DOMAIN_TYPEHASH);
     expect(await xcAmple.PERMIT_TYPEHASH()).to.eq(EIP2612_PERMIT_TYPEHASH);
     // with hard-coded parameters
