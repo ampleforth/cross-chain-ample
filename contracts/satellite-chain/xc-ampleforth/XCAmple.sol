@@ -43,7 +43,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     }
 
     uint256 private constant DECIMALS = 9;
-    uint256 private constant MAX_UINT256 = ~uint256(0);
+    uint256 private constant MAX_UINT256 = type(uint256).max; // (2^256) - 1
     uint256 private constant INITIAL_AMPL_SUPPLY = 50 * 10**6 * 10**DECIMALS;
 
     // TOTAL_GONS is a multiple of INITIAL_AMPL_SUPPLY so that _gonsPerAMPL is an integer.
@@ -51,7 +51,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     uint256 private constant TOTAL_GONS = MAX_UINT256 - (MAX_UINT256 % INITIAL_AMPL_SUPPLY);
 
     // MAX_SUPPLY = maximum integer < (sqrt(4*TOTAL_GONS + 1) - 1) / 2
-    uint256 private constant MAX_SUPPLY = ~uint128(0); // (2^128) - 1
+    uint256 private constant MAX_SUPPLY = type(uint128).max; // (2^128) - 1
 
     // ERC-20 identity attributes
     string private _name;
@@ -78,14 +78,13 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
 
     // EIP-2612: permit – 712-signed approvals
     // https://eips.ethereum.org/EIPS/eip-2612
-    bytes public constant EIP712_REVISION = "1";
+    string public constant EIP712_REVISION = "1";
     bytes32 public constant EIP712_DOMAIN = keccak256(
         "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
     );
     bytes32 public constant PERMIT_TYPEHASH = keccak256(
         "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
     );
-    bytes32 public DOMAIN_SEPARATOR;
 
     // EIP-2612: keeps track of number of permits per address
     mapping(address => uint256) private _nonces;
@@ -109,19 +108,24 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         onlyController
         returns (uint256)
     {
-        if (newGlobalAMPLSupply == globalAMPLSupply) {
-            emit LogRebase(epoch, globalAMPLSupply);
-            return globalAMPLSupply;
+        uint256 prevGlobalAMPLSupply = globalAMPLSupply;
+        if (newGlobalAMPLSupply == prevGlobalAMPLSupply) {
+            emit LogRebase(epoch, prevGlobalAMPLSupply);
+            return prevGlobalAMPLSupply;
         }
 
-        _totalSupply = _totalSupply.mul(newGlobalAMPLSupply).div(globalAMPLSupply);
+        // update xc-ample total supply
+        _totalSupply = _totalSupply.mul(newGlobalAMPLSupply).div(prevGlobalAMPLSupply);
 
+        // update AMPL global supply
         globalAMPLSupply = newGlobalAMPLSupply;
 
-        _gonsPerAMPL = TOTAL_GONS.div(globalAMPLSupply);
+        // update scalar
+        _gonsPerAMPL = TOTAL_GONS.div(newGlobalAMPLSupply);
 
-        emit LogRebase(epoch, globalAMPLSupply);
-        return globalAMPLSupply;
+        emit LogRebase(epoch, newGlobalAMPLSupply);
+
+        return newGlobalAMPLSupply;
     }
 
     /**
@@ -144,20 +148,6 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         _totalSupply = 0;
 
         _gonsPerAMPL = TOTAL_GONS.div(globalAMPLSupply);
-
-        uint256 chainId;
-        assembly {
-            chainId := chainid()
-        }
-        DOMAIN_SEPARATOR = keccak256(
-            abi.encode(
-                EIP712_DOMAIN,
-                keccak256(bytes(name)),
-                keccak256(EIP712_REVISION),
-                chainId,
-                address(this)
-            )
-        );
     }
 
     /**
@@ -186,6 +176,27 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
      */
     function decimals() external view returns (uint8) {
         return _decimals;
+    }
+
+    /**
+     * @dev Returns the computed DOMAIN_SEPARATOR to be used off-chain services
+     *      which implement EIP-2612.
+     */
+    function DOMAIN_SEPARATOR() public view returns (bytes32) {
+        uint256 chainId;
+        assembly {
+            chainId := chainid()
+        }
+        return
+            keccak256(
+                abi.encode(
+                    EIP712_DOMAIN,
+                    keccak256(bytes(_name)),
+                    keccak256(bytes(EIP712_REVISION)),
+                    chainId,
+                    address(this)
+                )
+            );
     }
 
     /**
@@ -319,6 +330,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
      * Changing an allowance with this method brings the risk that someone may transfer both
      * the old and the new allowance - if they are both greater than zero - if a transfer
      * transaction is mined before the later approve() call is mined.
+     * Approvals are denominated in xc-amples and do NOT change with underlying balances.
      *
      * @param spender The address which will spend the funds.
      * @param value The amount of tokens to be spent.
@@ -416,17 +428,17 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         bytes32 r,
         bytes32 s
     ) public {
-        require(block.timestamp <= deadline);
+        require(block.timestamp <= deadline, "XCAmple: surpassed permit deadline");
 
         uint256 ownerNonce = _nonces[owner];
         bytes32 permitDataDigest = keccak256(
             abi.encode(PERMIT_TYPEHASH, owner, spender, value, ownerNonce, deadline)
         );
         bytes32 digest = keccak256(
-            abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, permitDataDigest)
+            abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR(), permitDataDigest)
         );
 
-        require(owner == ecrecover(digest, v, r, s));
+        require(owner == ecrecover(digest, v, r, s), "XCAmple: signature invalid");
 
         _nonces[owner] = ownerNonce.add(1);
 

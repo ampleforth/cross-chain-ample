@@ -58,7 +58,7 @@ describe('XCAmple:Initialization', () => {
   before('setup XCAmple contract', setupContracts);
 
   it('should set the EIP2612 parameters', async function () {
-    expect(await xcAmple.EIP712_REVISION()).to.eq('0x31');
+    expect(await xcAmple.EIP712_REVISION()).to.eq('1');
     expect(await xcAmple.EIP712_DOMAIN()).to.eq(EIP712_DOMAIN_TYPEHASH);
     expect(await xcAmple.PERMIT_TYPEHASH()).to.eq(EIP2612_PERMIT_TYPEHASH);
     // with hard-coded parameters
@@ -145,7 +145,7 @@ describe('XCAmple:EIP-2612 Permit', () => {
         xcAmple
           .connect(deployer)
           .permit(ownerAddress, spenderAddress, amt, MAX_DEADLINE, v, r, s),
-      ).to.be.reverted;
+      ).to.be.revertedWith('XCAmple: signature invalid');
     });
 
     it('rejects other signature', async function () {
@@ -161,7 +161,7 @@ describe('XCAmple:EIP-2612 Permit', () => {
         xcAmple
           .connect(deployer)
           .permit(ownerAddress, spenderAddress, amt, MAX_DEADLINE, v, r, s),
-      ).to.be.reverted;
+      ).to.be.revertedWith('XCAmple: signature invalid');
     });
 
     it('rejects expired permit', async function () {
@@ -180,7 +180,7 @@ describe('XCAmple:EIP-2612 Permit', () => {
         xcAmple
           .connect(deployer)
           .permit(ownerAddress, spenderAddress, amt, deadline, v, r, s),
-      ).to.be.reverted;
+      ).to.be.revertedWith('XCAmple: surpassed permit deadline');
     });
   });
 });
