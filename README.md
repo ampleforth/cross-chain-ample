@@ -1,4 +1,4 @@
-## AMPL Bridge Solidity
+## Cross Chain Ample
 
 [![Build Status](https://travis-ci.com/ampleforth/ampl-bridge-solidity.svg?token=xxNsLhLrTiyG3pc78i5v&branch=master)](https://travis-ci.com/ampleforth/ampl-bridge-solidity)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/ampleforth/ampl-bridge-solidity/badge.svg?branch=master&t=QkPsQb)](https://coveralls.io/github/ampleforth/ampl-bridge-solidity?branch=master)
 
