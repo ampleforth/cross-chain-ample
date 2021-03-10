@@ -69,19 +69,6 @@ Each new bridge integration should check for the following cases.
 - [ ] User transfers from satellite to another satellite chain and back around rebases, where transfers are before, after and in-between rebase propagation to the target chain.
 
 
-## Deployment
+## Testnet Deployment
 
-```
-yarn hardhat --network ganacheBaseChain testnet_ampl:deploy
-
-yarn hardhat --network ganacheBaseChain  chain_bridge:deploy --chain-id 100
-yarn hardhat --network ganacheSatChain1  chain_bridge:deploy --chain-id 200
-yarn hardhat --network ganacheSatChain2  chain_bridge:deploy --chain-id 201
-
-yarn hardhat --network ganacheSatChain1 xc_ample:deploy --token-name "sat1-chainBridge-Ample" --token-symbol "sat1CBAmple" --base-chain-network ganacheBaseChain
-yarn hardhat --network ganacheSatChain2 xc_ample:deploy --token-name "sat2-chainBridge-Ample" --token-symbol "sat2CBAmple" --base-chain-network ganacheBaseChain
-
-yarn hardhat --network ganacheBaseChain  base_chain_bridge_gateway:deploy
-yarn hardhat --network ganacheSatChain1 satellite_chain_bridge_gateway:deploy
-yarn hardhat --network ganacheSatChain2 satellite_chain_bridge_gateway:deploy
-```
+* [Deploy local geth and chain-bridge](https://github.com/ampleforth/cross-chain-ample/wiki/Chainbridge---Local-geth-deployment)

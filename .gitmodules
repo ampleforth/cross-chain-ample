@@ -1,0 +1,3 @@
+[submodule "chainbridge-deploy"]
+	path = chainbridge-deploy
+	url = https://github.com/ChainSafe/chainbridge-deploy

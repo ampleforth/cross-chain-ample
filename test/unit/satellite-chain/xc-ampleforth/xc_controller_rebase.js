@@ -1,6 +1,6 @@
 const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
-const { increaseTime } = require('../../../_helpers/ethers_helpers');
+const { increaseTime } = require('../../../helpers/ethers');
 
 let accounts,
   deployer,

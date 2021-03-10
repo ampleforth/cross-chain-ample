@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+get-network-config(){
+  NETWORK_REF=$1
+  PORT=0
+  CHAIN_ID=0
+
+  if [ "$NETWORK_REF" == "gethBaseChain" ]; then
+    PORT=7545
+    CHAIN_ID=99999991
+  elif [ "$NETWORK_REF" == "gethSatChain1" ]; then
+    PORT=7550
+    CHAIN_ID=99999992
+  elif [ "$NETWORK_REF" == "gethSatChain2" ]; then
+    PORT=7555
+    CHAIN_ID=99999993
+  fi
+
+  echo "$NETWORK_REF" "$PORT" "$CHAIN_ID"
+}
+
+get-network-config $1

@@ -2,4 +2,4 @@
 // Importing chain-bridge contract dependencies to be compiled for integration tests
 pragma solidity 0.6.4;
 
-import "chainbridge-solidity/contracts/handlers/GenericHandler.sol";
+import "chainbridge-solidity/contracts/handlers/ERC20Handler.sol";

@@ -5,14 +5,13 @@
   "repository": "https://github.com/ampleforth/ampl-chainbridge",
   "author": "eng@ampleforth.org",
   "scripts": {
-    "compile": "rm -rf artifacts && yarn hardhat compile",
+    "compile": "yarn hardhat compile",
     "coverage": "yarn hardhat coverage --testfiles 'test/unit/**/*.js'",
     "format": "yarn prettier --config .prettierrc --write '**/*.js' 'contracts/**/*.sol'",
     "lint": "yarn solhint 'contracts/**/*.sol' && yarn eslint ./test *.js --cache --fix",
-    "test": "yarn hardhat test",
-    "test-ganache": "yarn hardhat test --network ganache",
     "profile": "REPORT_GAS=true yarn hardhat test",
-    "cmd": "node ./cmd/index"
+    "test": "yarn hardhat test",
+    "test-ganache": "yarn hardhat test --network ganache"
   },
   "pre-commit": [
     "format",
@@ -21,19 +20,21 @@
   "dependencies": {
     "@openzeppelin/contracts": "^3.2.0",
     "@openzeppelin/contracts-upgradeable": "^3.3.0",
-    "chainbridge-solidity": "https://github.com/ChainSafe/chainbridge-solidity#1d5bfa3570c8bf6b87bcb579e0216601ab68bf20",
+    "@openzeppelin/upgrades": "^2.8.0",
+    "chainbridge-solidity": "https://github.com/ChainSafe/chainbridge-solidity#a15727ad30bb359b4dfd0fb155f338d11ea80753",
     "market-oracle": "https://github.com/ampleforth/market-oracle#v1.0.1",
-    "uFragments": "https://github.com/ampleforth/uFragments#v1.0.5-alpha"
+    "uFragments": "https://github.com/ampleforth/uFragments#v1.1.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "@nomiclabs/hardhat-etherscan": "^2.1.1",
     "@nomiclabs/hardhat-ganache": "^2.0.0",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@openzeppelin/hardhat-upgrades": "^1.4.3",
+    "@openzeppelin/hardhat-upgrades": "^1.5.1",
     "@types/chai": "^4.2.12",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.6.1",
-    "bignumber.js": "^9.0.0",
+    "bignumber.js": "^9.0.1",
     "chai": "^4.2.0",
     "commander": "^6.2.1",
     "eslint": "^4.19.1",
@@ -52,6 +53,8 @@
     "ethers": "5.0.18",
     "hardhat": "^2.0.7",
     "hardhat-gas-reporter": "^1.0.3",
+    "js-yaml": "^4.0.0",
+    "node-fetch": "^2.6.1",
     "pre-commit": "^1.2.2",
     "prettier": "^2.1.1",
     "prettier-plugin-solidity": "^1.0.0-alpha.57",

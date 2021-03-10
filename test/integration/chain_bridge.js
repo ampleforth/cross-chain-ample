@@ -1,24 +1,26 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
-const {
-  setupAMPLContracts,
-  setupXCAMPLContracts,
-  toAmplDenomination
-} = require('../_helpers/ampl_helpers');
+const ETH_CHAIN_ID = '1';
+const TRON_CHAIN_ID = '2';
+const ACALA_CHAIN_ID = '3';
+const RELAYER_TRESHOLD = 2;
 
 const {
-  ETH_CHAIN_ID,
-  TRON_CHAIN_ID,
-  ACALA_CHAIN_ID,
-  setupBaseBridgeContracts,
-  setupSatelliteBridgeContracts,
-  propagateXCRebase,
-  propagateXCTransfer,
-  packXCTransferData,
-  transferResource,
-  executeBridgeTx
-} = require('../_helpers/chain_bridge_helpers');
+  executeXCRebase,
+  executeXCTransfer,
+  XC_TRANSFER_RESOURCE_ID,
+  packXCTransferData
+} = require('../../sdk/chain_bridge');
+const { execRebase, toAmplFixedPt } = require('../../sdk/ampleforth');
+
+const {
+  deployAMPLContracts,
+  deployXCAmpleContracts,
+  deployChainBridgeContracts,
+  deployChainBridgeBaseChainGatewayContracts,
+  deployChainBridgeSatelliteChainGatewayContracts
+} = require('../../helpers/deploy');
 
 let accounts,
   deployer,
@@ -45,34 +47,100 @@ async function setupContracts () {
 
   userABaseChainWallet = accounts[2];
   userBBaseChainWallet = accounts[3];
+
   userASatChain1Wallet = accounts[4];
   userBSatChain1Wallet = accounts[5];
 
   userASatChain2Wallet = accounts[6];
   userBSatChain2Wallet = accounts[7];
 
-  baseChainAmplContracts = await setupAMPLContracts(deployer);
-  baseChainBridgeContracts = await setupBaseBridgeContracts(
+  baseChainAmplContracts = await deployAMPLContracts(ethers, deployer);
+  baseChainBridgeContracts = await deployChainBridgeContracts(
+    {
+      chainId: ETH_CHAIN_ID,
+      relayers: [await deployer.getAddress(), await relayer.getAddress()],
+      relayerThreshold: RELAYER_TRESHOLD,
+      fee: 0,
+      expiry: 1000
+    },
+    ethers,
     deployer,
-    relayer,
-    baseChainAmplContracts,
-    ETH_CHAIN_ID,
+  );
+  const baseChainBridgeGatewayContracts = await deployChainBridgeBaseChainGatewayContracts(
+    { ...baseChainAmplContracts, ...baseChainBridgeContracts },
+    ethers,
+    deployer,
+  );
+  baseChainBridgeContracts = Object.assign(
+    baseChainBridgeContracts,
+    baseChainBridgeGatewayContracts,
   );
 
-  satChain1AmplContracts = await setupXCAMPLContracts(deployer);
-  satChain1BridgeContracts = await setupSatelliteBridgeContracts(
+  const [
+    globalAmpleforthEpoch,
+    globalAMPLSupply
+  ] = await baseChainAmplContracts.policy.globalAmpleforthEpochAndAMPLSupply();
+
+  satChain1AmplContracts = await deployXCAmpleContracts(
+    {
+      tokenSymbol: 'satChain1XCAmple',
+      tokenName: 'satChain1XCAmple',
+      globalAmpleforthEpoch,
+      globalAMPLSupply
+    },
+    ethers,
     deployer,
-    relayer,
-    satChain1AmplContracts,
-    TRON_CHAIN_ID,
+  );
+  satChain1BridgeContracts = await deployChainBridgeContracts(
+    {
+      chainId: TRON_CHAIN_ID,
+      relayers: [await deployer.getAddress(), await relayer.getAddress()],
+      relayerThreshold: RELAYER_TRESHOLD,
+      fee: 0,
+      expiry: 1000
+    },
+    ethers,
+    deployer,
+  );
+  const satChain1BridgeGatewayContracts = await deployChainBridgeSatelliteChainGatewayContracts(
+    { ...satChain1AmplContracts, ...satChain1BridgeContracts },
+    ethers,
+    deployer,
+  );
+  satChain1BridgeContracts = Object.assign(
+    satChain1BridgeContracts,
+    satChain1BridgeGatewayContracts,
   );
 
-  satChain2AmplContracts = await setupXCAMPLContracts(deployer);
-  satChain2BridgeContracts = await setupSatelliteBridgeContracts(
+  satChain2AmplContracts = await deployXCAmpleContracts(
+    {
+      tokenSymbol: 'satChain2XCAmple',
+      tokenName: 'satChain2XCAmple',
+      globalAmpleforthEpoch,
+      globalAMPLSupply
+    },
+    ethers,
     deployer,
-    relayer,
-    satChain2AmplContracts,
-    ACALA_CHAIN_ID,
+  );
+  satChain2BridgeContracts = await deployChainBridgeContracts(
+    {
+      chainId: ACALA_CHAIN_ID,
+      relayers: [await deployer.getAddress(), await relayer.getAddress()],
+      relayerThreshold: RELAYER_TRESHOLD,
+      fee: 0,
+      expiry: 1000
+    },
+    ethers,
+    deployer,
+  );
+  const satChain2BridgeGatewayContracts = await deployChainBridgeSatelliteChainGatewayContracts(
+    { ...satChain2AmplContracts, ...satChain2BridgeContracts },
+    ethers,
+    deployer,
+  );
+  satChain2BridgeContracts = Object.assign(
+    satChain2BridgeContracts,
+    satChain2BridgeGatewayContracts,
   );
 
   bridgeContractsMap = {
@@ -90,58 +158,130 @@ async function setupContracts () {
   // On the main-chain userA and userB have 100k AMPLs each
   await baseChainAmplContracts.ampl
     .connect(deployer)
-    .transfer(
-      await userABaseChainWallet.getAddress(),
-      toAmplDenomination('100000'),
-    );
+    .transfer(await userABaseChainWallet.getAddress(), toAmplFixedPt('100000'));
 
   await baseChainAmplContracts.ampl
     .connect(deployer)
-    .transfer(
-      await userBBaseChainWallet.getAddress(),
-      toAmplDenomination('100000'),
-    );
+    .transfer(await userBBaseChainWallet.getAddress(), toAmplFixedPt('100000'));
 }
 
-async function execXCRebase (perc, chainSubset = []) {
+async function mockOffchain (
+  toChainBridge,
+  fromChainID,
+  depositNonce,
+  resourceID,
+  dataHash,
+  data,
+) {
+  await toChainBridge
+    .connect(relayer)
+    .voteProposal(fromChainID, depositNonce, resourceID, dataHash);
+
+  await toChainBridge
+    .connect(deployer)
+    .voteProposal(fromChainID, depositNonce, resourceID, dataHash);
+
+  await toChainBridge
+    .connect(deployer)
+    .executeProposal(fromChainID, depositNonce, data, resourceID);
+  // console.log((await toChainBridge.getProposal(fromChainID, depositNonce, dataHash))._status);
+}
+
+async function execXCReportRebase (chain) {
+  const fromChainID = await baseChainBridgeContracts.bridge._chainID();
+
+  // Triggering rebase report to sat chain
+  const { data, dataHash, depositNonce, resourceID } = await executeXCRebase(
+    deployer,
+    baseChainBridgeContracts.bridge,
+    bridgeContractsMap[chain].bridge,
+    bridgeContractsMap[chain].genericHandler,
+    baseChainAmplContracts.policy,
+  );
+
+  // Executing rebase report on sat chain
+  await mockOffchain(
+    bridgeContractsMap[chain].bridge,
+    fromChainID,
+    depositNonce,
+    resourceID,
+    dataHash,
+    data,
+  );
+}
+
+// Executes rebase end to end
+async function execXCRebaseE2E (perc, chainSubset = []) {
   const chains =
     chainSubset.length === 0 ? Object.keys(bridgeContractsMap) : chainSubset;
 
-  await amplContractsMap['base'].execRebase(perc);
+  // Base chain rebase
+  await execRebase(
+    perc,
+    amplContractsMap['base'].rateOracle,
+    amplContractsMap['base'].orchestrator,
+    amplContractsMap['base'].policy,
+    deployer,
+  );
 
+  // Report rebase to sat chain
   let b;
   for (b in chains) {
     const chain = chains[b];
     if (chain !== 'base') {
-      await propagateXCRebase(
-        deployer,
-        deployer,
-        relayer,
-        await baseChainAmplContracts.getCurrentState(),
-        baseChainBridgeContracts,
-        bridgeContractsMap[chain],
-      );
-      await amplContractsMap[chain].xcController.rebase();
+      await execXCReportRebase(chain);
+    }
+  }
+
+  // Sat chain rebase
+  for (b in chains) {
+    const chain = chains[b];
+    if (chain !== 'base') {
+      await amplContractsMap[chain].xcAmpleController.rebase();
     }
   }
 }
 
-async function execXCSend (fromChain, toChain, fromAccount, toAccount, amount) {
-  if (fromChain === 'base') {
+async function execXCSend (
+  fromChain,
+  toChain,
+  fromAccount,
+  toAccount,
+  amount,
+  setApproval = true,
+) {
+  if (setApproval && fromChain === 'base') {
     await baseChainAmplContracts.ampl
       .connect(fromAccount)
-      .approve(bridgeContractsMap[fromChain].amplVault.address, amount);
+      .approve(bridgeContractsMap[fromChain].tokenVault.address, amount);
   }
-  await propagateXCTransfer(
+
+  const policy =
+    fromChain === 'base'
+      ? amplContractsMap[fromChain].policy
+      : amplContractsMap[fromChain].xcAmpleController;
+  const fromChainBridge = bridgeContractsMap[fromChain].bridge;
+  const toChainBridge = bridgeContractsMap[toChain].bridge;
+  const toChainHandler = bridgeContractsMap[toChain].genericHandler;
+  const fromChainID = await fromChainBridge._chainID();
+
+  const { data, dataHash, depositNonce, resourceID } = await executeXCTransfer(
     fromAccount,
-    deployer,
-    relayer,
-    bridgeContractsMap[fromChain],
-    bridgeContractsMap[toChain],
-    await amplContractsMap[fromChain].getCurrentState(),
-    await fromAccount.getAddress(),
     await toAccount.getAddress(),
     amount,
+    policy,
+    fromChainBridge,
+    toChainBridge,
+    toChainHandler,
+  );
+
+  await mockOffchain(
+    toChainBridge,
+    fromChainID,
+    depositNonce,
+    resourceID,
+    dataHash,
+    data,
   );
 }
 
@@ -187,7 +327,7 @@ async function checkBalancesAndSupply (
   sat2Supply,
 ) {
   const ROUNDING_ERROR_TOLARANCE = '0.00000001'; // 1e8, 0.00000001 AMPL
-  const ROUNDING_ERROR_LIMIT = toAmplDenomination(ROUNDING_ERROR_TOLARANCE);
+  const ROUNDING_ERROR_LIMIT = toAmplFixedPt(ROUNDING_ERROR_TOLARANCE);
 
   const cmp = (a, b) => {
     try {
@@ -202,19 +342,19 @@ async function checkBalancesAndSupply (
 
   let b_;
   for (b_ in baseBalances) {
-    cmp(toAmplDenomination(baseBalances[b_]), b.baseBalances[b_]);
+    cmp(toAmplFixedPt(baseBalances[b_]), b.baseBalances[b_]);
   }
 
   for (b_ in sat1Balances) {
-    cmp(toAmplDenomination(sat1Balances[b_]), b.sat1Balances[b_]);
+    cmp(toAmplFixedPt(sat1Balances[b_]), b.sat1Balances[b_]);
   }
-  cmp(toAmplDenomination(sat1Supply), b.sat1Supply);
+  cmp(toAmplFixedPt(sat1Supply), b.sat1Supply);
 
   for (b_ in sat2Balances) {
-    cmp(toAmplDenomination(sat2Balances[b_]), b.sat2Balances[b_]);
+    cmp(toAmplFixedPt(sat2Balances[b_]), b.sat2Balances[b_]);
   }
 
-  cmp(toAmplDenomination(sat2Supply), b.sat2Supply);
+  cmp(toAmplFixedPt(sat2Supply), b.sat2Supply);
 }
 
 describe('Rebase scenarios', function () {
@@ -225,21 +365,21 @@ describe('Rebase scenarios', function () {
       'sat1',
       userABaseChainWallet,
       userASatChain1Wallet,
-      toAmplDenomination('2500'),
+      toAmplFixedPt('2500'),
     );
     await execXCSend(
       'base',
       'sat1',
       userBBaseChainWallet,
       userBSatChain1Wallet,
-      toAmplDenomination('10000'),
+      toAmplFixedPt('10000'),
     );
     await execXCSend(
       'base',
       'sat2',
       userBBaseChainWallet,
       userBSatChain2Wallet,
-      toAmplDenomination('10000'),
+      toAmplFixedPt('10000'),
     );
   });
 
@@ -252,7 +392,7 @@ describe('Rebase scenarios', function () {
         ['0', '10000'],
         '10000',
       );
-      await execXCRebase(0);
+      await execXCRebaseE2E(0);
       await checkBalancesAndSupply(
         ['97500', '80000'],
         ['2500', '10000'],
@@ -272,7 +412,7 @@ describe('Rebase scenarios', function () {
         ['0', '10000'],
         '10000',
       );
-      await execXCRebase(+10);
+      await execXCRebaseE2E(+10);
       await checkBalancesAndSupply(
         ['107250', '88000'],
         ['2750', '11000'],
@@ -292,7 +432,7 @@ describe('Rebase scenarios', function () {
         ['0', '10000'],
         '10000',
       );
-      await execXCRebase(-10);
+      await execXCRebaseE2E(-10);
       await checkBalancesAndSupply(
         ['87750', '72000'],
         ['2250', '9000'],
@@ -312,7 +452,14 @@ describe('Rebase scenarios', function () {
         ['0', '10000'],
         '10000',
       );
-      await baseChainAmplContracts.execRebase(0); // rebase not propagated
+
+      await execRebase(
+        0,
+        baseChainAmplContracts.rateOracle,
+        baseChainAmplContracts.orchestrator,
+        baseChainAmplContracts.policy,
+        deployer,
+      );
 
       await checkBalancesAndSupply(
         ['97500', '80000'],
@@ -321,7 +468,14 @@ describe('Rebase scenarios', function () {
         ['0', '10000'],
         '10000',
       );
-      await execXCRebase(0); // rebase propagated
+
+      await execRebase(
+        0,
+        baseChainAmplContracts.rateOracle,
+        baseChainAmplContracts.orchestrator,
+        baseChainAmplContracts.policy,
+        deployer,
+      );
 
       await checkBalancesAndSupply(
         ['97500', '80000'],
@@ -344,7 +498,7 @@ describe('Rebase scenarios', function () {
       );
 
       // rebase not propagated to sat1
-      await execXCRebase(+10, ['base', 'sat2']);
+      await execXCRebaseE2E(+10, ['base', 'sat2']);
       await checkBalancesAndSupply(
         ['107250', '88000'],
         ['2500', '10000'],
@@ -354,7 +508,7 @@ describe('Rebase scenarios', function () {
       );
 
       // all chains get the rebase
-      await execXCRebase(+10);
+      await execXCRebaseE2E(+10);
 
       await checkBalancesAndSupply(
         ['117975', '96800'],
@@ -377,7 +531,7 @@ describe('Rebase scenarios', function () {
       );
 
       // rebase not propagated to sat1
-      await execXCRebase(-10, ['base', 'sat2']);
+      await execXCRebaseE2E(-10, ['base', 'sat2']);
       await checkBalancesAndSupply(
         ['87750', '72000'],
         ['2500', '10000'],
@@ -387,7 +541,7 @@ describe('Rebase scenarios', function () {
       );
 
       // all chains get the rebase
-      await execXCRebase(-10);
+      await execXCRebaseE2E(-10);
 
       await checkBalancesAndSupply(
         ['78975', '64800'],
@@ -410,21 +564,17 @@ describe('Transfers scenarios', function () {
       await baseChainAmplContracts.ampl
         .connect(userBBaseChainWallet)
         .approve(
-          bridgeContractsMap['base'].amplVault.address,
-          toAmplDenomination('0'),
+          bridgeContractsMap['base'].tokenVault.address,
+          toAmplFixedPt('0'),
         );
-
       await expect(
-        propagateXCTransfer(
+        execXCSend(
+          'base',
+          'sat1',
           userBBaseChainWallet,
-          deployer,
-          relayer,
-          bridgeContractsMap['base'],
-          bridgeContractsMap['sat1'],
-          await amplContractsMap['base'].getCurrentState(),
-          await userBBaseChainWallet.getAddress(),
-          await userBSatChain1Wallet.getAddress(),
-          toAmplDenomination('5000'),
+          userBSatChain1Wallet,
+          toAmplFixedPt('5000'),
+          false,
         ),
       ).to.be.reverted;
     });
@@ -435,21 +585,18 @@ describe('Transfers scenarios', function () {
       await baseChainAmplContracts.ampl
         .connect(userBBaseChainWallet)
         .approve(
-          bridgeContractsMap['base'].amplVault.address,
-          toAmplDenomination('5000'),
+          bridgeContractsMap['base'].tokenVault.address,
+          toAmplFixedPt('5000'),
         );
 
       await expect(
-        propagateXCTransfer(
+        execXCSend(
+          'base',
+          'sat1',
           userBBaseChainWallet,
-          deployer,
-          relayer,
-          bridgeContractsMap['base'],
-          bridgeContractsMap['sat1'],
-          await amplContractsMap['base'].getCurrentState(),
-          await userBBaseChainWallet.getAddress(),
-          await userBSatChain1Wallet.getAddress(),
-          toAmplDenomination('5000'),
+          userBSatChain1Wallet,
+          toAmplFixedPt('5000'),
+          false,
         ),
       ).not.to.be.reverted;
     });
@@ -461,30 +608,52 @@ describe('Transfers scenarios', function () {
       await baseChainAmplContracts.ampl
         .connect(userABaseChainWallet)
         .approve(
-          bridgeContractsMap['base'].amplVault.address,
-          toAmplDenomination('1000'),
+          bridgeContractsMap['base'].tokenVault.address,
+          toAmplFixedPt('1000'),
         );
 
       // userB front-runs A, tries to transfer userA's funds to a different wallet
       // on the satellite chain
-      const st = await amplContractsMap['base'].getCurrentState();
+      const fromChainBridge = baseChainBridgeContracts.bridge;
+      const toChainBridge = satChain1BridgeContracts.bridge;
+      const senderAddress = await userABaseChainWallet.getAddress();
+      const recepientAddress = await userASatChain1Wallet.getAddress();
+      const maliciousRecepientAddress = await userBSatChain1Wallet.getAddress();
+      const r = await baseChainAmplContracts.policy.globalAmpleforthEpochAndAMPLSupply();
+
+      const correctData = packXCTransferData(
+        senderAddress,
+        recepientAddress,
+        toAmplFixedPt('1000'),
+        r[1],
+      );
+
+      const maliciousData = packXCTransferData(
+        senderAddress,
+        maliciousRecepientAddress,
+        toAmplFixedPt('1000'),
+        r[1],
+      );
+
       await expect(
-        executeBridgeTx(
-          userBBaseChainWallet, // userB triggers tx
-          deployer,
-          relayer,
-          bridgeContractsMap['base'],
-          bridgeContractsMap['sat1'],
-          transferResource,
-          // but in the packed data bytes sends
-          packXCTransferData(
-            await userABaseChainWallet.getAddress(),
-            await userBSatChain1Wallet.getAddress(),
-            toAmplDenomination('1000'),
-            st.totalSupply,
+        fromChainBridge
+          .connect(userBBaseChainWallet)
+          .deposit(
+            await toChainBridge._chainID(),
+            XC_TRANSFER_RESOURCE_ID,
+            maliciousData,
           ),
-        ),
       ).to.be.revertedWith('incorrect depositer in the data');
+
+      await expect(
+        fromChainBridge
+          .connect(userABaseChainWallet)
+          .deposit(
+            await toChainBridge._chainID(),
+            XC_TRANSFER_RESOURCE_ID,
+            correctData,
+          ),
+      ).not.to.be.reverted;
     });
   });
 
@@ -503,7 +672,7 @@ describe('Transfers scenarios', function () {
         'sat1',
         userABaseChainWallet,
         userASatChain1Wallet,
-        toAmplDenomination('5000'),
+        toAmplFixedPt('5000'),
       );
       await checkBalancesAndSupply(
         ['95000', '100000'],
@@ -518,7 +687,7 @@ describe('Transfers scenarios', function () {
         'sat1',
         userBBaseChainWallet,
         userBSatChain1Wallet,
-        toAmplDenomination('25000'),
+        toAmplFixedPt('25000'),
       );
       await checkBalancesAndSupply(
         ['95000', '75000'],
@@ -533,7 +702,7 @@ describe('Transfers scenarios', function () {
         'base',
         userASatChain1Wallet,
         userBBaseChainWallet,
-        toAmplDenomination('2500'),
+        toAmplFixedPt('2500'),
       );
       await checkBalancesAndSupply(
         ['95000', '77500'],
@@ -548,7 +717,7 @@ describe('Transfers scenarios', function () {
         'base',
         userBSatChain1Wallet,
         userBBaseChainWallet,
-        toAmplDenomination('24000'),
+        toAmplFixedPt('24000'),
       );
       await checkBalancesAndSupply(
         ['95000', '101500'],
@@ -571,13 +740,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+0);
+        await execXCRebaseE2E(+0);
         await execXCSend(
           'base',
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
         await checkBalancesAndSupply(
           ['95000', '100000'],
@@ -587,13 +756,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+0);
+        await execXCRebaseE2E(+0);
         await execXCSend(
           'sat1',
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
         await checkBalancesAndSupply(
           ['97500', '100000'],
@@ -615,23 +784,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+0, ['base']);
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain1BridgeContracts,
-        );
+        await execXCRebaseE2E(+0, ['base']);
+        await execXCReportRebase(['sat1']);
         await execXCSend(
           'base',
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
-        await satChain1AmplContracts.xcController.rebase();
+        await satChain1AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['95000', '100000'],
           ['5000', '0'],
@@ -640,23 +802,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+0, ['base']);
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain1BridgeContracts,
-        );
+        await execXCRebaseE2E(+0, ['base']);
+        await execXCReportRebase(['sat1']);
         await execXCSend(
           'sat1',
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
-        await satChain1AmplContracts.xcController.rebase();
+        await satChain1AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['97500', '100000'],
           ['2500', '0'],
@@ -682,9 +837,9 @@ describe('Transfers scenarios', function () {
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
-        await execXCRebase(+0);
+        await execXCRebaseE2E(+0);
         await checkBalancesAndSupply(
           ['95000', '100000'],
           ['5000', '0'],
@@ -698,9 +853,9 @@ describe('Transfers scenarios', function () {
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
-        await execXCRebase(+0);
+        await execXCRebaseE2E(+0);
         await checkBalancesAndSupply(
           ['97500', '100000'],
           ['2500', '0'],
@@ -723,13 +878,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+10);
+        await execXCRebaseE2E(+10);
         await execXCSend(
           'base',
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
         await checkBalancesAndSupply(
           ['105000', '110000'],
@@ -739,13 +894,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+10);
+        await execXCRebaseE2E(+10);
         await execXCSend(
           'sat1',
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
         await checkBalancesAndSupply(
           ['118000', '121000'],
@@ -767,23 +922,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+10, ['base']);
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain1BridgeContracts,
-        );
+        await execXCRebaseE2E(+10, ['base']);
+        await execXCReportRebase(['sat1']);
         await execXCSend(
           'base',
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
-        await satChain1AmplContracts.xcController.rebase();
+        await satChain1AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['105000', '110000'],
           ['5000', '0'],
@@ -792,23 +940,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+10, ['base']);
+        await execXCRebaseE2E(+10, ['base']);
         await execXCSend(
           'sat1',
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain1BridgeContracts,
-        );
-        await satChain1AmplContracts.xcController.rebase();
+        await execXCReportRebase(['sat1']);
+        await satChain1AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['118250', '121000'],
           ['2750', '0'],
@@ -834,9 +975,9 @@ describe('Transfers scenarios', function () {
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
-        await execXCRebase(+10);
+        await execXCRebaseE2E(+10);
         await checkBalancesAndSupply(
           ['104500', '110000'],
           ['5500', '0'],
@@ -850,9 +991,9 @@ describe('Transfers scenarios', function () {
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
-        await execXCRebase(+10);
+        await execXCRebaseE2E(+10);
         await checkBalancesAndSupply(
           ['117700', '121000'],
           ['3300', '0'],
@@ -875,13 +1016,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(-10);
+        await execXCRebaseE2E(-10);
         await execXCSend(
           'base',
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
         await checkBalancesAndSupply(
           ['85000', '90000'],
@@ -891,13 +1032,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(-10);
+        await execXCRebaseE2E(-10);
         await execXCSend(
           'sat1',
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
         await checkBalancesAndSupply(
           ['79000', '81000'],
@@ -919,23 +1060,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(-10, ['base']);
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain1BridgeContracts,
-        );
+        await execXCRebaseE2E(-10, ['base']);
+        await execXCReportRebase(['sat1']);
         await execXCSend(
           'base',
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
-        await satChain1AmplContracts.xcController.rebase();
+        await satChain1AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['85000', '90000'],
           ['5000', '0'],
@@ -944,23 +1078,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(-10, ['base']);
+        await execXCRebaseE2E(-10, ['base']);
         await execXCSend(
           'sat1',
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain1BridgeContracts,
-        );
-        await satChain1AmplContracts.xcController.rebase();
+        await execXCReportRebase(['sat1']);
+        await satChain1AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['78750', '81000'],
           ['2250', '0'],
@@ -986,9 +1113,9 @@ describe('Transfers scenarios', function () {
           'sat1',
           userABaseChainWallet,
           userASatChain1Wallet,
-          toAmplDenomination('5000'),
+          toAmplFixedPt('5000'),
         );
-        await execXCRebase(-10);
+        await execXCRebaseE2E(-10);
         await checkBalancesAndSupply(
           ['85500', '90000'],
           ['4500', '0'],
@@ -1002,9 +1129,9 @@ describe('Transfers scenarios', function () {
           'base',
           userASatChain1Wallet,
           userABaseChainWallet,
-          toAmplDenomination('2500'),
+          toAmplFixedPt('2500'),
         );
-        await execXCRebase(-10);
+        await execXCRebaseE2E(-10);
         await checkBalancesAndSupply(
           ['79200', '81000'],
           ['1800', '0'],
@@ -1023,14 +1150,14 @@ describe('Transfers scenarios', function () {
         'sat1',
         userABaseChainWallet,
         userASatChain1Wallet,
-        toAmplDenomination('5000'),
+        toAmplFixedPt('5000'),
       );
       await execXCSend(
         'base',
         'sat1',
         userBBaseChainWallet,
         userBSatChain1Wallet,
-        toAmplDenomination('25000'),
+        toAmplFixedPt('25000'),
       );
     });
 
@@ -1048,7 +1175,7 @@ describe('Transfers scenarios', function () {
         'sat2',
         userASatChain1Wallet,
         userASatChain2Wallet,
-        toAmplDenomination('1000'),
+        toAmplFixedPt('1000'),
       );
       await checkBalancesAndSupply(
         ['95000', '75000'],
@@ -1063,7 +1190,7 @@ describe('Transfers scenarios', function () {
         'sat2',
         userBSatChain1Wallet,
         userBSatChain2Wallet,
-        toAmplDenomination('5000'),
+        toAmplFixedPt('5000'),
       );
       await checkBalancesAndSupply(
         ['95000', '75000'],
@@ -1078,7 +1205,7 @@ describe('Transfers scenarios', function () {
         'sat1',
         userASatChain2Wallet,
         userASatChain1Wallet,
-        toAmplDenomination('500'),
+        toAmplFixedPt('500'),
       );
       await checkBalancesAndSupply(
         ['95000', '75000'],
@@ -1093,7 +1220,7 @@ describe('Transfers scenarios', function () {
         'sat1',
         userBSatChain2Wallet,
         userBSatChain1Wallet,
-        toAmplDenomination('5000'),
+        toAmplFixedPt('5000'),
       );
       await checkBalancesAndSupply(
         ['95000', '75000'],
@@ -1112,7 +1239,7 @@ describe('Transfers scenarios', function () {
         'sat1',
         userABaseChainWallet,
         userASatChain1Wallet,
-        toAmplDenomination('5000'),
+        toAmplFixedPt('5000'),
       );
     });
 
@@ -1126,13 +1253,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+0);
+        await execXCRebaseE2E(+0);
         await execXCSend(
           'sat1',
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
         await checkBalancesAndSupply(
           ['95000', '100000'],
@@ -1142,13 +1269,13 @@ describe('Transfers scenarios', function () {
           '1000',
         );
 
-        await execXCRebase(+0);
+        await execXCRebaseE2E(+0);
         await execXCSend(
           'sat2',
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
         await checkBalancesAndSupply(
           ['95000', '100000'],
@@ -1170,23 +1297,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+0, ['base', 'sat1']);
+        await execXCRebaseE2E(+0, ['base', 'sat1']);
         await execXCSend(
           'sat1',
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain2BridgeContracts,
-        );
-        await satChain2AmplContracts.xcController.rebase();
+        await execXCReportRebase(['sat2']);
+        await satChain2AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['95000', '100000'],
           ['4000', '0'],
@@ -1195,23 +1315,16 @@ describe('Transfers scenarios', function () {
           '1000',
         );
 
-        await execXCRebase(+0, ['base', 'sat1']);
+        await execXCRebaseE2E(+0, ['base', 'sat1']);
         await execXCSend(
           'sat2',
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain2BridgeContracts,
-        );
-        await satChain2AmplContracts.xcController.rebase();
+        await execXCReportRebase(['sat2']);
+        await satChain2AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['95000', '100000'],
           ['4500', '0'],
@@ -1237,9 +1350,9 @@ describe('Transfers scenarios', function () {
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
-        await execXCRebase(+0);
+        await execXCRebaseE2E(+0);
         await checkBalancesAndSupply(
           ['95000', '100000'],
           ['4000', '0'],
@@ -1253,9 +1366,9 @@ describe('Transfers scenarios', function () {
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
-        await execXCRebase(+0);
+        await execXCRebaseE2E(+0);
         await checkBalancesAndSupply(
           ['95000', '100000'],
           ['4500', '0'],
@@ -1274,7 +1387,7 @@ describe('Transfers scenarios', function () {
         'sat1',
         userABaseChainWallet,
         userASatChain1Wallet,
-        toAmplDenomination('5000'),
+        toAmplFixedPt('5000'),
       );
     });
 
@@ -1288,13 +1401,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+10);
+        await execXCRebaseE2E(+10);
         await execXCSend(
           'sat1',
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
         await checkBalancesAndSupply(
           ['104500', '110000'],
@@ -1304,13 +1417,13 @@ describe('Transfers scenarios', function () {
           '1000',
         );
 
-        await execXCRebase(+10);
+        await execXCRebaseE2E(+10);
         await execXCSend(
           'sat2',
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
         await checkBalancesAndSupply(
           ['114950', '121000'],
@@ -1332,23 +1445,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(+10, ['base', 'sat1']);
+        await execXCRebaseE2E(+10, ['base', 'sat1']);
         await execXCSend(
           'sat1',
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain2BridgeContracts,
-        );
-        await satChain2AmplContracts.xcController.rebase();
+        await execXCReportRebase(['sat2']);
+        await satChain2AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['104500', '110000'],
           ['4500', '0'],
@@ -1357,23 +1463,16 @@ describe('Transfers scenarios', function () {
           '1000',
         );
 
-        await execXCRebase(+10, ['base', 'sat1']);
+        await execXCRebaseE2E(+10, ['base', 'sat1']);
         await execXCSend(
           'sat2',
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain2BridgeContracts,
-        );
-        await satChain2AmplContracts.xcController.rebase();
+        await execXCReportRebase(['sat2']);
+        await satChain2AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['114950', '121000'],
           ['5500', '0'],
@@ -1399,9 +1498,9 @@ describe('Transfers scenarios', function () {
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
-        await execXCRebase(+10);
+        await execXCRebaseE2E(+10);
         await checkBalancesAndSupply(
           ['104500', '110000'],
           ['4400', '0'],
@@ -1415,9 +1514,9 @@ describe('Transfers scenarios', function () {
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
-        await execXCRebase(+10);
+        await execXCRebaseE2E(+10);
         await checkBalancesAndSupply(
           ['114950', '121000'],
           ['5390', '0'],
@@ -1436,7 +1535,7 @@ describe('Transfers scenarios', function () {
         'sat1',
         userABaseChainWallet,
         userASatChain1Wallet,
-        toAmplDenomination('5000'),
+        toAmplFixedPt('5000'),
       );
     });
 
@@ -1450,13 +1549,13 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(-10);
+        await execXCRebaseE2E(-10);
         await execXCSend(
           'sat1',
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
         await checkBalancesAndSupply(
           ['85500', '90000'],
@@ -1466,13 +1565,13 @@ describe('Transfers scenarios', function () {
           '1000',
         );
 
-        await execXCRebase(-10);
+        await execXCRebaseE2E(-10);
         await execXCSend(
           'sat2',
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
         await checkBalancesAndSupply(
           ['76950', '81000'],
@@ -1494,23 +1593,16 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await execXCRebase(-10, ['base', 'sat1']);
+        await execXCRebaseE2E(-10, ['base', 'sat1']);
         await execXCSend(
           'sat1',
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain2BridgeContracts,
-        );
-        await satChain2AmplContracts.xcController.rebase();
+        await execXCReportRebase(['sat2']);
+        await satChain2AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['85500', '90000'],
           ['3500', '0'],
@@ -1519,23 +1611,16 @@ describe('Transfers scenarios', function () {
           '1000',
         );
 
-        await execXCRebase(-10, ['base', 'sat1']);
+        await execXCRebaseE2E(-10, ['base', 'sat1']);
         await execXCSend(
           'sat2',
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
-        await propagateXCRebase(
-          deployer,
-          deployer,
-          relayer,
-          await baseChainAmplContracts.getCurrentState(),
-          baseChainBridgeContracts,
-          satChain2BridgeContracts,
-        );
-        await satChain2AmplContracts.xcController.rebase();
+        await execXCReportRebase(['sat2']);
+        await satChain2AmplContracts.xcAmpleController.rebase();
         await checkBalancesAndSupply(
           ['76950', '81000'],
           ['3600', '0'],
@@ -1561,9 +1646,9 @@ describe('Transfers scenarios', function () {
           'sat2',
           userASatChain1Wallet,
           userASatChain2Wallet,
-          toAmplDenomination('1000'),
+          toAmplFixedPt('1000'),
         );
-        await execXCRebase(-10);
+        await execXCRebaseE2E(-10);
         await checkBalancesAndSupply(
           ['85500', '90000'],
           ['3600', '0'],
@@ -1577,9 +1662,9 @@ describe('Transfers scenarios', function () {
           'sat1',
           userASatChain2Wallet,
           userASatChain1Wallet,
-          toAmplDenomination('500'),
+          toAmplFixedPt('500'),
         );
-        await execXCRebase(-10);
+        await execXCRebaseE2E(-10);
         await checkBalancesAndSupply(
           ['76950', '81000'],
           ['3690', '0'],

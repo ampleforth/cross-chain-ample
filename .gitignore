@@ -88,3 +88,6 @@ cache
 
 #keystore
 keystore
+
+# logs
+logs

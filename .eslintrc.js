@@ -103,6 +103,7 @@ module.exports = {
           'Sighash',
           'hre',
           'ecsign',
+          'sdk',
 
           // shorthand
           'eth',
@@ -137,6 +138,7 @@ module.exports = {
           'cpi',
           'len',
           'cmp',
+          'api',
 
           // project-specific
           'rebase',
@@ -178,6 +180,12 @@ module.exports = {
           'depositer',
           'coinmarketcap',
           'nonces',
+          'testnet',
+          'etherscan',
+          'goerli',
+          'relayers',
+          'offchain',
+          'recepient',
 
           // names
           'nithin',
