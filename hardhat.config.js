@@ -13,6 +13,7 @@ require('./tasks/deploy/chain_bridge');
 require('./tasks/ops/rebase');
 require('./tasks/ops/xc_transfer');
 
+require('./tasks/info/config');
 require('./tasks/info/ampl');
 require('./tasks/info/chain_bridge');
 
@@ -68,14 +69,14 @@ module.exports = {
     },
 
     rinkebyBaseChain: {
-      url: 'https://rinkeby.infura.io/v3/'+process.env.INFURA_SECRET,
+      url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_SECRET
     },
     goerliSatChain: {
-      url: 'https://goerli.infura.io/v3/'+process.env.INFURA_SECRET,
+      url: 'https://goerli.infura.io/v3/' + process.env.INFURA_SECRET
     },
     bscSatChain: {
       url: 'https://bsc-dataseed1.defibit.io'
-    },
+    }
     // avaSatChain: {
     //   url: 'https://api.avax-test.network/ext/bc/C/rpc'
     // },

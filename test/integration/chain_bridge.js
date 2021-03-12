@@ -617,20 +617,20 @@ describe('Transfers scenarios', function () {
       const fromChainBridge = baseChainBridgeContracts.bridge;
       const toChainBridge = satChain1BridgeContracts.bridge;
       const senderAddress = await userABaseChainWallet.getAddress();
-      const recepientAddress = await userASatChain1Wallet.getAddress();
-      const maliciousRecepientAddress = await userBSatChain1Wallet.getAddress();
+      const recipientAddress = await userASatChain1Wallet.getAddress();
+      const maliciousRecipientAddress = await userBSatChain1Wallet.getAddress();
       const r = await baseChainAmplContracts.policy.globalAmpleforthEpochAndAMPLSupply();
 
       const correctData = packXCTransferData(
         senderAddress,
-        recepientAddress,
+        recipientAddress,
         toAmplFixedPt('1000'),
         r[1],
       );
 
       const maliciousData = packXCTransferData(
         senderAddress,
-        maliciousRecepientAddress,
+        maliciousRecipientAddress,
         toAmplFixedPt('1000'),
         r[1],
       );
