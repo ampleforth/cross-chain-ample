@@ -1,11 +1,13 @@
 const {
   types,
   task,
+  txTask,
   cbDeployTask,
   loadSignerSync,
 } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
+  deployContract,
   getDeployedContractInstance,
   readDeploymentData,
   writeDeploymentData,

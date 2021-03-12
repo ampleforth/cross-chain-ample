@@ -57,8 +57,6 @@ module.exports = {
   },
 
   networks: {
-    hardhat: {},
-
     gethBaseChain: {
       url: 'http://localhost:7545'
     },
@@ -70,10 +68,16 @@ module.exports = {
     },
 
     rinkebyBaseChain: {
-      url: 'https://rinkeby.infura.io/v3/b117b6719619448892c158d64291aa24'
+      url: 'https://rinkeby.infura.io/v3/'+process.env.INFURA_SECRET,
     },
-    goerliSatChain1: {
-      url: 'https://goerli.infura.io/v3/b117b6719619448892c158d64291aa24'
-    }
+    goerliSatChain: {
+      url: 'https://goerli.infura.io/v3/'+process.env.INFURA_SECRET,
+    },
+    bscSatChain: {
+      url: 'https://bsc-dataseed1.defibit.io'
+    },
+    // avaSatChain: {
+    //   url: 'https://api.avax-test.network/ext/bc/C/rpc'
+    // },
   }
 };
