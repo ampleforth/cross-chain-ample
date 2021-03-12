@@ -40,11 +40,11 @@ function cbDeployTask(name, desc) {
     );
 }
 
-function loadSignerSync(args, hre) {
+function loadSignerSync(args, provider) {
   return ethers.Wallet.fromEncryptedJsonSync(
     fs.readFileSync(args.keyfile),
     args.passphrase,
-  ).connect(hre.ethers.provider);
+  ).connect(provider);
 }
 
 module.exports = {

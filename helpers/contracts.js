@@ -28,6 +28,9 @@ const ContractABIPaths = {
   TokenVault: 'contracts/base-chain',
   AMPLChainBridgeGateway: 'contracts/base-chain/bridge-gateways',
   ChainBridgeXCAmpleGateway: 'contracts/satellite-chain/bridge-gateways',
+
+  // utilities
+  ChainBridgeBatchRebaseReport: 'contracts/_utilities',
 };
 
 const getCompiledContractFactory = (ethers, contract) => {

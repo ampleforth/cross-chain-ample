@@ -85,7 +85,7 @@ txTask('testnet:deploy:ampleforth', 'Deploy ampleforth contract suite')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
 
-    const deployer = loadSignerSync(args, hre);
+    const deployer = loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
 
     console.log('------------------------------------------------------------');
@@ -130,7 +130,7 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
 
-    const deployer = await loadSignerSync(args, hre);
+    const deployer = await loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
 
     console.log('------------------------------------------------------------');

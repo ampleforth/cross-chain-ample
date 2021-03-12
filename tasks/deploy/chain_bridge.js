@@ -24,7 +24,7 @@ cbDeployTask(
   'Deploys the chain gateway contract and connects it with chain-bridge and the AMPL token',
 ).setAction(async (args, hre) => {
   const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-  const deployer = loadSignerSync(args, hre);
+  const deployer = loadSignerSync(args, hre.ethers.provider);
   const deployerAddress = await deployer.getAddress();
   const chainAddresses = await readDeploymentData(hre.network.name);
 
@@ -37,6 +37,7 @@ cbDeployTask(
     genericHandler,
     erc20Handler,
     erc721Handler,
+    batchRebaseReporter,
   } = await deployChainBridgeContracts(args, hre.ethers, deployer, txParams);
 
   const ampl = await getDeployedContractInstance(
@@ -100,6 +101,7 @@ cbDeployTask(
     'chainBridge/tokenVault',
     tokenVault,
   );
+  await writeDeploymentData(hre.network.name, 'chainBridge/batchRebaseReporter', batchRebaseReporter);
 });
 
 cbDeployTask(
@@ -107,7 +109,7 @@ cbDeployTask(
   'Deploys the chain gateway contract and connects it with chain-bridge and the cross-chain ample token',
 ).setAction(async (args, hre) => {
   const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-  const deployer = loadSignerSync(args, hre);
+  const deployer = loadSignerSync(args, hre.ethers.provider);
   const deployerAddress = await deployer.getAddress();
   const chainAddresses = await readDeploymentData(hre.network.name);
 

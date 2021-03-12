@@ -91,3 +91,6 @@ keystore
 
 # logs
 logs
+
+# testnetdeployment
+sdk/deployments/geth*.json

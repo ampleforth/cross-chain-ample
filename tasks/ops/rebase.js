@@ -1,15 +1,15 @@
 const { txTask, types, loadSignerSync } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 
-const { getDeployedContractInstance } = require('../../helpers/contracts');
-const { executeXCRebase } = require('../../sdk/chain_bridge');
+const { readDeploymentData, getDeployedContractInstance } = require('../../helpers/contracts');
+const { executeXCRebase, XC_REBASE_RESOURCE_ID } = require('../../sdk/chain_bridge');
 const { printRebaseInfo, execRebase } = require('../../sdk/ampleforth');
 
 txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
   .addParam('rebasePerc', 'The rebase percentage to be applied', 0, types.float)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    const sender = await loadSignerSync(args, hre);
+    const sender = await loadSignerSync(args, hre.ethers.provider);
     const senderAddress = await sender.getAddress();
     console.log('Sender:', senderAddress);
 
@@ -54,17 +54,12 @@ txTask(
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    const sender = await loadSignerSync(args, hre);
+    const sender = await loadSignerSync(args, hre.ethers.provider);
     const senderAddress = await sender.getAddress();
     console.log('Sender:', senderAddress);
 
     const baseChainNetwork = hre.network.name;
     const baseChainProvider = hre.ethers.provider;
-    const baseChainBridge = await getDeployedContractInstance(
-      baseChainNetwork,
-      'chainBridge/bridge',
-      baseChainProvider,
-    );
     const policy = await getDeployedContractInstance(
       baseChainNetwork,
       'policy',
@@ -72,33 +67,43 @@ txTask(
     );
     await printRebaseInfo(policy);
 
-    console.log('Initiating cross-chain rebase');
-    for (let n in args.satelliteChainNetworks) {
-      const satelliteChainNetwork = args.satelliteChainNetworks[n];
-      const chainAddresses = await readDeploymentData(network);
-      const satelliteChainProvider = getEthersProvider(network);
+    const baseChainBridge = await getDeployedContractInstance(
+      baseChainNetwork,
+      'chainBridge/bridge',
+      baseChainProvider,
+    );
+    const batchRebaseReporter = await getDeployedContractInstance(
+      baseChainNetwork,
+      'chainBridge/batchRebaseReporter',
+      baseChainProvider,
+    );
 
+    const satelliteChainIDs = [ ];
+    for (let n in args.satelliteChainNetworks) {
+      const network = args.satelliteChainNetworks[n];
+      const provider = await getEthersProvider(network);
       const satelliteChainBridge = await getDeployedContractInstance(
-        args.satelliteChainNetwork,
+        network,
         'chainBridge/bridge',
-        satelliteChainProvider,
+        provider,
       );
-      const satelliteChainGenericHandler = await getDeployedContractInstance(
-        args.satelliteChainNetwork,
-        'chainBridge/genericHandler',
-        satelliteChainProvider,
+      satelliteChainIDs.push(
+        await satelliteChainBridge._chainID()
       );
-      console.log('Initiating report rebase to:', satelliteChainNetwork);
-      const { txR } = await executeXCRebase(
-        sender,
-        baseChainBridge,
-        satelliteChainBridge,
-        satelliteChainGenericHandler,
-        policy,
-        txParams,
-      );
-      console.log(txR.transactionHash);
     }
+
+    console.log('Initiating cross-chain rebase', satelliteChainIDs);
+    const tx = await batchRebaseReporter
+    .connect(sender)
+    .execute(
+      policy.address,
+      baseChainBridge.address,
+      satelliteChainIDs,
+      XC_REBASE_RESOURCE_ID,
+    );
+
+    const txR = await tx.wait();
+    console.log(txR.transactionHash);
   });
 
 txTask(
@@ -113,23 +118,20 @@ txTask(
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    const sender = await loadSignerSync(args, hre);
-    const senderAddress = await sender.getAddress();
-    console.log('Sender:', senderAddress);
 
     for (let n in args.networks) {
-      const satelliteChainNetwork = args.networks[n];
+      const network = args.networks[n];
       const chainAddresses = await readDeploymentData(network);
-      const satelliteChainProvider = getEthersProvider(network);
+      const provider = await getEthersProvider(network);
 
       const xcAmpleController = await getDeployedContractInstance(
-        satelliteChainNetwork,
+        network,
         'xcAmpleController',
-        satelliteChainProvider,
+        provider,
       );
-
-      await printRebaseInfo(xcAmpleController);
-      console.log('Executing rebase on:', satelliteChainNetwork);
+      console.log('Executing rebase on:', network);
+      const sender = await loadSignerSync(args, provider);
+      const senderAddress = await sender.getAddress();
       const tx = await xcAmpleController.connect(sender).rebase(txParams);
       await tx.wait();
       await printRebaseInfo(xcAmpleController);

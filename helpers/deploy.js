@@ -173,11 +173,20 @@ async function deployChainBridgeContracts(
     txParams,
   );
 
+  const batchRebaseReporter = await deployContract(
+    ethers,
+    'ChainBridgeBatchRebaseReport',
+    deployer,
+    [],
+    txParams,
+  );
+
   return {
     bridge,
     genericHandler,
     erc20Handler,
     erc721Handler,
+    batchRebaseReporter,
   };
 }
 
