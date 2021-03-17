@@ -79,6 +79,7 @@ const deployProxyContract = async (
     newProxyAdmin.address,
   );
   await refChangeTx.wait();
+
   return contract;
 };
 

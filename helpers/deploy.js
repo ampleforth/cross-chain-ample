@@ -37,8 +37,12 @@ async function deployAMPLContracts(ethers, deployer, txParams = {}) {
     [3600 * 24 * 365, 0, 1],
     txParams,
   );
-  await rateOracle.connect(deployer).addProvider(deployerAddress, txParams);
-  await rateOracle.connect(deployer).pushReport(AMPL_BASE_RATE, txParams);
+  await (
+    await rateOracle.connect(deployer).addProvider(deployerAddress, txParams)
+  ).wait();
+  await (
+    await rateOracle.connect(deployer).pushReport(AMPL_BASE_RATE, txParams)
+  ).wait();
 
   const cpiOracle = await deployContract(
     ethers,
@@ -47,8 +51,10 @@ async function deployAMPLContracts(ethers, deployer, txParams = {}) {
     [3600 * 24 * 365, 0, 1],
     txParams,
   );
-  await cpiOracle.addProvider(deployerAddress, txParams);
-  await cpiOracle.connect(deployer).pushReport(AMPL_BASE_CPI, txParams);
+  await (await cpiOracle.addProvider(deployerAddress, txParams)).wait();
+  await (
+    await cpiOracle.connect(deployer).pushReport(AMPL_BASE_CPI, txParams)
+  ).wait();
 
   const policy = await deployProxyContract(
     ethers,
@@ -61,14 +67,21 @@ async function deployAMPLContracts(ethers, deployer, txParams = {}) {
     },
     txParams,
   );
-  await policy.connect(deployer).setMarketOracle(rateOracle.address, txParams);
-  await policy.connect(deployer).setCpiOracle(cpiOracle.address, txParams);
-  await policy.connect(deployer).setRebaseLag(1, txParams);
-  await policy
-    .connect(deployer)
-    .setRebaseTimingParameters(1, 0, 3600, txParams);
-
-  await ampl.connect(deployer).setMonetaryPolicy(policy.address, txParams);
+  await (
+    await policy.connect(deployer).setMarketOracle(rateOracle.address, txParams)
+  ).wait();
+  await (
+    await policy.connect(deployer).setCpiOracle(cpiOracle.address, txParams)
+  ).wait();
+  await (await policy.connect(deployer).setRebaseLag(1, txParams)).wait();
+  await (
+    await policy
+      .connect(deployer)
+      .setRebaseTimingParameters(1, 0, 3600, txParams)
+  ).wait();
+  await (
+    await ampl.connect(deployer).setMonetaryPolicy(policy.address, txParams)
+  ).wait();
 
   const orchestrator = await deployContract(
     ethers,
@@ -77,9 +90,11 @@ async function deployAMPLContracts(ethers, deployer, txParams = {}) {
     [policy.address],
     txParams,
   );
-  await policy
-    .connect(deployer)
-    .setOrchestrator(orchestrator.address, txParams);
+  await (
+    await policy
+      .connect(deployer)
+      .setOrchestrator(orchestrator.address, txParams)
+  ).wait();
 
   return {
     proxyAdmin,
@@ -129,8 +144,10 @@ async function deployXCAmpleContracts(
     txParams,
   );
 
-  await xcAmple.setController(xcAmpleController.address);
-  await xcAmpleController.setRebaseRelayer(rebaseRelayer.address);
+  await (await xcAmple.setController(xcAmpleController.address)).wait();
+  await (
+    await xcAmpleController.setRebaseRelayer(rebaseRelayer.address)
+  ).wait();
 
   return { proxyAdmin, xcAmple, xcAmpleController, rebaseRelayer };
 }
@@ -222,28 +239,32 @@ async function deployChainBridgeBaseChainGatewayContracts(
   const reportRebaseFnSig = CB_FUNCTION_SIG_baseChainReportRebase(
     rebaseGateway,
   );
-  await bridge
-    .connect(deployer)
-    .adminSetGenericResource(
-      genericHandler.address,
-      XC_REBASE_RESOURCE_ID,
-      rebaseGateway.address,
-      ...reportRebaseFnSig,
-      txParams,
-    );
+  await (
+    await bridge
+      .connect(deployer)
+      .adminSetGenericResource(
+        genericHandler.address,
+        XC_REBASE_RESOURCE_ID,
+        rebaseGateway.address,
+        ...reportRebaseFnSig,
+        txParams,
+      )
+  ).wait();
 
   const transferFnSig = CB_FUNCTION_SIG_baseChainTransfer(transferGateway);
-  await bridge
-    .connect(deployer)
-    .adminSetGenericResource(
-      genericHandler.address,
-      XC_TRANSFER_RESOURCE_ID,
-      transferGateway.address,
-      ...transferFnSig,
-      txParams,
-    );
+  await (
+    await bridge
+      .connect(deployer)
+      .adminSetGenericResource(
+        genericHandler.address,
+        XC_TRANSFER_RESOURCE_ID,
+        transferGateway.address,
+        ...transferFnSig,
+        txParams,
+      )
+  ).wait();
 
-  await tokenVault.addBridgeGateway(transferGateway.address);
+  await (await tokenVault.addBridgeGateway(transferGateway.address)).wait();
 
   return { tokenVault, rebaseGateway, transferGateway };
 }
@@ -269,31 +290,39 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
     txParams,
   );
 
-  await xcAmpleController
-    .connect(deployer)
-    .addBridgeGateway(rebaseGateway.address);
-  await xcAmpleController
-    .connect(deployer)
-    .addBridgeGateway(transferGateway.address);
+  await (
+    await xcAmpleController
+      .connect(deployer)
+      .addBridgeGateway(rebaseGateway.address)
+  ).wait();
+  await (
+    await xcAmpleController
+      .connect(deployer)
+      .addBridgeGateway(transferGateway.address)
+  ).wait();
 
   const reportRebaseFnSig = CB_FUNCTION_SIG_satelliteChainReportRebase(
     rebaseGateway,
   );
-  await bridge.adminSetGenericResource(
-    genericHandler.address,
-    XC_REBASE_RESOURCE_ID,
-    rebaseGateway.address,
-    ...reportRebaseFnSig,
-    txParams,
-  );
+  await (
+    await bridge.adminSetGenericResource(
+      genericHandler.address,
+      XC_REBASE_RESOURCE_ID,
+      rebaseGateway.address,
+      ...reportRebaseFnSig,
+      txParams,
+    )
+  ).wait();
   const transferFnSig = CB_FUNCTION_SIG_satelliteChainTransfer(transferGateway);
-  await bridge.adminSetGenericResource(
-    genericHandler.address,
-    XC_TRANSFER_RESOURCE_ID,
-    transferGateway.address,
-    ...transferFnSig,
-    txParams,
-  );
+  await (
+    await bridge.adminSetGenericResource(
+      genericHandler.address,
+      XC_TRANSFER_RESOURCE_ID,
+      transferGateway.address,
+      ...transferFnSig,
+      txParams,
+    )
+  ).wait();
 
   return { rebaseGateway, transferGateway };
 }

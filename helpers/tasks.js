@@ -7,7 +7,7 @@ function txTask(name, desc) {
     .addParam(
       'gasPrice',
       'Gas price for the transaction',
-      100000000000,
+      25000000000,
       types.int,
     )
     .addParam('gasLimit', 'Gas limit for the transaction', 7000000, types.int)
@@ -47,10 +47,19 @@ function loadSignerSync(args, provider) {
   ).connect(provider);
 }
 
+async function etherscanVerify(hre, address, constructorArguments=[]){
+  try{
+    await hre.run('verify:verify', { address, constructorArguments })
+  } catch(e){
+    console.log('Verification failed', e.message)
+  };
+}
+
 module.exports = {
   types,
   task,
   txTask,
   cbDeployTask,
   loadSignerSync,
+  etherscanVerify,
 };

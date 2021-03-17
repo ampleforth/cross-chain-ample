@@ -1,4 +1,4 @@
-const { task, txTask, loadSignerSync } = require('../../helpers/tasks');
+const { task, txTask, loadSignerSync, etherscanVerify } = require('../../helpers/tasks');
 const { fetchAndParseYAML, getEthersProvider } = require('../../helpers/utils');
 const {
   getCompiledContractFactory,
@@ -118,6 +118,15 @@ txTask('testnet:deploy:ampleforth', 'Deploy ampleforth contract suite')
     await writeBulkDeploymentData(hre.network.name, {
       isBaseChain: true,
     });
+
+    console.log('------------------------------------------------------------');
+    console.log('Verify on etherscan');
+    await etherscanVerify(hre, proxyAdmin.address);
+    await etherscanVerify(hre, await proxyAdmin.getProxyImplementation(ampl.address));
+    await etherscanVerify(hre, await proxyAdmin.getProxyImplementation(policy.address));
+    await etherscanVerify(hre, orchestrator.address, [policy.address]);
+    await etherscanVerify(hre, rateOracle.address, [3600 * 24 * 365, 0, 1]);
+    await etherscanVerify(hre, cpiOracle.address, [3600 * 24 * 365, 0, 1]);
   });
 
 txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
@@ -177,4 +186,11 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
     await writeBulkDeploymentData(hre.network.name, {
       isBaseChain: false,
     });
+
+    console.log('------------------------------------------------------------');
+    console.log('Verify on etherscan');
+    await etherscanVerify(hre, proxyAdmin.address);
+    await etherscanVerify(hre, rebaseRelayer.address);
+    await etherscanVerify(hre, await proxyAdmin.getProxyImplementation(xcAmple.address));
+    await etherscanVerify(hre, await proxyAdmin.getProxyImplementation(xcAmpleController.address));
   });

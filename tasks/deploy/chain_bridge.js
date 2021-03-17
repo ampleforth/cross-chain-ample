@@ -4,6 +4,7 @@ const {
   txTask,
   cbDeployTask,
   loadSignerSync,
+  etherscanVerify,
 } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
@@ -102,6 +103,17 @@ cbDeployTask(
     tokenVault,
   );
   await writeDeploymentData(hre.network.name, 'chainBridge/batchRebaseReporter', batchRebaseReporter);
+
+  console.log('------------------------------------------------------------');
+  console.log('Verify on etherscan');
+  await etherscanVerify(hre, tokenVault.address);
+  await etherscanVerify(hre, bridge.address, [args.chainId, args.relayers, args.relayerThreshold, args.fee, args.expiry]);
+  await etherscanVerify(hre, genericHandler.address, [bridge.address, [], [], [], [], []]);
+  await etherscanVerify(hre, erc20Handler.address, [bridge.address, [], [], []]);
+  await etherscanVerify(hre, erc721Handler.address, [bridge.address, [], [], []]);
+  await etherscanVerify(hre, transferGateway.address, [genericHandler.address, ampl.address, policy.address, tokenVault.address]);
+  await etherscanVerify(hre, rebaseGateway.address, [genericHandler.address, ampl.address, policy.address, tokenVault.address]);
+  await etherscanVerify(hre, batchRebaseReporter.address);
 });
 
 cbDeployTask(
@@ -174,4 +186,13 @@ cbDeployTask(
     'chainBridge/rebaseGateway',
     rebaseGateway,
   );
+
+  console.log('------------------------------------------------------------');
+  console.log('Verify on etherscan');
+  await etherscanVerify(hre, bridge.address, [args.chainId, args.relayers, args.relayerThreshold, args.fee, args.expiry]);
+  await etherscanVerify(hre, genericHandler.address, [bridge.address, [], [], [], [], []]);
+  await etherscanVerify(hre, erc20Handler.address, [bridge.address, [], [], []]);
+  await etherscanVerify(hre, erc721Handler.address, [bridge.address, [], [], []]);
+  await etherscanVerify(hre, transferGateway.address, [genericHandler.address, xcAmple.address, xcAmpleController.address]);
+  await etherscanVerify(hre, rebaseGateway.address, [genericHandler.address, xcAmple.address, xcAmpleController.address]);
 });

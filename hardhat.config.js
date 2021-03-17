@@ -30,6 +30,9 @@ module.exports = {
         version: '0.6.4'
       },
       {
+        version: '0.6.8'
+      },
+      {
         version: '0.5.12'
       },
       {
@@ -67,18 +70,17 @@ module.exports = {
     gethSatChain2: {
       url: 'http://localhost:7555'
     },
-
     rinkebyBaseChain: {
       url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_SECRET
     },
     goerliSatChain: {
       url: 'https://goerli.infura.io/v3/' + process.env.INFURA_SECRET
     },
-    bscSatChain: {
-      url: 'https://bsc-dataseed1.defibit.io'
-    }
-    // avaSatChain: {
-    //   url: 'https://api.avax-test.network/ext/bc/C/rpc'
-    // },
+    bscTestnetSatChain: {
+      url: 'https://data-seed-prebsc-1-s1.binance.org:8545'
+    },
+    avaTestnetSatChain: {
+      url: 'https://api.avax-test.network/ext/bc/C/rpc'
+    },
   }
 };

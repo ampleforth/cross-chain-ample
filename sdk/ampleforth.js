@@ -32,10 +32,11 @@ const execRebase = async (
     .times(percChange)
     .div(100)
     .toString(10);
+  const newRate = AMPL_BASE_RATE.add(rateDiff);
 
   const rateTx = await rateOracle
     .connect(signer)
-    .pushReport(AMPL_BASE_RATE.add(rateDiff), txParams);
+    .pushReport(newRate, txParams);
   await rateTx.wait();
 
   const rebaseTx = await orchestrator.connect(signer).rebase(txParams);
