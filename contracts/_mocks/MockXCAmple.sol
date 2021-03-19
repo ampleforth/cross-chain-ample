@@ -26,7 +26,7 @@ contract MockXCAmple {
         emit Mint(who, value);
     }
 
-    function burn(address who, uint256 value) external {
+    function burnFrom(address who, uint256 value) external {
         emit Burn(who, value);
     }
 }
