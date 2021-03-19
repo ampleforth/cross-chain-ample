@@ -47,12 +47,12 @@ function loadSignerSync(args, provider) {
   ).connect(provider);
 }
 
-async function etherscanVerify(hre, address, constructorArguments=[]){
-  try{
-    await hre.run('verify:verify', { address, constructorArguments })
-  } catch(e){
-    console.log('Verification failed', e.message)
-  };
+async function etherscanVerify(hre, address, constructorArguments = []) {
+  try {
+    await hre.run('verify:verify', { address, constructorArguments });
+  } catch (e) {
+    console.log('Verification failed', e.message);
+  }
 }
 
 module.exports = {

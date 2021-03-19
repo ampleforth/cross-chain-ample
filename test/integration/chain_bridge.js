@@ -9,7 +9,6 @@ const RELAYER_TRESHOLD = 2;
 const {
   executeXCRebase,
   executeXCTransfer,
-  XC_REBASE_RESOURCE_ID,
   XC_TRANSFER_RESOURCE_ID,
   packXCTransferData
 } = require('../../sdk/chain_bridge');
@@ -22,8 +21,6 @@ const {
   deployChainBridgeBaseChainGatewayContracts,
   deployChainBridgeSatelliteChainGatewayContracts
 } = require('../../helpers/deploy');
-
-const { parseEventFromLogs } = require('../helpers/ethers');
 
 let accounts,
   deployer,
@@ -191,9 +188,6 @@ async function mockOffchain (
 }
 
 async function execXCReportRebase (chain) {
-  const fromChainID = await baseChainBridgeContracts.bridge._chainID();
-  const toChainID = await bridgeContractsMap[chain].bridge._chainID();
-
   // Triggering rebase report to sat chain
   const { data, dataHash, depositNonce, resourceID } = await executeXCRebase(
     deployer,
@@ -206,7 +200,7 @@ async function execXCReportRebase (chain) {
   // Executing rebase report on sat chain
   await mockOffchain(
     bridgeContractsMap[chain].bridge,
-    fromChainID,
+    await baseChainBridgeContracts.bridge._chainID(),
     depositNonce,
     resourceID,
     dataHash,

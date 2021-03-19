@@ -34,9 +34,7 @@ const execRebase = async (
     .toString(10);
   const newRate = AMPL_BASE_RATE.add(rateDiff);
 
-  const rateTx = await rateOracle
-    .connect(signer)
-    .pushReport(newRate, txParams);
+  const rateTx = await rateOracle.connect(signer).pushReport(newRate, txParams);
   await rateTx.wait();
 
   const rebaseTx = await orchestrator.connect(signer).rebase(txParams);

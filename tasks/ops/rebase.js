@@ -1,8 +1,14 @@
 const { txTask, types, loadSignerSync } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 
-const { readDeploymentData, getDeployedContractInstance } = require('../../helpers/contracts');
-const { executeXCRebase, XC_REBASE_RESOURCE_ID } = require('../../sdk/chain_bridge');
+const {
+  readDeploymentData,
+  getDeployedContractInstance,
+} = require('../../helpers/contracts');
+const {
+  executeXCRebase,
+  XC_REBASE_RESOURCE_ID,
+} = require('../../sdk/chain_bridge');
 const { printRebaseInfo, execRebase } = require('../../sdk/ampleforth');
 
 txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
@@ -78,7 +84,7 @@ txTask(
       baseChainProvider,
     );
 
-    const satelliteChainIDs = [ ];
+    const satelliteChainIDs = [];
     for (let n in args.satelliteChainNetworks) {
       const network = args.satelliteChainNetworks[n];
       const provider = await getEthersProvider(network);
@@ -87,20 +93,18 @@ txTask(
         'chainBridge/bridge',
         provider,
       );
-      satelliteChainIDs.push(
-        await satelliteChainBridge._chainID()
-      );
+      satelliteChainIDs.push(await satelliteChainBridge._chainID());
     }
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);
     const tx = await batchRebaseReporter
-    .connect(sender)
-    .execute(
-      policy.address,
-      baseChainBridge.address,
-      satelliteChainIDs,
-      XC_REBASE_RESOURCE_ID,
-    );
+      .connect(sender)
+      .execute(
+        policy.address,
+        baseChainBridge.address,
+        satelliteChainIDs,
+        XC_REBASE_RESOURCE_ID,
+      );
 
     const txR = await tx.wait();
     console.log(txR.transactionHash);

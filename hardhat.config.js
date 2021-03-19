@@ -81,6 +81,6 @@ module.exports = {
     },
     avaTestnetSatChain: {
       url: 'https://api.avax-test.network/ext/bc/C/rpc'
-    },
+    }
   }
 };

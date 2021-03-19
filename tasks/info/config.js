@@ -32,7 +32,7 @@ task('config:chain_bridge', 'Generates chian_bridge config file')
         name: network,
         type: 'ethereum',
         id: `${chainID}`,
-        endpoint: "[INSERT LIGHT NODE ENDPOINT]",
+        endpoint: '[INSERT LIGHT NODE ENDPOINT]',
         from: args.relayerAddress,
         opts: {
           bridge: chainAddresses['chainBridge/bridge'].address,
