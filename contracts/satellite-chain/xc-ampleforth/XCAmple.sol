@@ -398,7 +398,7 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
      * allowance.
      *
      * This is only callable by the controller, because we only want to support burn for the
-     * interchain-transfer case. Otherwise, there supply accounting could get out of sync.
+     * interchain-transfer case. Otherwise, AMPL on base chain could become locked in the vault.
      *
      * Requirements:
      *

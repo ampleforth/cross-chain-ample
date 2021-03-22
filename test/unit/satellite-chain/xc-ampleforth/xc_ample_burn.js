@@ -30,7 +30,7 @@ async function setupContracts () {
   await xcAmple.setController(deployer.getAddress());
 }
 
-describe('XCAmple:burn:accessControl', function () {
+describe('XCAmple:burnFrom:accessControl', function () {
   before('setup XCAmple contract', setupContracts);
   beforeEach(async function () {
     await xcAmple
@@ -47,14 +47,14 @@ describe('XCAmple:burn:accessControl', function () {
     ).to.be.reverted;
   });
 
-  it('should be callable by controller', async function () {
+  it('should be callable by spender', async function () {
     await expect(
       xcAmple.connect(deployer).burnFrom(otherUser.getAddress(), unitTokenAmount),
     ).not.to.be.reverted;
   });
 });
 
-describe('XCAmple:burn', () => {
+describe('XCAmple:burnFrom', () => {
   beforeEach('setup XCAmple contract', setupContracts);
 
   describe('when burn address is zero address', () => {
@@ -114,6 +114,11 @@ describe('XCAmple:burn', () => {
       await xcAmple.connect(deployer).burnFrom(otherUser.getAddress(), amt1);
       expect(await xcAmple.totalSupply()).to.eq(amt2);
     });
+    it('should reduce the approved amount', async function () {
+      const allowanceBefore = await xcAmple.allowance(otherUser.getAddress(), deployer.getAddress());
+      await xcAmple.connect(deployer).burnFrom(otherUser.getAddress(), amt1);
+      expect(await xcAmple.allowance(otherUser.getAddress(), deployer.getAddress())).to.eq(allowanceBefore - amt1);
+    });
     it('should log Transfer to zero address', async function () {
       await expect(xcAmple.connect(deployer).burnFrom(otherUser.getAddress(), amt1))
         .to.emit(xcAmple, 'Transfer')
@@ -144,6 +149,11 @@ describe('XCAmple:burn', () => {
       expect(await xcAmple.totalSupply()).to.eq(mintAmt);
       await xcAmple.connect(deployer).burnFrom(otherUser.getAddress(), burnAmt);
       expect(await xcAmple.totalSupply()).to.eq(remainingBal);
+    });
+    it('should reduce the approved amount', async function () {
+      const allowanceBefore = await xcAmple.allowance(otherUser.getAddress(), deployer.getAddress());
+      await xcAmple.connect(deployer).burnFrom(otherUser.getAddress(), burnAmt);
+      expect(await xcAmple.allowance(otherUser.getAddress(), deployer.getAddress())).to.eq(allowanceBefore - burnAmt);
     });
     it('should log Transfer to zero address', async function () {
       await expect(
@@ -178,6 +188,11 @@ describe('XCAmple:burn', () => {
       expect(await xcAmple.totalSupply()).to.eq(MAX_SUPPLY);
       await xcAmple.connect(deployer).burnFrom(otherUser.getAddress(), burnAmt);
       expect(await xcAmple.totalSupply()).to.eq(remainingBal);
+    });
+    it('should reduce the approved amount', async function () {
+      const allowanceBefore = await xcAmple.allowance(otherUser.getAddress(), deployer.getAddress());
+      await xcAmple.connect(deployer).burnFrom(otherUser.getAddress(), burnAmt);
+      expect(await xcAmple.allowance(otherUser.getAddress(), deployer.getAddress())).to.eq(allowanceBefore.sub(burnAmt));
     });
     it('should log Transfer to zero address', async function () {
       await expect(
