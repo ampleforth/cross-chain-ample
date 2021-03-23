@@ -254,10 +254,17 @@ async function execXCSend (
   amount,
   setApproval = true,
 ) {
-  if (setApproval && fromChain === 'base') {
-    await baseChainAmplContracts.ampl
-      .connect(fromAccount)
-      .approve(bridgeContractsMap[fromChain].tokenVault.address, amount);
+
+  if (setApproval) {
+    if (fromChain === 'base') {
+      await baseChainAmplContracts.ampl
+        .connect(fromAccount)
+        .approve(bridgeContractsMap[fromChain].tokenVault.address, amount);
+    } else {
+      await amplContractsMap[fromChain].xcAmple
+        .connect(fromAccount)
+        .approve(amplContractsMap[fromChain].xcAmpleController.address, amount);
+    }
   }
 
   const policy =
@@ -563,7 +570,7 @@ describe('Transfers scenarios', function () {
     await setupContracts();
   });
 
-  describe('cross-chain transfer when user has NOT approved the vault', function () {
+  describe('transfer from base when user has NOT approved the vault', function () {
     it('should revert', async function () {
       await baseChainAmplContracts.ampl
         .connect(userBBaseChainWallet)
@@ -584,7 +591,7 @@ describe('Transfers scenarios', function () {
     });
   });
 
-  describe('cross-chain transfer when user has approved the vault', function () {
+  describe('transfer from base when user has approved the vault', function () {
     it('should NOT revert', async function () {
       await baseChainAmplContracts.ampl
         .connect(userBBaseChainWallet)
@@ -730,6 +737,82 @@ describe('Transfers scenarios', function () {
         [],
         '0',
       );
+    });
+
+    describe('user does not approve Vault on base chain', function() {
+      it('should revert', async function () {
+        await checkBalancesAndSupply(
+          ['100000', '100000'],
+          ['0', '0'],
+          '0',
+          [],
+          '0',
+        );
+
+        await baseChainAmplContracts.ampl
+          .connect(userBBaseChainWallet)
+          .approve(
+            bridgeContractsMap['base'].tokenVault.address,
+            toAmplFixedPt('0'), // Approve 0
+          );
+
+        await expect(
+          execXCSend(
+            'base',
+            'sat1',
+            userBBaseChainWallet,
+            userBSatChain1Wallet,
+            toAmplFixedPt('5000'),
+            false,  // Use existing approval and don't auto-approve.
+          ),
+        ).to.be.reverted;
+      })
+    });
+
+    describe('user does not approve Controller on satellite chain', function() {
+      it('should revert', async function () {
+
+        // Setup by placing amples on satellite chain
+        await checkBalancesAndSupply(
+          ['100000', '100000'],
+          ['0', '0'],
+          '0',
+          [],
+          '0',
+        );
+        await execXCSend(
+          'base',
+          'sat1',
+          userABaseChainWallet,
+          userASatChain1Wallet,
+          toAmplFixedPt('5000'),
+        );
+        await checkBalancesAndSupply(
+          ['95000', '100000'],
+          ['5000', '0'],
+          '5000',
+          [],
+          '0',
+        );
+
+        // Test transfer from satellite chain
+        await amplContractsMap['sat1'].xcAmple
+          .connect(userASatChain1Wallet)
+          .approve(
+            amplContractsMap['sat1'].xcAmpleController.address,
+            toAmplFixedPt('0'),  // Approve 0
+          );
+        await expect(
+          execXCSend(
+            'sat1',
+            'base',
+            userASatChain1Wallet,
+            userABaseChainWallet,
+            toAmplFixedPt('1'),
+            false,  // Use existing approval and don't auto-approve.
+          ),
+        ).to.be.reverted;
+      });
     });
   });
 
