@@ -151,6 +151,8 @@ module.exports = {
           'goerli',
           'relayers',
           'offchain',
+          'bscscan',
+          'ropsten',
 
           // names
           'nithin',

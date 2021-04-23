@@ -18,24 +18,29 @@ function txTask(name, desc) {
 
 function cbDeployTask(name, desc) {
   return txTask(name, desc)
-    .addParam('chainId', 'Chain ID for the instance', 100, types.int)
-    .addParam(
+    .addOptionalParam('chainId', 'Chain ID for the instance', 100, types.int)
+    .addOptionalParam(
       'relayers',
       'Array of initial relayer address strings',
       [],
       types.json,
     )
-    .addParam(
+    .addOptionalParam(
       'relayerThreshold',
       'Number of votes required for a proposal to pass',
       1,
       types.int,
     )
-    .addParam('fee', 'Fee to be taken when making a deposit', 0, types.int)
-    .addParam(
+    .addOptionalParam(
+      'fee',
+      'Fee to be taken when making a deposit',
+      0,
+      types.int,
+    )
+    .addOptionalParam(
       'expiry',
       'Number of blocks after which a proposal is considered canceled',
-      1000,
+      100,
       types.int,
     );
 }

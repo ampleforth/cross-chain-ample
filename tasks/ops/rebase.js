@@ -63,6 +63,7 @@ txTask(
     const sender = await loadSignerSync(args, hre.ethers.provider);
     const senderAddress = await sender.getAddress();
     console.log('Sender:', senderAddress);
+    console.log(txParams);
 
     const baseChainNetwork = hre.network.name;
     const baseChainProvider = hre.ethers.provider;
@@ -128,14 +129,18 @@ txTask(
       const chainAddresses = await readDeploymentData(network);
       const provider = await getEthersProvider(network);
 
+      const sender = await loadSignerSync(args, provider);
+      const senderAddress = await sender.getAddress();
+      console.log('Sender:', senderAddress);
+      console.log(txParams);
+
       const xcAmpleController = await getDeployedContractInstance(
         network,
         'xcAmpleController',
         provider,
       );
       console.log('Executing rebase on:', network);
-      const sender = await loadSignerSync(args, provider);
-      const senderAddress = await sender.getAddress();
+
       const tx = await xcAmpleController.connect(sender).rebase(txParams);
       await tx.wait();
       await printRebaseInfo(xcAmpleController);

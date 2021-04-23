@@ -52,12 +52,22 @@ class BridgeData {
   }
 
   recordProposal(e) {
-    const d = this.depositData[this.depositKey(e.originChainID, e)];
+    const k = this.depositKey(e.originChainID, e);
+    let d = this.depositData[k];
+    if (!d) {
+      d = this.depositData[k] = {
+        sourceChainID: e.originChainID,
+        depositNonce: e.depositNonce.toString(),
+        executionStatus: 0,
+        votes: 0,
+      };
+    }
     d.executionStatus = e.status;
   }
 
   recordVote(e) {
-    const d = this.depositData[this.depositKey(e.originChainID, e)];
+    const k = this.depositKey(e.originChainID, e);
+    const d = this.depositData[k];
     d.votes++;
   }
 }

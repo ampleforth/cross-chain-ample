@@ -60,6 +60,10 @@ module.exports = {
     apiKey: process.env.ETHERSCAN_API_KEY
   },
 
+  bscscan: {
+    apiKey: process.env.BSCSCAN_API_KEY
+  },
+
   networks: {
     gethBaseChain: {
       url: 'http://localhost:7545'
@@ -70,17 +74,23 @@ module.exports = {
     gethSatChain2: {
       url: 'http://localhost:7555'
     },
-    rinkebyBaseChain: {
-      url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_SECRET
-    },
-    goerliSatChain: {
-      url: 'https://goerli.infura.io/v3/' + process.env.INFURA_SECRET
+
+    ropstenBaseChain: {
+      url: 'https://eth-ropsten.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
     },
     bscTestnetSatChain: {
       url: 'https://data-seed-prebsc-1-s1.binance.org:8545'
-    },
-    avaTestnetSatChain: {
-      url: 'https://api.avax-test.network/ext/bc/C/rpc'
     }
+
+    // rinkebyBaseChain: {
+    //   url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_SECRET
+    // },
+    // goerliSatChain: {
+    //   url: 'https://goerli.infura.io/v3/' + process.env.INFURA_SECRET
+    // },
+
+    // avaTestnetSatChain: {
+    //   url: 'https://api.avax-test.network/ext/bc/C/rpc'
+    // }
   }
 };

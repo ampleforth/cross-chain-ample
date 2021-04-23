@@ -144,28 +144,23 @@ async function deployXCAmpleContracts(
     txParams,
   );
 
-  await (await xcAmple.setController(xcAmpleController.address)).wait();
   await (
-    await xcAmpleController.setRebaseRelayer(rebaseRelayer.address)
+    await xcAmple.setController(xcAmpleController.address, txParams)
+  ).wait();
+  await (
+    await xcAmpleController.setRebaseRelayer(rebaseRelayer.address, txParams)
   ).wait();
 
   return { proxyAdmin, xcAmple, xcAmpleController, rebaseRelayer };
 }
 
-async function deployChainBridgeContracts(
+async function deployChainBridgeHandlers(
+  bridge,
   { chainId, relayers, relayerThreshold, fee, expiry },
   ethers,
   deployer,
   txParams = {},
 ) {
-  const bridge = await deployContract(
-    ethers,
-    'Bridge',
-    deployer,
-    [chainId, relayers, relayerThreshold, fee, expiry],
-    txParams,
-  );
-
   const genericHandler = await deployContract(
     ethers,
     'GenericHandler',
@@ -199,11 +194,38 @@ async function deployChainBridgeContracts(
   );
 
   return {
-    bridge,
     genericHandler,
     erc20Handler,
     erc721Handler,
     batchRebaseReporter,
+  };
+}
+
+async function deployChainBridgeContracts(
+  { chainId, relayers, relayerThreshold, fee, expiry },
+  ethers,
+  deployer,
+  txParams = {},
+) {
+  const bridge = await deployContract(
+    ethers,
+    'Bridge',
+    deployer,
+    [chainId, relayers, relayerThreshold, fee, expiry],
+    txParams,
+  );
+
+  const handlers = await deployChainBridgeHandlers(
+    bridge,
+    { chainId, relayers, relayerThreshold, fee, expiry },
+    ethers,
+    deployer,
+    txParams,
+  );
+
+  return {
+    bridge,
+    ...handlers,
   };
 }
 
@@ -239,30 +261,57 @@ async function deployChainBridgeBaseChainGatewayContracts(
   const reportRebaseFnSig = CB_FUNCTION_SIG_baseChainReportRebase(
     rebaseGateway,
   );
-  await (
-    await bridge
-      .connect(deployer)
-      .adminSetGenericResource(
-        genericHandler.address,
-        XC_REBASE_RESOURCE_ID,
-        rebaseGateway.address,
-        ...reportRebaseFnSig,
-        txParams,
-      )
-  ).wait();
+
+  try {
+    await (
+      await bridge
+        .connect(deployer)
+        .adminSetGenericResource(
+          genericHandler.address,
+          XC_REBASE_RESOURCE_ID,
+          rebaseGateway.address,
+          ...reportRebaseFnSig,
+          txParams,
+        )
+    ).wait();
+  } catch (e) {
+    console.log(
+      'Failed adding generic resource to bridge, deployer key not bridge owner',
+    );
+    console.log('Execute the following on-chain');
+    console.log('adminSetGenericResource', [
+      genericHandler.address,
+      XC_REBASE_RESOURCE_ID,
+      rebaseGateway.address,
+      ...reportRebaseFnSig,
+    ]);
+  }
 
   const transferFnSig = CB_FUNCTION_SIG_baseChainTransfer(transferGateway);
-  await (
-    await bridge
-      .connect(deployer)
-      .adminSetGenericResource(
-        genericHandler.address,
-        XC_TRANSFER_RESOURCE_ID,
-        transferGateway.address,
-        ...transferFnSig,
-        txParams,
-      )
-  ).wait();
+  try {
+    await (
+      await bridge
+        .connect(deployer)
+        .adminSetGenericResource(
+          genericHandler.address,
+          XC_TRANSFER_RESOURCE_ID,
+          transferGateway.address,
+          ...transferFnSig,
+          txParams,
+        )
+    ).wait();
+  } catch (e) {
+    console.log(
+      'Failed adding generic resource to bridge, deployer key not bridge owner',
+    );
+    console.log('Execute the following on-chain');
+    console.log('adminSetGenericResource', [
+      genericHandler.address,
+      XC_TRANSFER_RESOURCE_ID,
+      transferGateway.address,
+      ...transferFnSig,
+    ]);
+  }
 
   await (await tokenVault.addBridgeGateway(transferGateway.address)).wait();
 
@@ -293,36 +342,63 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
   await (
     await xcAmpleController
       .connect(deployer)
-      .addBridgeGateway(rebaseGateway.address)
+      .addBridgeGateway(rebaseGateway.address, txParams)
   ).wait();
   await (
     await xcAmpleController
       .connect(deployer)
-      .addBridgeGateway(transferGateway.address)
+      .addBridgeGateway(transferGateway.address, txParams)
   ).wait();
 
   const reportRebaseFnSig = CB_FUNCTION_SIG_satelliteChainReportRebase(
     rebaseGateway,
   );
-  await (
-    await bridge.adminSetGenericResource(
+  try {
+    await (
+      await bridge.adminSetGenericResource(
+        genericHandler.address,
+        XC_REBASE_RESOURCE_ID,
+        rebaseGateway.address,
+        ...reportRebaseFnSig,
+        txParams,
+      )
+    ).wait();
+  } catch (e) {
+    console.log(
+      'Failed adding generic resource to bridge, deployer key not bridge owner',
+    );
+    console.log('Execute the following on-chain');
+    console.log('adminSetGenericResource', [
       genericHandler.address,
       XC_REBASE_RESOURCE_ID,
       rebaseGateway.address,
       ...reportRebaseFnSig,
-      txParams,
-    )
-  ).wait();
+    ]);
+  }
+
   const transferFnSig = CB_FUNCTION_SIG_satelliteChainTransfer(transferGateway);
-  await (
-    await bridge.adminSetGenericResource(
+  try {
+    await (
+      await bridge.adminSetGenericResource(
+        genericHandler.address,
+        XC_TRANSFER_RESOURCE_ID,
+        transferGateway.address,
+        ...transferFnSig,
+        txParams,
+      )
+    ).wait();
+  } catch (e) {
+    console.log(
+      'Failed adding generic resource to bridge, deployer key not bridge owner',
+    );
+    console.log('Execute the following on-chain');
+    console.log('adminSetGenericResource', [
       genericHandler.address,
       XC_TRANSFER_RESOURCE_ID,
       transferGateway.address,
       ...transferFnSig,
-      txParams,
-    )
-  ).wait();
+    ]);
+  }
 
   return { rebaseGateway, transferGateway };
 }
@@ -331,6 +407,7 @@ module.exports = {
   deployAMPLContracts,
   deployXCAmpleContracts,
   deployChainBridgeContracts,
+  deployChainBridgeHandlers,
   deployChainBridgeBaseChainGatewayContracts,
   deployChainBridgeSatelliteChainGatewayContracts,
 };

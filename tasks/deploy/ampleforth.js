@@ -56,6 +56,7 @@ task(
     );
 
     await writeBulkDeploymentData(hre.network.name, {
+      isBaseChain: true,
       ampl: {
         address: addresses.UFragments,
         abi: UFragments.interface.format(),
@@ -155,6 +156,7 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
 
     console.log('------------------------------------------------------------');
     console.log('Deployer:', deployerAddress);
+    console.log(txParams);
 
     console.log('------------------------------------------------------------');
     console.log('Reading base-chain parameters');
