@@ -2,7 +2,7 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 let accounts, deployer, user, batchExecutor, mockDownstream, r;
-async function setupContracts() {
+async function setupContracts () {
   // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];

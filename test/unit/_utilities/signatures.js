@@ -3,7 +3,7 @@ const {
   keccak256,
   defaultAbiCoder,
   toUtf8Bytes,
-  solidityPack,
+  solidityPack
 } = require('ethers/lib/utils');
 const { ecsign } = require('ethereumjs-util');
 
@@ -17,7 +17,7 @@ const EIP712_DOMAIN_TYPE = [
   { name: 'name', type: 'string' },
   { name: 'version', type: 'string' },
   { name: 'chainId', type: 'uint256' },
-  { name: 'verifyingContract', type: 'address' },
+  { name: 'verifyingContract', type: 'address' }
 ];
 
 const EIP2612_PERMIT_TYPEHASH = keccak256(
@@ -31,11 +31,11 @@ const EIP2612_PERMIT_TYPE = [
   { name: 'spender', type: 'address' },
   { name: 'value', type: 'uint256' },
   { name: 'nonce', type: 'uint256' },
-  { name: 'deadline', type: 'uint256' },
+  { name: 'deadline', type: 'uint256' }
 ];
 
 // Gets the EIP712 domain separator
-function getDomainSeparator(version, name, contractAddress, chainId) {
+function getDomainSeparator (version, name, contractAddress, chainId) {
   return keccak256(
     defaultAbiCoder.encode(
       ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
@@ -44,7 +44,7 @@ function getDomainSeparator(version, name, contractAddress, chainId) {
         keccak256(toUtf8Bytes(name)),
         keccak256(toUtf8Bytes(version)),
         chainId,
-        contractAddress,
+        contractAddress
       ],
     ),
   );
@@ -52,7 +52,7 @@ function getDomainSeparator(version, name, contractAddress, chainId) {
 
 // Returns the EIP712 hash which should be signed by the user
 // in order to make a call to `permit`
-function getPermitDigest(
+function getPermitDigest (
   version,
   name,
   address,
@@ -115,5 +115,5 @@ module.exports = {
   EIP2612_PERMIT_TYPE,
   getDomainSeparator,
   getPermitDigest,
-  signEIP712Permission,
+  signEIP712Permission
 };

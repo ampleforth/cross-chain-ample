@@ -21,66 +21,66 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: '0.4.24',
+        version: '0.4.24'
       },
       {
-        version: '0.7.6',
+        version: '0.7.6'
       },
       {
-        version: '0.6.4',
+        version: '0.6.4'
       },
       {
-        version: '0.6.8',
+        version: '0.6.8'
       },
       {
-        version: '0.5.12',
+        version: '0.5.12'
       },
       {
         version: '0.6.12',
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
-          },
-        },
-      },
-    ],
+            runs: 200
+          }
+        }
+      }
+    ]
   },
   mocha: {
-    timeout: 100000,
+    timeout: 100000
   },
   gasReporter: {
     currency: 'USD',
     enabled: !!process.env.REPORT_GAS,
     excludeContracts: ['_mocks', '_external', 'uFragments'],
-    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY
   },
 
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: process.env.ETHERSCAN_API_KEY
   },
 
   bscscan: {
-    apiKey: process.env.BSCSCAN_API_KEY,
+    apiKey: process.env.BSCSCAN_API_KEY
   },
 
   networks: {
     gethBaseChain: {
-      url: 'http://localhost:7545',
+      url: 'http://localhost:7545'
     },
     gethSatChain1: {
-      url: 'http://localhost:7550',
+      url: 'http://localhost:7550'
     },
     gethSatChain2: {
-      url: 'http://localhost:7555',
+      url: 'http://localhost:7555'
     },
 
     ropstenBaseChain: {
-      url: 'https://eth-ropsten.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET,
+      url: 'https://eth-ropsten.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
     },
     bscTestnetSatChain: {
-      url: 'https://data-seed-prebsc-1-s1.binance.org:8545',
-    },
+      url: 'https://data-seed-prebsc-1-s1.binance.org:8545'
+    }
 
     // rinkebyBaseChain: {
     //   url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_SECRET
@@ -92,5 +92,5 @@ module.exports = {
     // avaTestnetSatChain: {
     //   url: 'https://api.avax-test.network/ext/bc/C/rpc'
     // }
-  },
+  }
 };
