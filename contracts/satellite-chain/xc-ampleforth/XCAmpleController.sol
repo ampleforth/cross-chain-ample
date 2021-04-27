@@ -126,7 +126,7 @@ contract XCAmpleController is OwnableUpgradeable {
      * @param xcAmpleAmount The amount of xcAmples to be burnt on this chain.
      */
     function burn(address depositor, uint256 xcAmpleAmount) external onlyBridgeGateway {
-        IXCAmpleSupplyPolicy(xcAmple).burn(depositor, xcAmpleAmount);
+        IXCAmple(xcAmple).burnFrom(depositor, xcAmpleAmount);
         emit GatewayBurn(msg.sender, depositor, xcAmpleAmount);
     }
 
