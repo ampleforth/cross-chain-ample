@@ -8,7 +8,7 @@ let accounts,
   beneficiaryAddress,
   controller,
   mockToken;
-async function setupContracts () {
+async function setupContracts() {
   // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
@@ -32,14 +32,14 @@ async function setupContracts () {
     factory.connect(deployer),
     [mockToken.address, 1],
     {
-      initializer: 'initialize(address,uint256)'
+      initializer: 'initialize(address,uint256)',
     },
   );
   await controller.connect(deployer).addBridgeGateway(bridge.getAddress());
   await controller.connect(deployer).addBridgeGateway(bridgeOther.getAddress());
 }
 
-async function getBlockTime (b = 'latest') {
+async function getBlockTime(b = 'latest') {
   return (await ethers.provider.getBlock(b)).timestamp;
 }
 

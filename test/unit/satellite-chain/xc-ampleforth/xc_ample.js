@@ -5,7 +5,7 @@ const { expect } = require('chai');
 // https://github.com/ampleforth/uFragments/blob/master/test/unit/UFragments.js
 
 const DECIMALS = 9;
-const toUFrgDenomination = ample => ethers.utils.parseUnits(ample, DECIMALS);
+const toUFrgDenomination = (ample) => ethers.utils.parseUnits(ample, DECIMALS);
 
 const INITIAL_AMPL_SUPPLY = ethers.utils.parseUnits('50', 6 + DECIMALS);
 const REBASE_AMT = INITIAL_AMPL_SUPPLY.div(10);
@@ -21,7 +21,7 @@ const unitTokenAmount = toUFrgDenomination('1');
 
 let accounts, deployer, xcAmple;
 
-async function setupContracts () {
+async function setupContracts() {
   // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];

@@ -9,7 +9,7 @@ const {
   EIP712_DOMAIN_TYPEHASH,
   EIP2612_PERMIT_TYPEHASH,
   getDomainSeparator,
-  signEIP712Permission
+  signEIP712Permission,
 } = require('../../_utilities/signatures');
 
 const EIP712_REVISION = '1';
@@ -25,7 +25,7 @@ let accounts,
   spenderAddress,
   xcAmple;
 
-async function setupContracts () {
+async function setupContracts() {
   accounts = await ethers.getSigners();
   deployer = accounts[0];
 

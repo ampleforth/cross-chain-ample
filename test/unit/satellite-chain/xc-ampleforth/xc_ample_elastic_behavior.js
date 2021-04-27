@@ -6,12 +6,12 @@ const INITIAL_SUPPLY = ethers.utils.parseUnits('50', 6 + DECIMALS);
 const MAX_UINT256 = ethers.BigNumber.from(2).pow(256).sub(1);
 const TOTAL_GONS = MAX_UINT256.sub(MAX_UINT256.mod(INITIAL_SUPPLY));
 
-const toUFrgDenomination = ample => ethers.utils.parseUnits(ample, DECIMALS);
+const toUFrgDenomination = (ample) => ethers.utils.parseUnits(ample, DECIMALS);
 
 const unitTokenAmount = toUFrgDenomination('1');
 
 let token, owner, anotherAccount, recipient;
-async function upgradeableToken () {
+async function upgradeableToken() {
   const [owner, recipient, anotherAccount] = await ethers.getSigners();
   const factory = await ethers.getContractFactory(
     'contracts/satellite-chain/xc-ampleforth/XCAmple.sol:XCAmple',
@@ -20,7 +20,7 @@ async function upgradeableToken () {
     factory.connect(owner),
     ['XCAmple', 'xcAMPL', INITIAL_SUPPLY],
     {
-      initializer: 'initialize(string,string,uint256)'
+      initializer: 'initialize(string,string,uint256)',
     },
   );
   await token.setController(owner.getAddress());

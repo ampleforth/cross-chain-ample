@@ -10,7 +10,7 @@ let accounts,
   otherBridgeAddress,
   vault,
   mockToken;
-async function setupContracts () {
+async function setupContracts() {
   accounts = await ethers.getSigners();
   deployer = accounts[0];
   bridge = accounts[1];

@@ -10,7 +10,7 @@ const {
   executeXCRebase,
   executeXCTransfer,
   XC_TRANSFER_RESOURCE_ID,
-  packXCTransferData
+  packXCTransferData,
 } = require('../../sdk/chain_bridge');
 const { execRebase, toAmplFixedPt } = require('../../sdk/ampleforth');
 
@@ -19,7 +19,7 @@ const {
   deployXCAmpleContracts,
   deployChainBridgeContracts,
   deployChainBridgeBaseChainGatewayContracts,
-  deployChainBridgeSatelliteChainGatewayContracts
+  deployChainBridgeSatelliteChainGatewayContracts,
 } = require('../../helpers/deploy');
 
 let accounts,
@@ -40,7 +40,7 @@ let accounts,
   userASatChain2Wallet,
   userBSatChain2Wallet;
 
-async function setupContracts () {
+async function setupContracts() {
   accounts = await ethers.getSigners();
   deployer = accounts[0];
   relayer = accounts[1];
@@ -61,7 +61,7 @@ async function setupContracts () {
       relayers: [await deployer.getAddress(), await relayer.getAddress()],
       relayerThreshold: RELAYER_TRESHOLD,
       fee: 0,
-      expiry: 1000
+      expiry: 1000,
     },
     ethers,
     deployer,
@@ -78,7 +78,7 @@ async function setupContracts () {
 
   const [
     globalAmpleforthEpoch,
-    globalAMPLSupply
+    globalAMPLSupply,
   ] = await baseChainAmplContracts.policy.globalAmpleforthEpochAndAMPLSupply();
 
   satChain1AmplContracts = await deployXCAmpleContracts(
@@ -86,7 +86,7 @@ async function setupContracts () {
       tokenSymbol: 'satChain1XCAmple',
       tokenName: 'satChain1XCAmple',
       globalAmpleforthEpoch,
-      globalAMPLSupply
+      globalAMPLSupply,
     },
     ethers,
     deployer,
@@ -97,7 +97,7 @@ async function setupContracts () {
       relayers: [await deployer.getAddress(), await relayer.getAddress()],
       relayerThreshold: RELAYER_TRESHOLD,
       fee: 0,
-      expiry: 1000
+      expiry: 1000,
     },
     ethers,
     deployer,
@@ -117,7 +117,7 @@ async function setupContracts () {
       tokenSymbol: 'satChain2XCAmple',
       tokenName: 'satChain2XCAmple',
       globalAmpleforthEpoch,
-      globalAMPLSupply
+      globalAMPLSupply,
     },
     ethers,
     deployer,
@@ -128,7 +128,7 @@ async function setupContracts () {
       relayers: [await deployer.getAddress(), await relayer.getAddress()],
       relayerThreshold: RELAYER_TRESHOLD,
       fee: 0,
-      expiry: 1000
+      expiry: 1000,
     },
     ethers,
     deployer,
@@ -146,13 +146,13 @@ async function setupContracts () {
   bridgeContractsMap = {
     base: baseChainBridgeContracts,
     sat1: satChain1BridgeContracts,
-    sat2: satChain2BridgeContracts
+    sat2: satChain2BridgeContracts,
   };
 
   amplContractsMap = {
     base: baseChainAmplContracts,
     sat1: satChain1AmplContracts,
-    sat2: satChain2AmplContracts
+    sat2: satChain2AmplContracts,
   };
 
   // On the main-chain userA and userB have 100k AMPLs each
@@ -165,7 +165,7 @@ async function setupContracts () {
     .transfer(await userBBaseChainWallet.getAddress(), toAmplFixedPt('100000'));
 }
 
-async function mockOffchain (
+async function mockOffchain(
   toChainBridge,
   fromChainID,
   depositNonce,
@@ -187,7 +187,7 @@ async function mockOffchain (
   // console.log((await toChainBridge.getProposal(fromChainID, depositNonce, dataHash))._status);
 }
 
-async function execXCReportRebase (chain) {
+async function execXCReportRebase(chain) {
   // Triggering rebase report to sat chain
   const { data, dataHash, depositNonce, resourceID } = await executeXCRebase(
     deployer,
@@ -209,7 +209,7 @@ async function execXCReportRebase (chain) {
 }
 
 // Executes rebase end to end
-async function execXCRebaseE2E (perc, chainSubset = []) {
+async function execXCRebaseE2E(perc, chainSubset = []) {
   const chains =
     chainSubset.length === 0 ? Object.keys(bridgeContractsMap) : chainSubset;
 
@@ -240,7 +240,7 @@ async function execXCRebaseE2E (perc, chainSubset = []) {
   }
 }
 
-async function execXCSend (
+async function execXCSend(
   fromChain,
   toChain,
   fromAccount,
@@ -289,7 +289,7 @@ async function execXCSend (
   );
 }
 
-async function getBalancesAndSupply () {
+async function getBalancesAndSupply() {
   const userAEthBal = await baseChainAmplContracts.ampl.balanceOf(
     await userABaseChainWallet.getAddress(),
   );
@@ -319,11 +319,11 @@ async function getBalancesAndSupply () {
     sat1Balances: [userATronBal, userBTronBal],
     sat2Balances: [userAAcalaBal, userBAcalaBal],
     sat1Supply,
-    sat2Supply
+    sat2Supply,
   };
 }
 
-async function checkBalancesAndSupply (
+async function checkBalancesAndSupply(
   baseBalances,
   sat1Balances,
   sat1Supply,
