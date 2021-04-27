@@ -394,13 +394,24 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     }
 
     /**
-     * @dev Burn xcAmples from the beneficiary.
+     * @dev Destroys `xcAmpleAmount` tokens from `who`, deducting from the caller's
+     * allowance.
+     *
+     * This is only callable by the controller, because we only want to support burn for the
+     * interchain-transfer case. Otherwise, AMPL on base chain could become locked in the vault.
+     *
+     * Requirements:
+     *
+     * - the caller must have allowance for ``who``'s tokens of at least
+     * `xcAmpleAmount`.
      *
      * @param who The address of the beneficiary.
      * @param xcAmpleAmount The amount of xcAmple tokens to be burned.
      */
-    function burn(address who, uint256 xcAmpleAmount) external onlyController {
+    function burnFrom(address who, uint256 xcAmpleAmount) external onlyController {
         require(who != address(0), "XCAmple: burn address zero address");
+
+        _allowedXCAmples[who][msg.sender] = _allowedXCAmples[who][msg.sender].sub(xcAmpleAmount);
 
         uint256 gonValue = xcAmpleAmount.mul(_gonsPerAMPL);
         _gonBalances[who] = _gonBalances[who].sub(gonValue);
