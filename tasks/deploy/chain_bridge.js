@@ -18,7 +18,7 @@ const {
 
 const {
   deployChainBridgeContracts,
-  deployChainBridgeHandlers,
+  deployChainBridgeHelpers,
   deployChainBridgeBaseChainGatewayContracts,
   deployChainBridgeSatelliteChainGatewayContracts,
 } = require('../../helpers/deploy');
@@ -28,12 +28,26 @@ task(
   'Generates deployment files for a deployed instance of Bridge',
 )
   .addParam('bridgeAddress', 'The address of the bridge contract')
+  .addParam(
+    'genericHandlerAddress',
+    'The address of the bridge generic handler contract',
+  )
   .setAction(async (args, hre) => {
     const Bridge = await getCompiledContractFactory(hre.ethers, 'Bridge');
+    const GenericHandler = await getCompiledContractFactory(
+      hre.ethers,
+      'GenericHandler',
+    );
     await writeBulkDeploymentData(hre.network.name, {
       'chainBridge/bridge': {
         address: args.bridgeAddress,
         abi: Bridge.interface.format(),
+      },
+    });
+    await writeBulkDeploymentData(hre.network.name, {
+      'chainBridge/genericHandler': {
+        address: args.genericHandlerAddress,
+        abi: GenericHandler.interface.format(),
       },
     });
   });
@@ -55,7 +69,6 @@ cbDeployTask(
     console.log(txParams);
 
     let bridge,
-      handlers,
       genericHandler,
       erc20Handler,
       erc721Handler,
@@ -68,25 +81,30 @@ cbDeployTask(
         'chainBridge/bridge',
         hre.ethers.provider,
       );
-      handlers = await deployChainBridgeHandlers(
+      genericHandler = await getDeployedContractInstance(
+        hre.network.name,
+        'chainBridge/genericHandler',
+        hre.ethers.provider,
+      );
+      const helpers = await deployChainBridgeHelpers(
         bridge,
         args,
         hre.ethers,
         deployer,
         txParams,
       );
+      batchRebaseReporter = helpers.batchRebaseReporter;
     } else {
-      handlers = await deployChainBridgeContracts(
+      const chainBridge = await deployChainBridgeContracts(
         args,
         hre.ethers,
         deployer,
         txParams,
       );
+      bridge = chainBridge.bridge;
+      genericHandler = chainBridge.genericHandler;
+      batchRebaseReporter = chainBridge.batchRebaseReporter;
     }
-    genericHandler = handlers.genericHandler;
-    erc20Handler = handlers.erc20Handler;
-    erc721Handler = handlers.erc721Handler;
-    batchRebaseReporter = handlers.batchRebaseReporter;
 
     const ampl = await getDeployedContractInstance(
       hre.network.name,
@@ -118,30 +136,11 @@ cbDeployTask(
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');
-    if (args.useDeployed) {
-      await writeBulkDeploymentData(hre.network.name, {
-        'chainBridge/bridge': {
-          address: bridge.address,
-          abi: bridge.interface.format(),
-        },
-      });
-    } else {
-      await writeDeploymentData(hre.network.name, 'chainBridge/bridge', bridge);
-    }
+    await writeDeploymentData(hre.network.name, 'chainBridge/bridge', bridge);
     await writeDeploymentData(
       hre.network.name,
       'chainBridge/genericHandler',
       genericHandler,
-    );
-    await writeDeploymentData(
-      hre.network.name,
-      'chainBridge/erc20Handler',
-      erc20Handler,
-    );
-    await writeDeploymentData(
-      hre.network.name,
-      'chainBridge/erc721Handler',
-      erc721Handler,
     );
     await writeDeploymentData(
       hre.network.name,
@@ -168,28 +167,16 @@ cbDeployTask(
     console.log('Verify on etherscan');
     await etherscanVerify(hre, tokenVault.address);
     await etherscanVerify(hre, bridge.address, [
-      args.chainId,
-      args.relayers,
-      args.relayerThreshold,
-      args.fee,
-      args.expiry,
+      await bridge._chainID(),
+      [],
+      await bridge._relayerThreshold(),
+      await bridge._fee(),
+      await bridge._expiry(),
     ]);
     await etherscanVerify(hre, genericHandler.address, [
       bridge.address,
       [],
       [],
-      [],
-      [],
-      [],
-    ]);
-    await etherscanVerify(hre, erc20Handler.address, [
-      bridge.address,
-      [],
-      [],
-      [],
-    ]);
-    await etherscanVerify(hre, erc721Handler.address, [
-      bridge.address,
       [],
       [],
       [],
@@ -225,7 +212,7 @@ cbDeployTask(
     console.log('Deployer:', deployerAddress);
     console.log(txParams);
 
-    let bridge, handlers, genericHandler, erc20Handler, erc721Handler;
+    let bridge, genericHandler, erc20Handler, erc721Handler;
 
     if (args.useDeployed) {
       console.log('Using deployed bridge');
@@ -234,24 +221,21 @@ cbDeployTask(
         'chainBridge/bridge',
         hre.ethers.provider,
       );
-      handlers = await deployChainBridgeHandlers(
-        bridge,
-        args,
-        hre.ethers,
-        deployer,
-        txParams,
+      genericHandler = await getDeployedContractInstance(
+        hre.network.name,
+        'chainBridge/genericHandler',
+        hre.ethers.provider,
       );
     } else {
-      handlers = await deployChainBridgeContracts(
+      const chainBridge = await deployChainBridgeContracts(
         args,
         hre.ethers,
         deployer,
         txParams,
       );
+      bridge = chainBridge.bridge;
+      genericHandler = chainBridge.genericHandler;
     }
-    genericHandler = handlers.genericHandler;
-    erc20Handler = handlers.erc20Handler;
-    erc721Handler = handlers.erc721Handler;
 
     const xcAmple = await getDeployedContractInstance(
       hre.network.name,
@@ -277,30 +261,11 @@ cbDeployTask(
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');
-    if (args.useDeployed) {
-      await writeBulkDeploymentData(hre.network.name, {
-        'chainBridge/bridge': {
-          address: bridge.address,
-          abi: bridge.interface.format(),
-        },
-      });
-    } else {
-      await writeDeploymentData(hre.network.name, 'chainBridge/bridge', bridge);
-    }
+    await writeDeploymentData(hre.network.name, 'chainBridge/bridge', bridge);
     await writeDeploymentData(
       hre.network.name,
       'chainBridge/genericHandler',
       genericHandler,
-    );
-    await writeDeploymentData(
-      hre.network.name,
-      'chainBridge/erc20Handler',
-      erc20Handler,
-    );
-    await writeDeploymentData(
-      hre.network.name,
-      'chainBridge/erc721Handler',
-      erc721Handler,
     );
     await writeDeploymentData(
       hre.network.name,
@@ -316,28 +281,16 @@ cbDeployTask(
     console.log('------------------------------------------------------------');
     console.log('Verify on etherscan');
     await etherscanVerify(hre, bridge.address, [
-      args.chainId,
-      args.relayers,
-      args.relayerThreshold,
-      args.fee,
-      args.expiry,
+      await bridge._chainID(),
+      [],
+      await bridge._relayerThreshold(),
+      await bridge._fee(),
+      await bridge._expiry(),
     ]);
     await etherscanVerify(hre, genericHandler.address, [
       bridge.address,
       [],
       [],
-      [],
-      [],
-      [],
-    ]);
-    await etherscanVerify(hre, erc20Handler.address, [
-      bridge.address,
-      [],
-      [],
-      [],
-    ]);
-    await etherscanVerify(hre, erc721Handler.address, [
-      bridge.address,
       [],
       [],
       [],

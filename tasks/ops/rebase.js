@@ -94,7 +94,8 @@ txTask(
         'chainBridge/bridge',
         provider,
       );
-      satelliteChainIDs.push(await satelliteChainBridge._chainID());
+      const satelliteChainID = await satelliteChainBridge._chainID();
+      satelliteChainIDs.push(satelliteChainID);
     }
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);

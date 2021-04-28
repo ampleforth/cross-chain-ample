@@ -154,37 +154,13 @@ async function deployXCAmpleContracts(
   return { proxyAdmin, xcAmple, xcAmpleController, rebaseRelayer };
 }
 
-async function deployChainBridgeHandlers(
+async function deployChainBridgeHelpers(
   bridge,
   { chainId, relayers, relayerThreshold, fee, expiry },
   ethers,
   deployer,
   txParams = {},
 ) {
-  const genericHandler = await deployContract(
-    ethers,
-    'GenericHandler',
-    deployer,
-    [bridge.address, [], [], [], [], []],
-    txParams,
-  );
-
-  const erc20Handler = await deployContract(
-    ethers,
-    'ERC20Handler',
-    deployer,
-    [bridge.address, [], [], []],
-    txParams,
-  );
-
-  const erc721Handler = await deployContract(
-    ethers,
-    'ERC721Handler',
-    deployer,
-    [bridge.address, [], [], []],
-    txParams,
-  );
-
   const batchRebaseReporter = await deployContract(
     ethers,
     'ChainBridgeBatchRebaseReport',
@@ -194,9 +170,6 @@ async function deployChainBridgeHandlers(
   );
 
   return {
-    genericHandler,
-    erc20Handler,
-    erc721Handler,
     batchRebaseReporter,
   };
 }
@@ -215,7 +188,15 @@ async function deployChainBridgeContracts(
     txParams,
   );
 
-  const handlers = await deployChainBridgeHandlers(
+  const genericHandler = await deployContract(
+    ethers,
+    'GenericHandler',
+    deployer,
+    [bridge.address, [], [], [], [], []],
+    txParams,
+  );
+
+  const helpers = await deployChainBridgeHelpers(
     bridge,
     { chainId, relayers, relayerThreshold, fee, expiry },
     ethers,
@@ -225,7 +206,8 @@ async function deployChainBridgeContracts(
 
   return {
     bridge,
-    ...handlers,
+    genericHandler,
+    ...helpers,
   };
 }
 
@@ -407,7 +389,7 @@ module.exports = {
   deployAMPLContracts,
   deployXCAmpleContracts,
   deployChainBridgeContracts,
-  deployChainBridgeHandlers,
+  deployChainBridgeHelpers,
   deployChainBridgeBaseChainGatewayContracts,
   deployChainBridgeSatelliteChainGatewayContracts,
 };

@@ -115,14 +115,21 @@ const writeDeploymentData = async (network, contractRef, contract) => {
     ? JSON.parse(fs.readFileSync(addressFile))
     : {};
 
-  const tx = await contract.deployTransaction;
-  const txR = await tx.wait();
-  chainAddresses[contractRef] = {
-    address: contract.address,
-    abi: contract.interface.format(),
-    hash: tx.hash,
-    blockNumber: txR.blockNumber,
-  };
+  if (contract.deployTransaction) {
+    const tx = await contract.deployTransaction;
+    const txR = await tx.wait();
+    chainAddresses[contractRef] = {
+      address: contract.address,
+      abi: contract.interface.format(),
+      hash: tx.hash,
+      blockNumber: txR.blockNumber,
+    };
+  } else {
+    chainAddresses[contractRef] = {
+      address: contract.address,
+      abi: contract.interface.format(),
+    };
+  }
 
   fs.writeFileSync(addressFile, JSON.stringify(chainAddresses, null, 2));
 };

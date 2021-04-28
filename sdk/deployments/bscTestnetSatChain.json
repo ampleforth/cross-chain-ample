@@ -111,7 +111,7 @@
   },
   "isBaseChain": false,
   "chainBridge/bridge": {
-    "address": "0x26c61e08d6fd620420079ED4B90Ec4a99c6bCEaa",
+    "address": "0xa939D6a9E91ebD962f36bD0f7cf1c6C3C12c798f",
     "abi": [
       "constructor(uint8 chainID, address[] initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry)",
       "event Deposit(uint8 indexed destinationChainID, bytes32 indexed resourceID, uint64 indexed depositNonce)",
@@ -164,11 +164,10 @@
       "function revokeRole(bytes32 role, address account)",
       "function transferFunds(address[] addrs, uint256[] amounts)",
       "function voteProposal(uint8 chainID, uint64 depositNonce, bytes32 resourceID, bytes32 dataHash)"
-    ],
-    "blockNumber": 8114796
+    ]
   },
   "chainBridge/genericHandler": {
-    "address": "0x57f464ebeabA7008CDaCdde73a1bEe6CCc2c6Fac",
+    "address": "0x8E61cC786AaFA0BFd13035a5b0b7A8CcdFB4CE12",
     "abi": [
       "constructor(address bridgeAddress, bytes32[] initialResourceIDs, address[] initialContractAddresses, bytes4[] initialDepositFunctionSignatures, uint256[] initialDepositFunctionDepositerOffsets, bytes4[] initialExecuteFunctionSignatures)",
       "function _bridgeAddress() view returns (address)",
@@ -183,54 +182,10 @@
       "function executeProposal(bytes32 resourceID, bytes data)",
       "function getDepositRecord(uint64 depositNonce, uint8 destId) view returns (tuple(uint8 _destinationChainID, address _depositer, bytes32 _resourceID, bytes _metaData))",
       "function setResource(bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositerOffset, bytes4 executeFunctionSig)"
-    ],
-    "hash": "0xda8317a63fbc303ff916886997769acd9509ed097b7b30c9f11ecd1df2d68b52",
-    "blockNumber": 8241693
-  },
-  "chainBridge/erc20Handler": {
-    "address": "0x7FcBc5aB294f26888C59b663bFEa5412915ab96e",
-    "abi": [
-      "constructor(address bridgeAddress, bytes32[] initialResourceIDs, address[] initialContractAddresses, address[] burnableContractAddresses)",
-      "function _bridgeAddress() view returns (address)",
-      "function _burnList(address) view returns (bool)",
-      "function _contractWhitelist(address) view returns (bool)",
-      "function _depositRecords(uint8, uint64) view returns (address _tokenAddress, uint8 _destinationChainID, bytes32 _resourceID, bytes _destinationRecipientAddress, address _depositer, uint256 _amount)",
-      "function _resourceIDToTokenContractAddress(bytes32) view returns (address)",
-      "function _tokenContractAddressToResourceID(address) view returns (bytes32)",
-      "function deposit(bytes32 resourceID, uint8 destinationChainID, uint64 depositNonce, address depositer, bytes data)",
-      "function executeProposal(bytes32 resourceID, bytes data)",
-      "function fundERC20(address tokenAddress, address owner, uint256 amount)",
-      "function getDepositRecord(uint64 depositNonce, uint8 destId) view returns (tuple(address _tokenAddress, uint8 _destinationChainID, bytes32 _resourceID, bytes _destinationRecipientAddress, address _depositer, uint256 _amount))",
-      "function setBurnable(address contractAddress)",
-      "function setResource(bytes32 resourceID, address contractAddress)",
-      "function withdraw(address tokenAddress, address recipient, uint256 amount)"
-    ],
-    "hash": "0x3be6089f62fb1352bb0198112d2b86978903d3139a9a25ce887288fc7a1bfa7f",
-    "blockNumber": 8241697
-  },
-  "chainBridge/erc721Handler": {
-    "address": "0xda24842Bb27b5F40E67cEB8284AadC3321Bc5C2c",
-    "abi": [
-      "constructor(address bridgeAddress, bytes32[] initialResourceIDs, address[] initialContractAddresses, address[] burnableContractAddresses)",
-      "function _bridgeAddress() view returns (address)",
-      "function _burnList(address) view returns (bool)",
-      "function _contractWhitelist(address) view returns (bool)",
-      "function _depositRecords(uint8, uint64) view returns (address _tokenAddress, uint8 _destinationChainID, bytes32 _resourceID, bytes _destinationRecipientAddress, address _depositer, uint256 _tokenID, bytes _metaData)",
-      "function _resourceIDToTokenContractAddress(bytes32) view returns (address)",
-      "function _tokenContractAddressToResourceID(address) view returns (bytes32)",
-      "function deposit(bytes32 resourceID, uint8 destinationChainID, uint64 depositNonce, address depositer, bytes data)",
-      "function executeProposal(bytes32 resourceID, bytes data)",
-      "function fundERC721(address tokenAddress, address owner, uint256 tokenID)",
-      "function getDepositRecord(uint64 depositNonce, uint8 destId) view returns (tuple(address _tokenAddress, uint8 _destinationChainID, bytes32 _resourceID, bytes _destinationRecipientAddress, address _depositer, uint256 _tokenID, bytes _metaData))",
-      "function setBurnable(address contractAddress)",
-      "function setResource(bytes32 resourceID, address contractAddress)",
-      "function withdraw(address tokenAddress, address recipient, uint256 tokenID)"
-    ],
-    "hash": "0x2e8aef39b275c2bb7f0c50415070d5b4b72d3e133b7849a7e8f99b01c8548cad",
-    "blockNumber": 8241701
+    ]
   },
   "chainBridge/transferGateway": {
-    "address": "0x42F87e8a61a90Ab53b9dF79AFa7Bc5d0D35c2dC0",
+    "address": "0x4162aEE7665a2b8EafE5C257e600DEa7c4296f73",
     "abi": [
       "constructor(address bridgeHandler, address xcAmple_, address xcController_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -247,11 +202,11 @@
       "function xcAmple() view returns (address)",
       "function xcController() view returns (address)"
     ],
-    "hash": "0x9de998cb2a96900ce3fd6a40721e51123c17fbbbf57d63b43c5b505c040b3c5e",
-    "blockNumber": 8241713
+    "hash": "0xd73bda81318db5d72f0d01ed92d787cb6419270153913785623ba9891c5a42e8",
+    "blockNumber": 8377250
   },
   "chainBridge/rebaseGateway": {
-    "address": "0xC8E2fb59a5A7485F642291475af01B3840E3eadb",
+    "address": "0xbAdBD05c2eC381B2DdF610E125A73baBda54fc7f",
     "abi": [
       "constructor(address bridgeHandler, address xcAmple_, address xcController_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -268,7 +223,7 @@
       "function xcAmple() view returns (address)",
       "function xcController() view returns (address)"
     ],
-    "hash": "0xca0ed9c5a1b6805e178685ee65cd5d21e268d871b6c43bca0f67ec57663d2241",
-    "blockNumber": 8241709
+    "hash": "0x97e7fea0c528a59cb20f5ec7dfcc702c3edc9db1648a8516c30f4d7f8e807ce9",
+    "blockNumber": 8377245
   }
 }
