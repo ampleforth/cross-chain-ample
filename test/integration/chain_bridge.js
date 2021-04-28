@@ -248,7 +248,6 @@ async function execXCSend (
   amount,
   setApproval = true,
 ) {
-
   if (setApproval) {
     if (fromChain === 'base') {
       await baseChainAmplContracts.ampl
@@ -733,7 +732,7 @@ describe('Transfers scenarios', function () {
       );
     });
 
-    describe('user does not approve Vault on base chain', function() {
+    describe('user does not approve Vault on base chain', function () {
       it('should revert', async function () {
         await checkBalancesAndSupply(
           ['100000', '100000'],
@@ -743,12 +742,10 @@ describe('Transfers scenarios', function () {
           '0',
         );
 
-        await baseChainAmplContracts.ampl
-          .connect(userBBaseChainWallet)
-          .approve(
-            bridgeContractsMap['base'].tokenVault.address,
-            toAmplFixedPt('0'), // Approve 0
-          );
+        await baseChainAmplContracts.ampl.connect(userBBaseChainWallet).approve(
+          bridgeContractsMap['base'].tokenVault.address,
+          toAmplFixedPt('0'), // Approve 0
+        );
 
         await expect(
           execXCSend(
@@ -757,15 +754,14 @@ describe('Transfers scenarios', function () {
             userBBaseChainWallet,
             userBSatChain1Wallet,
             toAmplFixedPt('5000'),
-            false,  // Use existing approval and don't auto-approve.
+            false, // Use existing approval and don't auto-approve.
           ),
         ).to.be.reverted;
-      })
+      });
     });
 
-    describe('user does not approve Controller on satellite chain', function() {
+    describe('user does not approve Controller on satellite chain', function () {
       it('should revert', async function () {
-
         // Setup by placing amples on satellite chain
         await checkBalancesAndSupply(
           ['100000', '100000'],
@@ -794,7 +790,7 @@ describe('Transfers scenarios', function () {
           .connect(userASatChain1Wallet)
           .approve(
             amplContractsMap['sat1'].xcAmpleController.address,
-            toAmplFixedPt('0'),  // Approve 0
+            toAmplFixedPt('0'), // Approve 0
           );
         await expect(
           execXCSend(
@@ -803,7 +799,7 @@ describe('Transfers scenarios', function () {
             userASatChain1Wallet,
             userABaseChainWallet,
             toAmplFixedPt('1'),
-            false,  // Use existing approval and don't auto-approve.
+            false, // Use existing approval and don't auto-approve.
           ),
         ).to.be.reverted;
       });
