@@ -80,7 +80,10 @@ module.exports = {
     },
     bscTestnetSatChain: {
       url: 'https://data-seed-prebsc-1-s1.binance.org:8545'
-    }
+    },
+    meterTestnetSatChain: {
+      url: 'http://s11.meter.io:8545'
+    },
 
     // rinkebyBaseChain: {
     //   url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_SECRET

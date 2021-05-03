@@ -326,6 +326,7 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
       .connect(deployer)
       .addBridgeGateway(rebaseGateway.address, txParams)
   ).wait();
+
   await (
     await xcAmpleController
       .connect(deployer)

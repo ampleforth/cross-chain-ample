@@ -37,8 +37,6 @@ task('config:chain_bridge', 'Generates chian_bridge config file')
         opts: {
           bridge: chainAddresses['chainBridge/bridge'].address,
           genericHandler: chainAddresses['chainBridge/genericHandler'].address,
-          erc20Handler: chainAddresses['chainBridge/erc20Handler'].address,
-          erc721Handler: chainAddresses['chainBridge/erc721Handler'].address,
           startBlock: `${(
             chainAddresses['chainBridge/bridge'].blockNumber || 0
           ).toString()}`,
