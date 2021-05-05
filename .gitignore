@@ -94,3 +94,5 @@ logs
 
 # testnetdeployment
 sdk/deployments/geth*.json
+
+console.js
