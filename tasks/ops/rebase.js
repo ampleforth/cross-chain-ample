@@ -79,6 +79,11 @@ txTask(
       'chainBridge/bridge',
       baseChainProvider,
     );
+    const baseChainGenericHandler = await getDeployedContractInstance(
+      baseChainNetwork,
+      'chainBridge/genericHandler',
+      baseChainProvider,
+    );
     const batchRebaseReporter = await getDeployedContractInstance(
       baseChainNetwork,
       'chainBridge/batchRebaseReporter',

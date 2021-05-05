@@ -1,6 +1,6 @@
 {
   "proxyAdmin": {
-    "address": "0xD7e36FC5540986f20e42a5941777Ec333b4Cf875",
+    "address": "0xBf1D78dEC7f1D82CCF0c45ab7Ee362e72BeE6f39",
     "abi": [
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
       "function changeProxyAdmin(address proxy, address newAdmin)",
@@ -13,11 +13,11 @@
       "function upgrade(address proxy, address implementation)",
       "function upgradeAndCall(address proxy, address implementation, bytes data) payable"
     ],
-    "hash": "0x77aca8d850086a139d0b501c62d26dcec1cf95dcf79954d0f98a46a35602ff20",
-    "blockNumber": 10095767
+    "hash": "0x1204defb18dc011b6d782623d883314a39bbff04f033715470ada1d6672a2853",
+    "blockNumber": 10165141
   },
   "ampl": {
-    "address": "0xF63DC56cD7B55DE02A0341A5F4bbFAf9657721D9",
+    "address": "0xD0E9335817f7B7c2567b784FD55b203697177E2A",
     "abi": [
       "event Approval(address indexed owner, address indexed spender, uint256 value)",
       "event LogMonetaryPolicyUpdated(address monetaryPolicy)",
@@ -56,11 +56,11 @@
       "function transferFrom(address from, address to, uint256 value) returns (bool)",
       "function transferOwnership(address newOwner)"
     ],
-    "hash": "0x2b7bf72578ce588d825ab57a05e0a234911e2a905bab35b550c44abc78c4b394",
-    "blockNumber": 10095768
+    "hash": "0x94dc7db0c5e9c0f0d7eabb23b67f9244122eac6dac3c503c7885ceaf85d6927a",
+    "blockNumber": 10165144
   },
   "policy": {
-    "address": "0x042Cde821fA5E8c4581780dFFfb6E3dCE77f0019",
+    "address": "0x7F93DE6733602f4606986389e4fbaC2010904aCE",
     "abi": [
       "event LogRebase(uint256 indexed epoch, uint256 exchangeRate, uint256 cpi, int256 requestedSupplyAdjustment, uint256 timestampSec)",
       "event OwnershipRenounced(address indexed previousOwner)",
@@ -92,11 +92,11 @@
       "function transferOwnership(address newOwner)",
       "function uFrags() view returns (address)"
     ],
-    "hash": "0x207451d81e759bd59ad9282dd45e3abed2efd4fe5c987f40aef3122008691444",
-    "blockNumber": 10095779
+    "hash": "0x6778c4852b634b1e6eff292630be2c165a146eb306cde2ac62448f426e4c6d48",
+    "blockNumber": 10165158
   },
   "orchestrator": {
-    "address": "0xFC344AF21d647f4244B5F098203A178BF26c51Dc",
+    "address": "0x09cc04b4fDc38AD6C4433B2EAeE122A079eB0EC3",
     "abi": [
       "constructor(address policy_)",
       "event OwnershipRenounced(address indexed previousOwner)",
@@ -114,11 +114,11 @@
       "function transactionsSize() view returns (uint256)",
       "function transferOwnership(address newOwner)"
     ],
-    "hash": "0x38397f48960fce0e69c18587099fedce35ddde72a1bd87a8157fab39c4b407cb",
-    "blockNumber": 10095787
+    "hash": "0x43a7d90cc6a0222a9cb71d6a528255dd9f6ad7bb2151be0fa699af50efe1cf7a",
+    "blockNumber": 10165174
   },
   "rateOracle": {
-    "address": "0x90B0425ed5D437beb8ED833E9C7908a809972725",
+    "address": "0x75c00CF8B6C932AaD2E20fa238a57D389aE3842d",
     "abi": [
       "function reportDelaySec() view returns (uint256)",
       "function pushReport(uint256 payload)",
@@ -145,11 +145,11 @@
       "event ProviderReportPushed(address indexed provider, uint256 payload, uint256 timestamp)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)"
     ],
-    "hash": "0x76ba4b8712c56893d19b7dc3ff37a896e540f2b8e3e1987d4506c116fb5dd747",
-    "blockNumber": 10095770
+    "hash": "0xcabd1eaff3c5fa1aa21aba87c64d7658093640aa7a7098dc54691734930f5111",
+    "blockNumber": 10165147
   },
   "cpiOracle": {
-    "address": "0xFe1cEb0Aa5AC1c386B48d057c4a1659677f6f180",
+    "address": "0x22881e9feb1746109227397cAe6Cd86859b9C43e",
     "abi": [
       "function reportDelaySec() view returns (uint256)",
       "function pushReport(uint256 payload)",
@@ -176,8 +176,8 @@
       "event ProviderReportPushed(address indexed provider, uint256 payload, uint256 timestamp)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)"
     ],
-    "hash": "0xb37cb32fbb66da5268a23f83b50e3c6f140dc1c0cd24eed6deba7ed8685d37bc",
-    "blockNumber": 10095775
+    "hash": "0x33b5316925a6884e23ec3d6650225eae1ae25ed65fdcdec71b7ef7ea2d351dd1",
+    "blockNumber": 10165152
   },
   "isBaseChain": true,
   "chainBridge/bridge": {
@@ -234,7 +234,9 @@
       "function revokeRole(bytes32 role, address account)",
       "function transferFunds(address[] addrs, uint256[] amounts)",
       "function voteProposal(uint8 chainID, uint64 depositNonce, bytes32 resourceID, bytes32 dataHash)"
-    ]
+    ],
+    "hash": "0xbef13bb1110e34978fe99307ba51c222fbf2dc93b569174e016c226ebd6ab895",
+    "blockNumber": 10126635
   },
   "chainBridge/genericHandler": {
     "address": "0x4CbbA9ea441cae4c07cB42549F3b2372c445CDd3",
@@ -255,7 +257,7 @@
     ]
   },
   "chainBridge/transferGateway": {
-    "address": "0x57b44cb7Fb65b1Ff7D4919026A5AC8f0D3c3Ff21",
+    "address": "0xE60a3D760A0bFbDf5eF5D23Ba39536Be96eb8885",
     "abi": [
       "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -273,11 +275,11 @@
       "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function vault() view returns (address)"
     ],
-    "hash": "0x444f738b0abe99cb7c0f2de70542bad3b686278dfcd1af3afd08f4a040f89777",
-    "blockNumber": 10131529
+    "hash": "0xccddf1246ab89e3ac0516be880a5519e33f84d4f6110e225d9f39b41630d3e67",
+    "blockNumber": 10165265
   },
   "chainBridge/rebaseGateway": {
-    "address": "0xFB2a1734F91C405A394e973B5472922eA1e499a6",
+    "address": "0x7df4ee3DcE56Cf56B43D383ED4c6089E5D861275",
     "abi": [
       "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -295,11 +297,11 @@
       "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function vault() view returns (address)"
     ],
-    "hash": "0x04be676cc0b6f2f22e45b7f252ede3695bdcabdce8d7a29783237e4148ef2ee9",
-    "blockNumber": 10131526
+    "hash": "0x749e9cde30c0315d2a89e3263e4c3ad2ac28bfd1a2466d194feacd187b6b3fe5",
+    "blockNumber": 10165261
   },
   "chainBridge/tokenVault": {
-    "address": "0xdc5a066f83dFf7D26Bb9B1D7Df629C8a4f5890Cf",
+    "address": "0xa0DF1131eFA62E487dF180Feb9ecF1cdE7aad632",
     "abi": [
       "event GatewayLocked(address indexed bridgeGateway, address indexed token, address indexed depositor, uint256 amount)",
       "event GatewayUnlocked(address indexed bridgeGateway, address indexed token, address indexed recipient, uint256 amount)",
@@ -315,15 +317,15 @@
       "function unlock(address token, address recipient, uint256 amount)",
       "function whitelistedBridgeGateways(address) view returns (bool)"
     ],
-    "hash": "0xfc36480c54feb765b0f54cd5cb5b2669aae37d1d2ae0058b4e1c6904dc962b38",
-    "blockNumber": 10131524
+    "hash": "0xde6c8d24b5ad8c597d10dc2d2f5eefb4ea0e327e92295f73c0fcef69633c1fa2",
+    "blockNumber": 10165259
   },
   "chainBridge/batchRebaseReporter": {
-    "address": "0x25e197dfed59B9EBA9df8dd9364d42D5D8B41180",
+    "address": "0xCCc7bB32f2c693edd8bBE5326ebf676F1ad86Eec",
     "abi": [
       "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID)"
     ],
-    "hash": "0x2cf8d19b644fc3ab64f66d48db9cab2546b5715111f5a237ebd7932f53bc0eef",
-    "blockNumber": 10131523
+    "hash": "0x4d7c68d2ef06e6f222be9c4b5da94305d6a7ac5a59d6ce163043b1c5d487ff3a",
+    "blockNumber": 10165257
   }
 }

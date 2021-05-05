@@ -79,6 +79,14 @@ txTask('xc_transfer', 'Executes cross chain transfer')
         sourceChainProvider,
       );
       await printRebaseInfo(policy);
+
+      const approveTx = await token
+        .connect(sender)
+        .approve(
+          policy.address,
+          transferAmt,
+        );
+      await approveTx.wait();
     }
 
     const { txR } = await executeXCTransfer(
