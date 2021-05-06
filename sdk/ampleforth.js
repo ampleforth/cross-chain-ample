@@ -4,10 +4,10 @@ const BigNumber = require('bignumber.js');
 const AMPL_DECIMALS = 9;
 
 const toAmplFloatingPt = (ample) =>
-  ethers.utils.formatUnits(ample.toString(), AMPL_DECIMALS);
+  ethers.utils.formatUnits(`${ample}`, AMPL_DECIMALS);
 
 const toAmplFixedPt = (ample) =>
-  ethers.utils.parseUnits(ample.toString(), AMPL_DECIMALS);
+  ethers.utils.parseUnits(`${ample.toFixed(AMPL_DECIMALS)}`, AMPL_DECIMALS);
 
 const INITIAL_SUPPLY = ethers.utils.parseUnits('50', 6 + AMPL_DECIMALS);
 const AMPL_ORACLE_DECIMALS = 18;
