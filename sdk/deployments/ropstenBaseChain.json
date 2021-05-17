@@ -321,11 +321,11 @@
     "blockNumber": 10165259
   },
   "chainBridge/batchRebaseReporter": {
-    "address": "0xCCc7bB32f2c693edd8bBE5326ebf676F1ad86Eec",
+    "address": "0xeeC0f9370732fD0ccD374d1c9fFB6C818E5d03bb",
     "abi": [
-      "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID)"
+      "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID, uint128 bridgeFee) payable"
     ],
-    "hash": "0x4d7c68d2ef06e6f222be9c4b5da94305d6a7ac5a59d6ce163043b1c5d487ff3a",
-    "blockNumber": 10165257
+    "hash": "0x56395e830441701c7145c78d0327de9a6d6232c050f8f85cf39b26ed5ba60d34",
+    "blockNumber": 10235930
   }
 }

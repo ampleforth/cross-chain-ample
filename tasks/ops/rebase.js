@@ -104,6 +104,7 @@ txTask(
     }
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);
+    const fee = await baseChainBridge._fee();
     const tx = await batchRebaseReporter
       .connect(sender)
       .execute(
@@ -111,6 +112,7 @@ txTask(
         baseChainBridge.address,
         satelliteChainIDs,
         XC_REBASE_RESOURCE_ID,
+        fee,
       );
 
     const txR = await tx.wait();

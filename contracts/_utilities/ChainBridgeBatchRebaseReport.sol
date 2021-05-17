@@ -6,7 +6,7 @@ interface IBridge {
         uint8 destinationChainID,
         bytes32 resourceID,
         bytes calldata data
-    ) external;
+    ) external payable;
 }
 
 interface IPolicy {
@@ -22,8 +22,9 @@ contract ChainBridgeBatchRebaseReport {
         address policy,
         address bridge,
         uint8[] memory destinationChainIDs,
-        bytes32 resourceID
-    ) external {
+        bytes32 resourceID,
+        uint128 bridgeFee
+    ) external payable {
         for (uint256 i = 0; i < destinationChainIDs.length; i++) {
             uint8 destinationChainID = destinationChainIDs[i];
 
@@ -32,7 +33,7 @@ contract ChainBridgeBatchRebaseReport {
             (epoch, totalSupply) = IPolicy(policy).globalAmpleforthEpochAndAMPLSupply();
 
             uint256 dataLen = 64;
-            IBridge(bridge).deposit(
+            IBridge(bridge).deposit{value:bridgeFee}(
                 destinationChainID,
                 resourceID,
                 abi.encode(dataLen, epoch, totalSupply)
