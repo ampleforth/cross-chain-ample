@@ -65,35 +65,31 @@ module.exports = {
   },
 
   networks: {
-    gethBaseChain: {
+    localGethBaseChain: {
       url: 'http://localhost:7545'
     },
-    gethSatChain1: {
+    localGethSatChain1: {
       url: 'http://localhost:7550'
     },
-    gethSatChain2: {
+    localGethSatChain2: {
       url: 'http://localhost:7555'
     },
 
-    ropstenBaseChain: {
+    devRopstenBaseChain: {
       url: 'https://eth-ropsten.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
     },
-    bscTestnetSatChain: {
+    devBscTestnetSatChain: {
       url: 'https://data-seed-prebsc-1-s1.binance.org:8545'
     },
-    meterTestnetSatChain: {
+    devMeterTestnetSatChain: {
       url: 'http://s11.meter.io:8545'
     },
 
-    // rinkebyBaseChain: {
-    //   url: 'https://rinkeby.infura.io/v3/' + process.env.INFURA_SECRET
-    // },
-    // goerliSatChain: {
-    //   url: 'https://goerli.infura.io/v3/' + process.env.INFURA_SECRET
-    // },
-
-    // avaTestnetSatChain: {
-    //   url: 'https://api.avax-test.network/ext/bc/C/rpc'
-    // }
+    prodEthereumBaseChain: {
+      url: 'https://eth-mainnet.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
+    },
+    prodBscSatChain: {
+      url: 'https://bsc-dataseed.binance.org/'
+    },
   }
 };

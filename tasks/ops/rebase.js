@@ -15,6 +15,9 @@ txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
   .addParam('rebasePerc', 'The rebase percentage to be applied', 0, types.float)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if(txParams.gasPrice == 0){
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
     const sender = await loadSignerSync(args, hre.ethers.provider);
     const senderAddress = await sender.getAddress();
     console.log('Sender:', senderAddress);
@@ -60,6 +63,9 @@ txTask(
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if(txParams.gasPrice == 0){
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
     const sender = await loadSignerSync(args, hre.ethers.provider);
     const senderAddress = await sender.getAddress();
     console.log('Sender:', senderAddress);
@@ -131,6 +137,9 @@ txTask(
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if(txParams.gasPrice == 0){
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
 
     for (let n in args.networks) {
       const network = args.networks[n];

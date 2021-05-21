@@ -90,6 +90,9 @@ txTask('testnet:deploy:ampleforth', 'Deploy ampleforth contract suite')
   .addParam('amount', 'Amount of ampl to transfer', 0, types.float)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if(txParams.gasPrice == 0){
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
 
     const deployer = loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
@@ -150,6 +153,9 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
   .addParam('tokenName', 'The symbol of the cross-chain ample ERC-20 token')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if(txParams.gasPrice == 0){
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
 
     const deployer = await loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();

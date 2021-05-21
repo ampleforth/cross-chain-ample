@@ -7,7 +7,7 @@ function txTask(name, desc) {
     .addParam(
       'gasPrice',
       'Gas price for the transaction',
-      25000000000,
+      0,
       types.int,
     )
     .addParam('gasLimit', 'Gas limit for the transaction', 7000000, types.int)

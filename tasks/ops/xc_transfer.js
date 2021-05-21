@@ -17,6 +17,9 @@ txTask('xc_transfer', 'Executes cross chain transfer')
   .addParam('targetChainNetwork', 'The hre network of target chain')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if(txParams.gasPrice == 0){
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
     const sender = await loadSignerSync(args, hre.ethers.provider);
     const senderAddress = await sender.getAddress();
     const recipientAddress = args.recipientAddress;
