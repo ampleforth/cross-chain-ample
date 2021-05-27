@@ -33,7 +33,7 @@ contract ChainBridgeBatchRebaseReport {
             (epoch, totalSupply) = IPolicy(policy).globalAmpleforthEpochAndAMPLSupply();
 
             uint256 dataLen = 64;
-            IBridge(bridge).deposit{value:bridgeFee}(
+            IBridge(bridge).deposit{value: bridgeFee}(
                 destinationChainID,
                 resourceID,
                 abi.encode(dataLen, epoch, totalSupply)

@@ -16,6 +16,7 @@ require('./tasks/ops/xc_transfer');
 require('./tasks/info/config');
 require('./tasks/info/ampl');
 require('./tasks/info/chain_bridge');
+require('./tasks/info/cb_ampl_tx');
 
 module.exports = {
   solidity: {
@@ -90,6 +91,6 @@ module.exports = {
     },
     prodBscSatChain: {
       url: 'https://bsc-dataseed.binance.org/'
-    },
+    }
   }
 };

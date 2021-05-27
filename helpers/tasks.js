@@ -4,12 +4,7 @@ const { task } = require('hardhat/config');
 
 function txTask(name, desc) {
   return task(name, desc)
-    .addParam(
-      'gasPrice',
-      'Gas price for the transaction',
-      0,
-      types.int,
-    )
+    .addParam('gasPrice', 'Gas price for the transaction', 0, types.int)
     .addParam('gasLimit', 'Gas limit for the transaction', 7000000, types.int)
     .addParam('txSleepSec', 'Time to wait between transactions', 2, types.int)
     .addParam('keyfile', 'The path to signer keyfile')

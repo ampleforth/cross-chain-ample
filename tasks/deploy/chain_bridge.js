@@ -59,7 +59,7 @@ cbDeployTask(
   .addParam('useDeployed', 'Use deployed bridge', false, types.boolean)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if(txParams.gasPrice == 0){
+    if (txParams.gasPrice == 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const deployer = loadSignerSync(args, hre.ethers.provider);
@@ -206,7 +206,7 @@ cbDeployTask(
   .addParam('useDeployed', 'Use deployed bridge', false, types.boolean)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if(txParams.gasPrice == 0){
+    if (txParams.gasPrice == 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const deployer = loadSignerSync(args, hre.ethers.provider);
