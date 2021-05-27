@@ -2614,9 +2614,9 @@ chai@^4.2.0:
     pathval "^1.1.0"
     type-detect "^4.0.5"
 
-"chainbridge-solidity@https://github.com/meterio/chainbridge-solidity-v1.0.0-eth#master":
-  version "1.0.2"
-  resolved "https://github.com/meterio/chainbridge-solidity-v1.0.0-eth#01fc753cc3ebead7a65372bb882c89a7aab49547"
+"chainbridge-solidity@https://github.com/meterio/chainbridge-solidity-v1.0.0-eth#6b02b0a52ce7e3967feeffbe6a6440a5b1006aec":
+  version "1.0.6"
+  resolved "https://github.com/meterio/chainbridge-solidity-v1.0.0-eth#6b02b0a52ce7e3967feeffbe6a6440a5b1006aec"
 
 chalk@^1.1.3:
   version "1.1.3"

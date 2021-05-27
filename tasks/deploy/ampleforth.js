@@ -18,6 +18,7 @@ const {
 const {
   deployAMPLContracts,
   deployXCAmpleContracts,
+  deployTokenVault,
 } = require('../../helpers/deploy');
 const {
   AMPL_BASE_RATE,
@@ -218,4 +219,41 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
       hre,
       await proxyAdmin.getProxyImplementation(xcAmpleController.address),
     );
+  });
+
+
+txTask('deploy:token_vault', 'Deploy the token vault contract on base chain')
+  .addParam('bridge', 'The bridge which secures the vault')
+  .setAction(async (args, hre) => {
+    const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if (txParams.gasPrice == 0) {
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
+
+    const deployer = await loadSignerSync(args, hre.ethers.provider);
+    const deployerAddress = await deployer.getAddress();
+
+    console.log('------------------------------------------------------------');
+    console.log('Deployer:', deployerAddress);
+    console.log(txParams);
+
+    console.log('------------------------------------------------------------');
+    console.log('Deploying TokenVault on base chain');
+    const tokenVault = await deployTokenVault(
+      hre.ethers,
+      deployer,
+      txParams,
+    );
+
+    console.log('------------------------------------------------------------');
+    console.log('Writing data to file');
+    await writeDeploymentData(
+      hre.network.name,
+      args.bridge + '/tokenVault',
+      tokenVault,
+    );
+
+    console.log('------------------------------------------------------------');
+    console.log('Verify on etherscan');
+    await etherscanVerify(hre, tokenVault.address);
   });

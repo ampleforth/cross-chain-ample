@@ -17,6 +17,7 @@ const { execRebase, toAmplFixedPt } = require('../../sdk/ampleforth');
 const {
   deployAMPLContracts,
   deployXCAmpleContracts,
+  deployTokenVault,
   deployChainBridgeContracts,
   deployChainBridgeBaseChainGatewayContracts,
   deployChainBridgeSatelliteChainGatewayContracts
@@ -55,6 +56,8 @@ async function setupContracts () {
   userBSatChain2Wallet = accounts[7];
 
   baseChainAmplContracts = await deployAMPLContracts(ethers, deployer);
+  baseChainAmplContracts.tokenVault = await deployTokenVault(ethers, deployer);
+
   baseChainBridgeContracts = await deployChainBridgeContracts(
     {
       chainId: ETH_CHAIN_ID,
@@ -66,6 +69,7 @@ async function setupContracts () {
     ethers,
     deployer,
   );
+
   const baseChainBridgeGatewayContracts = await deployChainBridgeBaseChainGatewayContracts(
     { ...baseChainAmplContracts, ...baseChainBridgeContracts },
     ethers,
@@ -252,7 +256,7 @@ async function execXCSend (
     if (fromChain === 'base') {
       await baseChainAmplContracts.ampl
         .connect(fromAccount)
-        .approve(bridgeContractsMap[fromChain].tokenVault.address, amount);
+        .approve(baseChainAmplContracts.tokenVault.address, amount);
     } else {
       await amplContractsMap[fromChain].xcAmple
         .connect(fromAccount)
@@ -568,7 +572,7 @@ describe('Transfers scenarios', function () {
       await baseChainAmplContracts.ampl
         .connect(userBBaseChainWallet)
         .approve(
-          bridgeContractsMap['base'].tokenVault.address,
+          baseChainAmplContracts.tokenVault.address,
           toAmplFixedPt('0'),
         );
       await expect(
@@ -589,7 +593,7 @@ describe('Transfers scenarios', function () {
       await baseChainAmplContracts.ampl
         .connect(userBBaseChainWallet)
         .approve(
-          bridgeContractsMap['base'].tokenVault.address,
+          baseChainAmplContracts.tokenVault.address,
           toAmplFixedPt('5000'),
         );
 
@@ -612,7 +616,7 @@ describe('Transfers scenarios', function () {
       await baseChainAmplContracts.ampl
         .connect(userABaseChainWallet)
         .approve(
-          bridgeContractsMap['base'].tokenVault.address,
+          baseChainAmplContracts.tokenVault.address,
           toAmplFixedPt('1000'),
         );
 
@@ -743,7 +747,7 @@ describe('Transfers scenarios', function () {
         );
 
         await baseChainAmplContracts.ampl.connect(userBBaseChainWallet).approve(
-          bridgeContractsMap['base'].tokenVault.address,
+          baseChainAmplContracts.tokenVault.address,
           toAmplFixedPt('0'), // Approve 0
         );
 

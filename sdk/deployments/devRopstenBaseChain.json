@@ -181,7 +181,7 @@
   },
   "isBaseChain": true,
   "chainBridge/bridge": {
-    "address": "0xd7fb746e905f60e0f84F5eE545104A05066eCD86",
+    "address": "0x6fC272eD9B6B947a7858DF30D7DD2D8173306EA8",
     "abi": [
       "constructor(uint8 chainID, address[] initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry)",
       "event Deposit(uint8 indexed destinationChainID, bytes32 indexed resourceID, uint64 indexed depositNonce)",
@@ -206,21 +206,29 @@
       "function _proposals(uint72, bytes32) view returns (bytes32 _resourceID, bytes32 _dataHash, uint8 _status, uint256 _proposedBlock)",
       "function _relayerThreshold() view returns (uint256)",
       "function _resourceIDToHandlerAddress(bytes32) view returns (address)",
+      "function _specialFee() view returns (uint256)",
+      "function _specialFeeChainID() view returns (uint8)",
       "function _totalProposals() view returns (uint256)",
       "function _totalRelayers() view returns (uint256)",
+      "function _wtokenAddress() view returns (address)",
       "function adminAddRelayer(address relayerAddress)",
       "function adminChangeFee(uint256 newFee)",
       "function adminChangeRelayerThreshold(uint256 newThreshold)",
+      "function adminChangeSpecialFee(uint256 newFee, uint8 chainID)",
       "function adminPauseTransfers()",
       "function adminRemoveRelayer(address relayerAddress)",
       "function adminSetBurnable(address handlerAddress, address tokenAddress)",
       "function adminSetGenericResource(address handlerAddress, bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositerOffset, bytes4 executeFunctionSig)",
       "function adminSetResource(address handlerAddress, bytes32 resourceID, address tokenAddress)",
       "function adminUnpauseTransfers()",
+      "function adminUpdateBridgeAddress(address handlerAddress, address newBridgeAddress)",
       "function adminWithdraw(address handlerAddress, address tokenAddress, address recipient, uint256 amountOrTokenID)",
       "function cancelProposal(uint8 chainID, uint64 depositNonce, bytes32 dataHash)",
       "function deposit(uint8 destinationChainID, bytes32 resourceID, bytes data) payable",
+      "function depositETH(uint8 destinationChainID, bytes32 resourceID, bytes data) payable",
       "function executeProposal(uint8 chainID, uint64 depositNonce, bytes data, bytes32 resourceID)",
+      "function getFee(uint8 destinationChainID) view returns (uint256)",
+      "function getFees() view returns (uint256, uint256, uint8)",
       "function getProposal(uint8 originChainID, uint64 depositNonce, bytes32 dataHash) view returns (tuple(bytes32 _resourceID, bytes32 _dataHash, address[] _yesVotes, address[] _noVotes, uint8 _status, uint256 _proposedBlock))",
       "function getRoleAdmin(bytes32 role) view returns (bytes32)",
       "function getRoleMember(bytes32 role, uint256 index) view returns (address)",
@@ -234,12 +242,10 @@
       "function revokeRole(bytes32 role, address account)",
       "function transferFunds(address[] addrs, uint256[] amounts)",
       "function voteProposal(uint8 chainID, uint64 depositNonce, bytes32 resourceID, bytes32 dataHash)"
-    ],
-    "hash": "0xbef13bb1110e34978fe99307ba51c222fbf2dc93b569174e016c226ebd6ab895",
-    "blockNumber": 10126635
+    ]
   },
   "chainBridge/genericHandler": {
-    "address": "0x4CbbA9ea441cae4c07cB42549F3b2372c445CDd3",
+    "address": "0xBAb8402E278F45d51BB342525716611fE1090027",
     "abi": [
       "constructor(address bridgeAddress, bytes32[] initialResourceIDs, address[] initialContractAddresses, bytes4[] initialDepositFunctionSignatures, uint256[] initialDepositFunctionDepositerOffsets, bytes4[] initialExecuteFunctionSignatures)",
       "function _bridgeAddress() view returns (address)",
@@ -253,11 +259,12 @@
       "function deposit(bytes32 resourceID, uint8 destinationChainID, uint64 depositNonce, address depositer, bytes data)",
       "function executeProposal(bytes32 resourceID, bytes data)",
       "function getDepositRecord(uint64 depositNonce, uint8 destId) view returns (tuple(uint8 _destinationChainID, address _depositer, bytes32 _resourceID, bytes _metaData))",
-      "function setResource(bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositerOffset, bytes4 executeFunctionSig)"
+      "function setResource(bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositerOffset, bytes4 executeFunctionSig)",
+      "function updateBridgeAddress(address newBridgeAddress)"
     ]
   },
   "chainBridge/transferGateway": {
-    "address": "0xE60a3D760A0bFbDf5eF5D23Ba39536Be96eb8885",
+    "address": "0x7ec8E16995D598CE8B18C7A32734EF4557b12DB7",
     "abi": [
       "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -275,11 +282,11 @@
       "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function vault() view returns (address)"
     ],
-    "hash": "0xccddf1246ab89e3ac0516be880a5519e33f84d4f6110e225d9f39b41630d3e67",
-    "blockNumber": 10165265
+    "hash": "0x382061bb6a09c097ba8c6349fee7e1740d337cd92deb32e2f7a58304e032e0e3",
+    "blockNumber": 10359467
   },
   "chainBridge/rebaseGateway": {
-    "address": "0x7df4ee3DcE56Cf56B43D383ED4c6089E5D861275",
+    "address": "0x918aC242c8A2a3Ccad642533023402608f3b213d",
     "abi": [
       "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -297,8 +304,8 @@
       "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function vault() view returns (address)"
     ],
-    "hash": "0x749e9cde30c0315d2a89e3263e4c3ad2ac28bfd1a2466d194feacd187b6b3fe5",
-    "blockNumber": 10165261
+    "hash": "0x9b788bfbce623f05cc85d4a8bc418535bcc48889339f03a903c2a258ed4352a4",
+    "blockNumber": 10359463
   },
   "chainBridge/tokenVault": {
     "address": "0xa0DF1131eFA62E487dF180Feb9ecF1cdE7aad632",
@@ -321,11 +328,11 @@
     "blockNumber": 10165259
   },
   "chainBridge/batchRebaseReporter": {
-    "address": "0xeeC0f9370732fD0ccD374d1c9fFB6C818E5d03bb",
+    "address": "0x3835d499765a18ccC2a88A46A50f779e0a408BfA",
     "abi": [
-      "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID, uint128 bridgeFee) payable"
+      "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID) payable"
     ],
-    "hash": "0x56395e830441701c7145c78d0327de9a6d6232c050f8f85cf39b26ed5ba60d34",
-    "blockNumber": 10235930
+    "hash": "0x7908741fc922ee39ad4ebced37496d196b5c0641dae4aba535f239184281b96c",
+    "blockNumber": 10359882
   }
 }

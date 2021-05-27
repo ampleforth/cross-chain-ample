@@ -211,12 +211,10 @@ async function deployChainBridgeContracts(
   };
 }
 
-async function deployChainBridgeBaseChainGatewayContracts(
-  { ampl, policy, bridge, genericHandler },
+async function deployTokenVault(
   ethers,
   deployer,
-  txParams = {},
-) {
+  txParams = {}) {
   const tokenVault = await deployContract(
     ethers,
     'TokenVault',
@@ -225,6 +223,15 @@ async function deployChainBridgeBaseChainGatewayContracts(
     txParams,
   );
 
+  return tokenVault;
+}
+
+async function deployChainBridgeBaseChainGatewayContracts(
+  { ampl, policy, bridge, genericHandler, tokenVault },
+  ethers,
+  deployer,
+  txParams = {},
+) {
   const rebaseGateway = await deployContract(
     ethers,
     'AMPLChainBridgeGateway',
@@ -240,11 +247,15 @@ async function deployChainBridgeBaseChainGatewayContracts(
     txParams,
   );
 
+  const deployerAddress = await deployer.getAddress();
+  const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
+  const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
+
   const reportRebaseFnSig = CB_FUNCTION_SIG_baseChainReportRebase(
     rebaseGateway,
   );
 
-  try {
+  if(isAdmin){
     await (
       await bridge
         .connect(deployer)
@@ -256,7 +267,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
           txParams,
         )
     ).wait();
-  } catch (e) {
+  } else {
     console.log(
       'Failed adding generic resource to bridge, deployer key not bridge owner',
     );
@@ -270,7 +281,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
   }
 
   const transferFnSig = CB_FUNCTION_SIG_baseChainTransfer(transferGateway);
-  try {
+  if(isAdmin) {
     await (
       await bridge
         .connect(deployer)
@@ -282,7 +293,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
           txParams,
         )
     ).wait();
-  } catch (e) {
+  } else {
     console.log(
       'Failed adding generic resource to bridge, deployer key not bridge owner',
     );
@@ -295,9 +306,23 @@ async function deployChainBridgeBaseChainGatewayContracts(
     ]);
   }
 
-  await (await tokenVault.addBridgeGateway(transferGateway.address)).wait();
+  if(await tokenVault.owner() == deployerAddress){
+    await (
+      await tokenVault
+        .connect(deployer)
+        .addBridgeGateway(transferGateway.address)
+    ).wait();
+  } else {
+    console.log(
+      'Failed to add whitelist transfer gateway to vault as deployer not vault owner',
+    );
+    console.log('Execute the following on-chain');
+    console.log('addBridgeGateway', [
+      transferGateway.address,
+    ]);
+  }
 
-  return { tokenVault, rebaseGateway, transferGateway };
+  return { rebaseGateway, transferGateway };
 }
 
 async function deployChainBridgeSatelliteChainGatewayContracts(
@@ -333,10 +358,13 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
       .addBridgeGateway(transferGateway.address, txParams)
   ).wait();
 
+  const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
+  const isAdmin = await bridge.hasRole(adminRole, await deployer.getAddress());
+
   const reportRebaseFnSig = CB_FUNCTION_SIG_satelliteChainReportRebase(
     rebaseGateway,
   );
-  try {
+  if(isAdmin) {
     await (
       await bridge.adminSetGenericResource(
         genericHandler.address,
@@ -346,7 +374,7 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
         txParams,
       )
     ).wait();
-  } catch (e) {
+  } else {
     console.log(
       'Failed adding generic resource to bridge, deployer key not bridge owner',
     );
@@ -360,7 +388,7 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
   }
 
   const transferFnSig = CB_FUNCTION_SIG_satelliteChainTransfer(transferGateway);
-  try {
+  if(isAdmin) {
     await (
       await bridge.adminSetGenericResource(
         genericHandler.address,
@@ -370,7 +398,7 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
         txParams,
       )
     ).wait();
-  } catch (e) {
+  } else {
     console.log(
       'Failed adding generic resource to bridge, deployer key not bridge owner',
     );
@@ -391,6 +419,7 @@ module.exports = {
   deployXCAmpleContracts,
   deployChainBridgeContracts,
   deployChainBridgeHelpers,
+  deployTokenVault,
   deployChainBridgeBaseChainGatewayContracts,
   deployChainBridgeSatelliteChainGatewayContracts,
 };

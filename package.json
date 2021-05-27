@@ -21,7 +21,7 @@
     "@openzeppelin/contracts": "^3.2.0",
     "@openzeppelin/contracts-upgradeable": "^3.3.0",
     "@openzeppelin/upgrades": "^2.8.0",
-    "chainbridge-solidity": "https://github.com/meterio/chainbridge-solidity-v1.0.0-eth#master",
+    "chainbridge-solidity": "https://github.com/meterio/chainbridge-solidity-v1.0.0-eth#6b02b0a52ce7e3967feeffbe6a6440a5b1006aec",
     "market-oracle": "https://github.com/ampleforth/market-oracle#v1.0.1",
     "uFragments": "https://github.com/ampleforth/uFragments#v1.1.0"
   },
