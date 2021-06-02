@@ -4,6 +4,8 @@ const { getAdminAddress } = require('@openzeppelin/upgrades-core');
 const DEPLOYMENT_CONFIG_PATH = __dirname + '/../sdk/deployments';
 const { getEthersProvider } = require('./utils');
 
+const BLOCKS_PER_SEC = 1 / 15;
+
 const ContractABIPaths = {
   // Openzepppelin
   ProxyAdmin: '@openzeppelin/upgrades/contracts/upgradeability',
@@ -157,6 +159,43 @@ const writeProxyDeploymentData = async (network, contractRef, contract) => {
   fs.writeFileSync(addressFile, JSON.stringify(chainAddresses, null, 2));
 };
 
+const filterContractEvents = async (
+  ethers,
+  provider,
+  address,
+  abi,
+  event,
+  startBlock,
+  endBlock,
+  timeFrameSec = 7 * 24 * 3600,
+) => {
+  endBlock = endBlock || (await provider.getBlockNumber());
+  const freq = timeFrameSec * BLOCKS_PER_SEC;
+
+  let logs = [];
+  for (let i = startBlock; i <= endBlock; i += freq) {
+    // console.log(i, startBlock, endBlock)
+    const _logs = await provider.getLogs({
+      address: address,
+      fromBlock: ethers.utils.hexlify(i),
+      toBlock: ethers.utils.hexlify(i + freq > endBlock ? endBlock : i + freq),
+    });
+    logs = logs.concat(_logs);
+  }
+
+  const contractInterface = new ethers.utils.Interface(abi);
+  const decodedEvents = logs.reduce((m, log) => {
+    try {
+      log.parsed = contractInterface.parseLog(log);
+      log.parsed.name == event ? m.push(log) : m;
+      return m;
+    } catch (e) {
+      return m;
+    }
+  }, []);
+  return decodedEvents;
+};
+
 module.exports = {
   readDeploymentData,
   readContractDeploymentData,
@@ -169,4 +208,6 @@ module.exports = {
   deployContract,
   deployProxyAdminContract,
   deployProxyContract,
+
+  filterContractEvents,
 };

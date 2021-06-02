@@ -21,7 +21,7 @@
     "@openzeppelin/contracts": "^3.2.0",
     "@openzeppelin/contracts-upgradeable": "^3.3.0",
     "@openzeppelin/upgrades": "^2.8.0",
-    "chainbridge-solidity": "https://github.com/ChainSafe/chainbridge-solidity#a15727ad30bb359b4dfd0fb155f338d11ea80753",
+    "chainbridge-solidity": "https://github.com/meterio/chainbridge-solidity-v1.0.0-eth#6b02b0a52ce7e3967feeffbe6a6440a5b1006aec",
     "market-oracle": "https://github.com/ampleforth/market-oracle#v1.0.1",
     "uFragments": "https://github.com/ampleforth/uFragments#v1.1.0"
   },
@@ -38,6 +38,7 @@
     "bignumber.js": "^9.0.1",
     "chai": "^4.2.0",
     "commander": "^6.2.1",
+    "csv-writer": "^1.6.0",
     "eslint": "^4.19.1",
     "eslint-config-google": "^0.9.1",
     "eslint-config-mocha": "^0.0.0",
@@ -66,6 +67,7 @@
     "stochasm": "^0.5.0",
     "ts-node": "^9.0.0",
     "typechain": "^4.0.3",
-    "typescript": "^4.0.2"
+    "typescript": "^4.0.2",
+    "underscore": "^1.13.1"
   }
 }

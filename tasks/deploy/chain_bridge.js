@@ -1,3 +1,4 @@
+
 const {
   types,
   task,
@@ -59,6 +60,9 @@ cbDeployTask(
   .addParam('useDeployed', 'Use deployed bridge', false, types.boolean)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if (txParams.gasPrice == 0) {
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
     const deployer = loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
     const chainAddresses = await readDeploymentData(hre.network.name);
@@ -71,8 +75,7 @@ cbDeployTask(
     let bridge,
       genericHandler,
       erc20Handler,
-      erc721Handler,
-      batchRebaseReporter;
+      erc721Handler;
 
     if (args.useDeployed) {
       console.log('Using deployed bridge');
@@ -86,14 +89,7 @@ cbDeployTask(
         'chainBridge/genericHandler',
         hre.ethers.provider,
       );
-      const helpers = await deployChainBridgeHelpers(
-        bridge,
-        args,
-        hre.ethers,
-        deployer,
-        txParams,
-      );
-      batchRebaseReporter = helpers.batchRebaseReporter;
+
     } else {
       const chainBridge = await deployChainBridgeContracts(
         args,
@@ -103,7 +99,6 @@ cbDeployTask(
       );
       bridge = chainBridge.bridge;
       genericHandler = chainBridge.genericHandler;
-      batchRebaseReporter = chainBridge.batchRebaseReporter;
     }
 
     const ampl = await getDeployedContractInstance(
@@ -118,8 +113,21 @@ cbDeployTask(
       hre.ethers.provider,
     );
 
+    const tokenVault = await getDeployedContractInstance(
+      hre.network.name,
+      'chainBridge/tokenVault',
+      hre.ethers.provider,
+    );
+
+    const { batchRebaseReporter } = await deployChainBridgeHelpers(
+      bridge,
+      args,
+      hre.ethers,
+      deployer,
+      txParams,
+    );
+
     const {
-      tokenVault,
       rebaseGateway,
       transferGateway,
     } = await deployChainBridgeBaseChainGatewayContracts(
@@ -128,6 +136,7 @@ cbDeployTask(
         genericHandler,
         ampl,
         policy,
+        tokenVault,
       },
       hre.ethers,
       deployer,
@@ -154,18 +163,12 @@ cbDeployTask(
     );
     await writeDeploymentData(
       hre.network.name,
-      'chainBridge/tokenVault',
-      tokenVault,
-    );
-    await writeDeploymentData(
-      hre.network.name,
       'chainBridge/batchRebaseReporter',
       batchRebaseReporter,
     );
 
     console.log('------------------------------------------------------------');
     console.log('Verify on etherscan');
-    await etherscanVerify(hre, tokenVault.address);
     await etherscanVerify(hre, bridge.address, [
       await bridge._chainID(),
       [],
@@ -203,6 +206,9 @@ cbDeployTask(
   .addParam('useDeployed', 'Use deployed bridge', false, types.boolean)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if (txParams.gasPrice == 0) {
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
     const deployer = loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
     const chainAddresses = await readDeploymentData(hre.network.name);

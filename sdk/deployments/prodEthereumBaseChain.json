@@ -1,27 +1,12 @@
 {
-  "proxyAdmin": {
-    "address": "0xD0E9335817f7B7c2567b784FD55b203697177E2A",
-    "abi": [
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "function changeProxyAdmin(address proxy, address newAdmin)",
-      "function getProxyAdmin(address proxy) view returns (address)",
-      "function getProxyImplementation(address proxy) view returns (address)",
-      "function isOwner() view returns (bool)",
-      "function owner() view returns (address)",
-      "function renounceOwnership()",
-      "function transferOwnership(address newOwner)",
-      "function upgrade(address proxy, address implementation)",
-      "function upgradeAndCall(address proxy, address implementation, bytes data) payable"
-    ],
-    "hash": "0xe3b59f38f32189f59f364d9e738a8979c76d5713b8c7ebf88a70029904d158b7",
-    "blockNumber": 8523989
-  },
-  "xcAmple": {
-    "address": "0x75c00CF8B6C932AaD2E20fa238a57D389aE3842d",
+  "isBaseChain": true,
+  "ampl": {
+    "address": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
     "abi": [
       "event Approval(address indexed owner, address indexed spender, uint256 value)",
-      "event ControllerUpdated(address controller)",
-      "event LogRebase(uint256 indexed epoch, uint256 globalAMPLSupply)",
+      "event LogMonetaryPolicyUpdated(address monetaryPolicy)",
+      "event LogRebase(uint256 indexed epoch, uint256 totalSupply)",
+      "event OwnershipRenounced(address indexed previousOwner)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
       "event Transfer(address indexed from, address indexed to, uint256 value)",
       "function DOMAIN_SEPARATOR() view returns (bytes32)",
@@ -31,23 +16,22 @@
       "function allowance(address owner_, address spender) view returns (uint256)",
       "function approve(address spender, uint256 value) returns (bool)",
       "function balanceOf(address who) view returns (uint256)",
-      "function burnFrom(address who, uint256 xcAmpleAmount)",
-      "function controller() view returns (address)",
       "function decimals() view returns (uint8)",
       "function decreaseAllowance(address spender, uint256 subtractedValue) returns (bool)",
-      "function globalAMPLSupply() view returns (uint256)",
       "function increaseAllowance(address spender, uint256 addedValue) returns (bool)",
-      "function initialize(string name, string symbol, uint256 globalAMPLSupply_)",
-      "function mint(address who, uint256 xcAmpleAmount)",
+      "function initialize(string name, string symbol, uint8 decimals)",
+      "function initialize(address owner_)",
+      "function isOwner() view returns (bool)",
+      "function monetaryPolicy() view returns (address)",
       "function name() view returns (string)",
       "function nonces(address who) view returns (uint256)",
       "function owner() view returns (address)",
       "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)",
-      "function rebase(uint256 epoch, uint256 newGlobalAMPLSupply) returns (uint256)",
+      "function rebase(uint256 epoch, int256 supplyDelta) returns (uint256)",
       "function renounceOwnership()",
       "function scaledBalanceOf(address who) view returns (uint256)",
       "function scaledTotalSupply() pure returns (uint256)",
-      "function setController(address controller_)",
+      "function setMonetaryPolicy(address monetaryPolicy_)",
       "function symbol() view returns (string)",
       "function totalSupply() view returns (uint256)",
       "function transfer(address to, uint256 value) returns (bool)",
@@ -55,63 +39,122 @@
       "function transferAllFrom(address from, address to) returns (bool)",
       "function transferFrom(address from, address to, uint256 value) returns (bool)",
       "function transferOwnership(address newOwner)"
-    ],
-    "hash": "0x0a7e3c19fc3ad5e26824c2beff4492cb47116c8e707be1e88cec31e610b7d555",
-    "blockNumber": 8523999
+    ]
   },
-  "xcAmpleController": {
-    "address": "0x22881e9feb1746109227397cAe6Cd86859b9C43e",
+  "policy": {
+    "address": "0x1B228a749077b8e307C5856cE62Ef35d96Dca2ea",
     "abi": [
-      "event GatewayBurn(address indexed bridgeGateway, address indexed depositor, uint256 xcAmpleAmount)",
-      "event GatewayMint(address indexed bridgeGateway, address indexed recipient, uint256 xcAmpleAmount)",
-      "event GatewayRebaseReported(address indexed bridgeGateway, uint256 indexed epoch, uint256 globalAMPLSupply, uint256 timestampSec)",
-      "event GatewayWhitelistUpdated(address indexed bridgeGateway, bool active)",
-      "event LogRebase(uint256 indexed epoch, int256 requestedSupplyAdjustment, uint256 timestampSec)",
+      "event LogRebase(uint256 indexed epoch, uint256 exchangeRate, uint256 cpi, int256 requestedSupplyAdjustment, uint256 timestampSec)",
+      "event OwnershipRenounced(address indexed previousOwner)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "function addBridgeGateway(address bridgeGateway)",
-      "function burn(address depositor, uint256 xcAmpleAmount)",
-      "function globalAmpleforthEpoch() view returns (uint256)",
+      "function cpiOracle() view returns (address)",
+      "function deviationThreshold() view returns (uint256)",
+      "function epoch() view returns (uint256)",
       "function globalAmpleforthEpochAndAMPLSupply() view returns (uint256, uint256)",
-      "function initialize(address xcAmple_, uint256 globalAmpleforthEpoch_)",
+      "function inRebaseWindow() view returns (bool)",
+      "function initialize(address owner_, address uFrags_, uint256 baseCpi_)",
+      "function initialize(address sender)",
+      "function isOwner() view returns (bool)",
       "function lastRebaseTimestampSec() view returns (uint256)",
-      "function mint(address recipient, uint256 xcAmpleAmount)",
-      "function nextGlobalAMPLSupply() view returns (uint256)",
-      "function nextGlobalAmpleforthEpoch() view returns (uint256)",
+      "function marketOracle() view returns (address)",
+      "function minRebaseTimeIntervalSec() view returns (uint256)",
+      "function orchestrator() view returns (address)",
       "function owner() view returns (address)",
       "function rebase()",
-      "function rebaseRelayer() view returns (address)",
-      "function removeBridgeGateway(address bridgeGateway)",
+      "function rebaseLag() view returns (uint256)",
+      "function rebaseWindowLengthSec() view returns (uint256)",
+      "function rebaseWindowOffsetSec() view returns (uint256)",
       "function renounceOwnership()",
-      "function reportRebase(uint256 nextGlobalAmpleforthEpoch_, uint256 nextGlobalAMPLSupply_)",
-      "function setRebaseRelayer(address rebaseRelayer_)",
+      "function setCpiOracle(address cpiOracle_)",
+      "function setDeviationThreshold(uint256 deviationThreshold_)",
+      "function setMarketOracle(address marketOracle_)",
+      "function setOrchestrator(address orchestrator_)",
+      "function setRebaseLag(uint256 rebaseLag_)",
+      "function setRebaseTimingParameters(uint256 minRebaseTimeIntervalSec_, uint256 rebaseWindowOffsetSec_, uint256 rebaseWindowLengthSec_)",
       "function transferOwnership(address newOwner)",
-      "function whitelistedBridgeGateways(address) view returns (bool)",
-      "function xcAmple() view returns (address)"
-    ],
-    "hash": "0x9bb21fd2db66dc24cce1347dd4dce3029202e1c826e45d732189cc6eefd34763",
-    "blockNumber": 8524017
+      "function uFrags() view returns (address)"
+    ]
   },
-  "rebaseRelayer": {
-    "address": "0x1649F3AeCf5B311625A932cf89a86D1824D182B1",
+  "orchestrator": {
+    "address": "0x6FB00a180781E75F87E2B690Af0196bAa77C7e7C",
     "abi": [
+      "constructor(address policy_)",
+      "event OwnershipRenounced(address indexed previousOwner)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "event TransactionFailed(address indexed destination, uint256 index, bytes data, bytes reason)",
       "function addTransaction(address destination, bytes data)",
-      "function executeAll() returns (bool)",
+      "function initialize(address sender)",
+      "function isOwner() view returns (bool)",
       "function owner() view returns (address)",
+      "function policy() view returns (address)",
+      "function rebase()",
       "function removeTransaction(uint256 index)",
       "function renounceOwnership()",
       "function setTransactionEnabled(uint256 index, bool enabled)",
       "function transactions(uint256) view returns (bool enabled, address destination, bytes data)",
       "function transactionsSize() view returns (uint256)",
       "function transferOwnership(address newOwner)"
-    ],
-    "hash": "0xbad398e7ec46d2a7ddf6f35f4bf6fbd35d4cbbaacea8cd7ca36f892df58feba8",
-    "blockNumber": 8524026
+    ]
   },
-  "isBaseChain": false,
+  "rateOracle": {
+    "address": "0x99C9775E076FDF99388C029550155032Ba2d8914",
+    "abi": [
+      "function reportDelaySec() view returns (uint256)",
+      "function pushReport(uint256 payload)",
+      "function getData() returns (uint256, bool)",
+      "function addProvider(address provider)",
+      "function providers(uint256) view returns (address)",
+      "function renounceOwnership()",
+      "function removeProvider(address provider)",
+      "function owner() view returns (address)",
+      "function isOwner() view returns (bool)",
+      "function minimumProviders() view returns (uint256)",
+      "function purgeReports()",
+      "function setReportDelaySec(uint256 reportDelaySec_)",
+      "function providersSize() view returns (uint256)",
+      "function reportExpirationTimeSec() view returns (uint256)",
+      "function setMinimumProviders(uint256 minimumProviders_)",
+      "function providerReports(address, uint256) view returns (uint256 timestamp, uint256 payload)",
+      "function transferOwnership(address newOwner)",
+      "function setReportExpirationTimeSec(uint256 reportExpirationTimeSec_)",
+      "constructor(uint256 reportExpirationTimeSec_, uint256 reportDelaySec_, uint256 minimumProviders_)",
+      "event ProviderAdded(address provider)",
+      "event ProviderRemoved(address provider)",
+      "event ReportTimestampOutOfRange(address provider)",
+      "event ProviderReportPushed(address indexed provider, uint256 payload, uint256 timestamp)",
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)"
+    ]
+  },
+  "cpiOracle": {
+    "address": "0xa759F960dD59A1aD32c995ecabE802a0C35F244F",
+    "abi": [
+      "function reportDelaySec() view returns (uint256)",
+      "function pushReport(uint256 payload)",
+      "function getData() returns (uint256, bool)",
+      "function addProvider(address provider)",
+      "function providers(uint256) view returns (address)",
+      "function renounceOwnership()",
+      "function removeProvider(address provider)",
+      "function owner() view returns (address)",
+      "function isOwner() view returns (bool)",
+      "function minimumProviders() view returns (uint256)",
+      "function purgeReports()",
+      "function setReportDelaySec(uint256 reportDelaySec_)",
+      "function providersSize() view returns (uint256)",
+      "function reportExpirationTimeSec() view returns (uint256)",
+      "function setMinimumProviders(uint256 minimumProviders_)",
+      "function providerReports(address, uint256) view returns (uint256 timestamp, uint256 payload)",
+      "function transferOwnership(address newOwner)",
+      "function setReportExpirationTimeSec(uint256 reportExpirationTimeSec_)",
+      "constructor(uint256 reportExpirationTimeSec_, uint256 reportDelaySec_, uint256 minimumProviders_)",
+      "event ProviderAdded(address provider)",
+      "event ProviderRemoved(address provider)",
+      "event ReportTimestampOutOfRange(address provider)",
+      "event ProviderReportPushed(address indexed provider, uint256 payload, uint256 timestamp)",
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)"
+    ]
+  },
   "chainBridge/bridge": {
-    "address": "0xa939D6a9E91ebD962f36bD0f7cf1c6C3C12c798f",
+    "address": "0xbD515E41DF155112Cc883f8981CB763a286261be",
     "abi": [
       "constructor(uint8 chainID, address[] initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry)",
       "event Deposit(uint8 indexed destinationChainID, bytes32 indexed resourceID, uint64 indexed depositNonce)",
@@ -164,12 +207,10 @@
       "function revokeRole(bytes32 role, address account)",
       "function transferFunds(address[] addrs, uint256[] amounts)",
       "function voteProposal(uint8 chainID, uint64 depositNonce, bytes32 resourceID, bytes32 dataHash)"
-    ],
-    "hash": "0x11b4bd48528093bdb645d8747f53bffff63d9e361be174f6ba4f24ea9fd48838",
-    "blockNumber": 8356136
+    ]
   },
   "chainBridge/genericHandler": {
-    "address": "0x8E61cC786AaFA0BFd13035a5b0b7A8CcdFB4CE12",
+    "address": "0x517828d2549cEC09386f89a67E92825E26740240",
     "abi": [
       "constructor(address bridgeAddress, bytes32[] initialResourceIDs, address[] initialContractAddresses, bytes4[] initialDepositFunctionSignatures, uint256[] initialDepositFunctionDepositerOffsets, bytes4[] initialExecuteFunctionSignatures)",
       "function _bridgeAddress() view returns (address)",
@@ -187,45 +228,75 @@
     ]
   },
   "chainBridge/transferGateway": {
-    "address": "0x340416722A688f933f1bcE712E5061Ab9708463e",
+    "address": "0x48BC03bC755Ac3e8cc511D9d480A5bffb16F6bBb",
     "abi": [
-      "constructor(address bridgeHandler, address xcAmple_, address xcController_)",
+      "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
       "event XCRebaseReportIn(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply, uint256 recordedGlobalAmpleforthEpoch, uint256 recordedGlobalAMPLSupply)",
       "event XCRebaseReportOut(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "event XCTransferIn(address recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
       "event XCTransferOut(address sender, uint256 amount, uint256 recordedGlobalAMPLSupply)",
-      "function mint(address senderAddressInSourceChain, address recipient, uint256 amount, uint256 globalAMPLSupply)",
+      "function ampl() view returns (address)",
       "function owner() view returns (address)",
+      "function policy() view returns (address)",
       "function renounceOwnership()",
-      "function reportRebase(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function transferOwnership(address newOwner)",
-      "function validateAndBurn(address sender, address recipientAddressInTargetChain, uint256 amount, uint256 globalAMPLSupply)",
-      "function xcAmple() view returns (address)",
-      "function xcController() view returns (address)"
+      "function unlock(address senderAddressInSourceChain, address recipient, uint256 amount, uint256 globalAMPLSupply)",
+      "function validateAndLock(address sender, address recipientAddressInTargetChain, uint256 amount, uint256 globalAMPLSupply)",
+      "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
+      "function vault() view returns (address)"
     ],
-    "hash": "0x4d986836dbb8fd31ef8047252dfaed10acd9fb07d0c01d7c2ca49b002e160e32",
-    "blockNumber": 8524276
+    "hash": "0x771b482b0063fbcb66f6149083cca618dfd8d685aa036360cf8f4acba615a811",
+    "blockNumber": 12556994
   },
   "chainBridge/rebaseGateway": {
-    "address": "0xEAB83AfcF1D5e008fD4284F266dAc75a0ab51497",
+    "address": "0xE2d12f56293bC9FCD77378da7AceE48bc0D7E9a2",
     "abi": [
-      "constructor(address bridgeHandler, address xcAmple_, address xcController_)",
+      "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
       "event XCRebaseReportIn(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply, uint256 recordedGlobalAmpleforthEpoch, uint256 recordedGlobalAMPLSupply)",
       "event XCRebaseReportOut(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "event XCTransferIn(address recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
       "event XCTransferOut(address sender, uint256 amount, uint256 recordedGlobalAMPLSupply)",
-      "function mint(address senderAddressInSourceChain, address recipient, uint256 amount, uint256 globalAMPLSupply)",
+      "function ampl() view returns (address)",
       "function owner() view returns (address)",
+      "function policy() view returns (address)",
       "function renounceOwnership()",
-      "function reportRebase(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function transferOwnership(address newOwner)",
-      "function validateAndBurn(address sender, address recipientAddressInTargetChain, uint256 amount, uint256 globalAMPLSupply)",
-      "function xcAmple() view returns (address)",
-      "function xcController() view returns (address)"
+      "function unlock(address senderAddressInSourceChain, address recipient, uint256 amount, uint256 globalAMPLSupply)",
+      "function validateAndLock(address sender, address recipientAddressInTargetChain, uint256 amount, uint256 globalAMPLSupply)",
+      "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
+      "function vault() view returns (address)"
     ],
-    "hash": "0x7201c38708f6a8d6612bca9a7acbf5df2fef7656b152d3a8415c6b2c47d7b8bc",
-    "blockNumber": 8524272
+    "hash": "0xe466306c54f46c2852565f227cb8f419ebdcfce5b81376e299ebc4616fe8c5f3",
+    "blockNumber": 12556991
+  },
+  "chainBridge/tokenVault": {
+    "address": "0x805c7Ecba41f9321bb098ec1cf31d86d9407de2F",
+    "abi": [
+      "event GatewayLocked(address indexed bridgeGateway, address indexed token, address indexed depositor, uint256 amount)",
+      "event GatewayUnlocked(address indexed bridgeGateway, address indexed token, address indexed recipient, uint256 amount)",
+      "event GatewayWhitelistUpdated(address indexed bridgeGateway, bool active)",
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "function addBridgeGateway(address bridgeGateway)",
+      "function lock(address token, address depositor, uint256 amount)",
+      "function owner() view returns (address)",
+      "function removeBridgeGateway(address bridgeGateway)",
+      "function renounceOwnership()",
+      "function totalLocked(address token) view returns (uint256)",
+      "function transferOwnership(address newOwner)",
+      "function unlock(address token, address recipient, uint256 amount)",
+      "function whitelistedBridgeGateways(address) view returns (bool)"
+    ],
+    "hash": "0x7867408431bc02ad3faae4d5fd8b1ab0600f196700ac1dca650e83c5702d4887",
+    "blockNumber": 12478421
+  },
+  "chainBridge/batchRebaseReporter": {
+    "address": "0x454DE9c544fcAe74Eb09c57A042349d3eAD07E29",
+    "abi": [
+      "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID) payable"
+    ],
+    "hash": "0xc9422a7cd0b7714446d9ab0da2c84fed5a2e990e94191391c90070b9e1354f39",
+    "blockNumber": 12556990
   }
 }
