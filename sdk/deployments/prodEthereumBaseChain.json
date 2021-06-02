@@ -154,7 +154,7 @@
     ]
   },
   "chainBridge/bridge": {
-    "address": "0x0682642d18ebb4bb5e759AF07A7DE4eADAE8E8c5",
+    "address": "0xbD515E41DF155112Cc883f8981CB763a286261be",
     "abi": [
       "constructor(uint8 chainID, address[] initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry)",
       "event Deposit(uint8 indexed destinationChainID, bytes32 indexed resourceID, uint64 indexed depositNonce)",
@@ -207,12 +207,10 @@
       "function revokeRole(bytes32 role, address account)",
       "function transferFunds(address[] addrs, uint256[] amounts)",
       "function voteProposal(uint8 chainID, uint64 depositNonce, bytes32 resourceID, bytes32 dataHash)"
-    ],
-    "hash": "0xf11b6a0f37d6cf08cdafc1b16bc69c74555fdbbb9647cdf8531cdc889f1ae59a",
-    "blockNumber": 12345342
+    ]
   },
   "chainBridge/genericHandler": {
-    "address": "0x30b7026e9E5b35C844F6B115Ab4558c3F7e7e3B1",
+    "address": "0x517828d2549cEC09386f89a67E92825E26740240",
     "abi": [
       "constructor(address bridgeAddress, bytes32[] initialResourceIDs, address[] initialContractAddresses, bytes4[] initialDepositFunctionSignatures, uint256[] initialDepositFunctionDepositerOffsets, bytes4[] initialExecuteFunctionSignatures)",
       "function _bridgeAddress() view returns (address)",
@@ -227,12 +225,10 @@
       "function executeProposal(bytes32 resourceID, bytes data)",
       "function getDepositRecord(uint64 depositNonce, uint8 destId) view returns (tuple(uint8 _destinationChainID, address _depositer, bytes32 _resourceID, bytes _metaData))",
       "function setResource(bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositerOffset, bytes4 executeFunctionSig)"
-    ],
-    "hash": "0x96605e5104dd3688d5f6095292c04afd04d3cc8681747232f6d072355d7b2fee",
-    "blockNumber": 12346092
+    ]
   },
   "chainBridge/transferGateway": {
-    "address": "0xdbfC96df67f2044F3359cDC43B3B94b1a27a4b55",
+    "address": "0x48BC03bC755Ac3e8cc511D9d480A5bffb16F6bBb",
     "abi": [
       "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -250,11 +246,11 @@
       "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function vault() view returns (address)"
     ],
-    "hash": "0x6e62067e1e2f65fa8440dfc263a1f755d38082b13311124a7a9f2a12e9900c76",
-    "blockNumber": 12478425
+    "hash": "0x771b482b0063fbcb66f6149083cca618dfd8d685aa036360cf8f4acba615a811",
+    "blockNumber": 12556994
   },
   "chainBridge/rebaseGateway": {
-    "address": "0x9BED89582490fe0709023A048af3b16382e7A883",
+    "address": "0xE2d12f56293bC9FCD77378da7AceE48bc0D7E9a2",
     "abi": [
       "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -272,8 +268,8 @@
       "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function vault() view returns (address)"
     ],
-    "hash": "0x5be525d8fd49339f96d0cefd2f4f15a6a3fb66a04e123bf4f7ddb40e5fb5e0bf",
-    "blockNumber": 12478422
+    "hash": "0xe466306c54f46c2852565f227cb8f419ebdcfce5b81376e299ebc4616fe8c5f3",
+    "blockNumber": 12556991
   },
   "chainBridge/tokenVault": {
     "address": "0x805c7Ecba41f9321bb098ec1cf31d86d9407de2F",
@@ -296,11 +292,11 @@
     "blockNumber": 12478421
   },
   "chainBridge/batchRebaseReporter": {
-    "address": "0xc944eb24Fd4993Ad3B056fB8b166F3f40EE2F28b",
+    "address": "0x454DE9c544fcAe74Eb09c57A042349d3eAD07E29",
     "abi": [
-      "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID, uint128 bridgeFee) payable"
+      "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID) payable"
     ],
-    "hash": "0x1687ce9f328484e782d7e05bd523ad4e9981ab384641b84895edff55c95ba174",
-    "blockNumber": 12478417
+    "hash": "0xc9422a7cd0b7714446d9ab0da2c84fed5a2e990e94191391c90070b9e1354f39",
+    "blockNumber": 12556990
   }
 }
