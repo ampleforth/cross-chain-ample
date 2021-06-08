@@ -69,6 +69,7 @@ Each new bridge integration should check for the following cases.
 - [ ] User transfers from satellite to another satellite chain and back around rebases, where transfers are before, after and in-between rebase propagation to the target chain.
 
 
-## Testnet Deployment
+## Deployments
 
-* [Deploy local geth and chain-bridge](https://github.com/ampleforth/cross-chain-ample/wiki/Chainbridge---Local-geth-deployment)
+* [Deploy meter passport DEV](https://github.com/ampleforth/cross-chain-ample/wiki/AMPL-Meter-Passport-dev-deployment)
+* [Deploy meter passport PROD](https://github.com/ampleforth/cross-chain-ample/wiki/AMPL-Meter-Passport-prod-deployment)
