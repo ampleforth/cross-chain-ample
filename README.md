@@ -8,6 +8,10 @@ Currently supports integration with ChainSafe's [chain-bridge](https://github.co
 
 [Get up to speed](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-Bridge-Primer).
 
+### Live Deployments
+  * [BSC](https://bscscan.com/token/0xDB021b1B247fe2F1fa57e0A87C748Cc1E321F07F)
+
+
 ### Working Bridges
   * [ChainBridge](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-ChainBridge)
 
