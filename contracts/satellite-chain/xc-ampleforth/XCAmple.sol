@@ -150,6 +150,12 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
         _gonsPerAMPL = TOTAL_GONS.div(globalAMPLSupply);
     }
 
+    // HOT-Fix: Method to update token-name and symbol
+    function updateTokenDesc() external {
+        _name = "AMPL secured by Meter Passport";
+        _symbol = "AMPL";
+    }
+
     /**
      * @dev Returns the name of the token.
      */
