@@ -172,6 +172,8 @@ contract XCAmpleController is OwnableUpgradeable {
      *      on the rebase relayer.
      */
     function rebase() external {
+        require(msg.sender == tx.origin, "XCAmpleController: expected caller to be eoa");
+
         // recently reported epoch needs to be more than current globalEpoch in storage
         require(
             nextGlobalAmpleforthEpoch > globalAmpleforthEpoch,

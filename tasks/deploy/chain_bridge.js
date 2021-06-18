@@ -1,4 +1,3 @@
-
 const {
   types,
   task,
@@ -72,10 +71,7 @@ cbDeployTask(
     console.log('Deployer:', deployerAddress);
     console.log(txParams);
 
-    let bridge,
-      genericHandler,
-      erc20Handler,
-      erc721Handler;
+    let bridge, genericHandler, erc20Handler, erc721Handler;
 
     if (args.useDeployed) {
       console.log('Using deployed bridge');
@@ -89,7 +85,6 @@ cbDeployTask(
         'chainBridge/genericHandler',
         hre.ethers.provider,
       );
-
     } else {
       const chainBridge = await deployChainBridgeContracts(
         args,
