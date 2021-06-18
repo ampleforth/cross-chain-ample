@@ -221,7 +221,6 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
     );
   });
 
-
 txTask('deploy:token_vault', 'Deploy the token vault contract on base chain')
   .addParam('bridge', 'The bridge which secures the vault')
   .setAction(async (args, hre) => {
@@ -239,11 +238,7 @@ txTask('deploy:token_vault', 'Deploy the token vault contract on base chain')
 
     console.log('------------------------------------------------------------');
     console.log('Deploying TokenVault on base chain');
-    const tokenVault = await deployTokenVault(
-      hre.ethers,
-      deployer,
-      txParams,
-    );
+    const tokenVault = await deployTokenVault(hre.ethers, deployer, txParams);
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');

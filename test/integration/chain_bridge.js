@@ -571,10 +571,7 @@ describe('Transfers scenarios', function () {
     it('should revert', async function () {
       await baseChainAmplContracts.ampl
         .connect(userBBaseChainWallet)
-        .approve(
-          baseChainAmplContracts.tokenVault.address,
-          toAmplFixedPt('0'),
-        );
+        .approve(baseChainAmplContracts.tokenVault.address, toAmplFixedPt('0'));
       await expect(
         execXCSend(
           'base',

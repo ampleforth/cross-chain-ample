@@ -211,10 +211,7 @@ async function deployChainBridgeContracts(
   };
 }
 
-async function deployTokenVault(
-  ethers,
-  deployer,
-  txParams = {}) {
+async function deployTokenVault(ethers, deployer, txParams = {}) {
   const tokenVault = await deployContract(
     ethers,
     'TokenVault',
@@ -255,7 +252,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
     rebaseGateway,
   );
 
-  if(isAdmin){
+  if (isAdmin) {
     await (
       await bridge
         .connect(deployer)
@@ -281,7 +278,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
   }
 
   const transferFnSig = CB_FUNCTION_SIG_baseChainTransfer(transferGateway);
-  if(isAdmin) {
+  if (isAdmin) {
     await (
       await bridge
         .connect(deployer)
@@ -306,7 +303,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
     ]);
   }
 
-  if(await tokenVault.owner() == deployerAddress){
+  if ((await tokenVault.owner()) == deployerAddress) {
     await (
       await tokenVault
         .connect(deployer)
@@ -317,9 +314,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
       'Failed to add whitelist transfer gateway to vault as deployer not vault owner',
     );
     console.log('Execute the following on-chain');
-    console.log('addBridgeGateway', [
-      transferGateway.address,
-    ]);
+    console.log('addBridgeGateway', [transferGateway.address]);
   }
 
   return { rebaseGateway, transferGateway };
@@ -364,7 +359,7 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
   const reportRebaseFnSig = CB_FUNCTION_SIG_satelliteChainReportRebase(
     rebaseGateway,
   );
-  if(isAdmin) {
+  if (isAdmin) {
     await (
       await bridge.adminSetGenericResource(
         genericHandler.address,
@@ -388,7 +383,7 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
   }
 
   const transferFnSig = CB_FUNCTION_SIG_satelliteChainTransfer(transferGateway);
-  if(isAdmin) {
+  if (isAdmin) {
     await (
       await bridge.adminSetGenericResource(
         genericHandler.address,
