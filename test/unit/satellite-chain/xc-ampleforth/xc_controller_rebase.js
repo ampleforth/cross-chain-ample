@@ -69,6 +69,31 @@ describe('XCAmpleController:rebase:epoch', async () => {
   });
 });
 
+describe('XCAmpleController:rebase:called by a contract', function () {
+  it('should fail', async function () {
+    await controller.connect(bridge).reportRebase(2, 1000);
+    const rebaseCallerContract = await (
+      await ethers.getContractFactory('MockRebaseCallerContract')
+    )
+      .connect(deployer)
+      .deploy();
+    await expect(
+      rebaseCallerContract.callRebase(controller.address),
+    ).to.be.revertedWith('XCAmpleController: expected caller to be eoa');
+  });
+});
+
+describe('XCAmpleController:rebase:called by a contract which is being constructed', function () {
+  it('should fail', async function () {
+    await controller.connect(bridge).reportRebase(2, 1000);
+    await expect(
+      (await ethers.getContractFactory('MockConstructorRebaseCallerContract'))
+        .connect(deployer)
+        .deploy(controller.address),
+    ).to.be.revertedWith('XCAmpleController: expected caller to be eoa');
+  });
+});
+
 describe('XCAmpleController:rebase', async () => {
   beforeEach('setup XCAmpleController contract', async () => {
     await setupContracts();
