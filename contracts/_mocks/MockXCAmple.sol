@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.6.12;
+pragma solidity 0.7.3;
 
 contract MockXCAmple {
     event Rebase(uint256 globalEpoch, uint256 globalAMPLSupply_);

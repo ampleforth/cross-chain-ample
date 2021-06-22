@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.6.12;
+pragma solidity 0.7.3;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
@@ -120,7 +120,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         address ampl_,
         address policy_,
         address vault_
-    ) public {
+    ) {
         ampl = ampl_;
         policy = policy_;
         vault = vault_;

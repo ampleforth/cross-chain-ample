@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.6.12;
+pragma solidity 0.7.3;
 
 import {
     SafeMathUpgradeable
@@ -146,7 +146,7 @@ contract XCAmpleController is OwnableUpgradeable {
             msg.sender,
             nextGlobalAmpleforthEpoch,
             nextGlobalAMPLSupply,
-            now
+            block.timestamp
         );
     }
 
@@ -191,7 +191,7 @@ contract XCAmpleController is OwnableUpgradeable {
 
         // update state variables on this chain
         globalAmpleforthEpoch = nextGlobalAmpleforthEpoch;
-        lastRebaseTimestampSec = now;
+        lastRebaseTimestampSec = block.timestamp;
 
         // log rebase event
         emit LogRebase(globalAmpleforthEpoch, supplyDelta, lastRebaseTimestampSec);

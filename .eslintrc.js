@@ -153,6 +153,7 @@ module.exports = {
           'offchain',
           'bscscan',
           'ropsten',
+          'matic',
 
           // names
           'nithin',

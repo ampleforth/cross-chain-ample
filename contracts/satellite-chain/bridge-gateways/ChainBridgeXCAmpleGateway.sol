@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.6.12;
+pragma solidity 0.7.3;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
@@ -116,7 +116,7 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         address bridgeHandler,
         address xcAmple_,
         address xcController_
-    ) public {
+    ) {
         xcAmple = xcAmple_;
         xcController = xcController_;
 
