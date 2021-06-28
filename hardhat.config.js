@@ -9,6 +9,7 @@ require('@nomiclabs/hardhat-etherscan');
 
 require('./tasks/deploy/ampleforth');
 require('./tasks/deploy/chain_bridge');
+require('./tasks/deploy/matic');
 
 require('./tasks/ops/rebase');
 require('./tasks/ops/xc_transfer');
@@ -76,6 +77,7 @@ module.exports = {
       url: 'http://localhost:7555'
     },
 
+    // meter-passport
     devRopstenBaseChain: {
       url: 'https://eth-ropsten.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
     },
@@ -84,6 +86,14 @@ module.exports = {
     },
     devMeterTestnetSatChain: {
       url: 'http://s11.meter.io:8545'
+    },
+
+    // matic
+    devGoerliBaseChain: {
+      url: 'https://eth-goerli.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
+    },
+    devMumbaiSatChain: {
+      url: 'https://matic-testnet-archive-rpc.bwarelabs.com'
     },
 
     prodEthereumBaseChain: {

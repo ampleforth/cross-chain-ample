@@ -11,6 +11,7 @@ const { toAmplFloatingPt } = require('../../sdk/ampleforth');
 
 task('info:ampl', 'Prints AMPL token data from given networks')
   .addParam('networks', 'List of hardhat networks', [], types.json)
+  .addParam('bridge', 'Name of the bridge')
   .setAction(async (args, hre) => {
     for (let n in args.networks) {
       const network = args.networks[n];
@@ -21,7 +22,7 @@ task('info:ampl', 'Prints AMPL token data from given networks')
       console.log(
         chainAddresses.isBaseChain ? 'BaseChain' : 'SatelliteChain',
         network,
-        '\tBridge: chainBridge',
+        '\tBridge:' + args.bridge,
       );
 
       if (chainAddresses.isBaseChain) {
@@ -37,7 +38,7 @@ task('info:ampl', 'Prints AMPL token data from given networks')
         );
         const tokenVault = await getDeployedContractInstance(
           network,
-          'chainBridge/tokenVault',
+          `${args.bridge}/tokenVault`,
           provider,
         );
         const [
@@ -93,7 +94,6 @@ task('info:ampl:balance', 'Prints AMPL token balance from given networks')
       console.log(
         chainAddresses.isBaseChain ? 'BaseChain' : 'SatelliteChain',
         network,
-        '\tBridge: chainBridge',
       );
 
       if (chainAddresses.isBaseChain) {

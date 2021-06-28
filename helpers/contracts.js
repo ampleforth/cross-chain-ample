@@ -28,8 +28,17 @@ const ContractABIPaths = {
   BatchTxExecutor: 'contracts/_utilities',
 
   TokenVault: 'contracts/base-chain',
+
   AMPLChainBridgeGateway: 'contracts/base-chain/bridge-gateways',
   ChainBridgeXCAmpleGateway: 'contracts/satellite-chain/bridge-gateways',
+  AMPLChainBridgeGateway: 'contracts/base-chain/bridge-gateways',
+  ChainBridgeXCAmpleGateway: 'contracts/satellite-chain/bridge-gateways',
+
+  AMPLMaticRebaseGateway: 'contracts/base-chain/bridge-gateways',
+  AMPLMaticTransferGateway: 'contracts/base-chain/bridge-gateways',
+  MaticXCAmpleRebaseGateway: 'contracts/satellite-chain/bridge-gateways',
+  MaticXCAmpleTransferGateway:
+    'contracts/satellite-chain/bridge-gateways',
 
   // utilities
   ChainBridgeBatchRebaseReport: 'contracts/_utilities',
@@ -79,6 +88,7 @@ const deployProxyContract = async (
   const refChangeTx = await defaultProxyAdmin.changeProxyAdmin(
     contract.address,
     newProxyAdmin.address,
+    txParams,
   );
   await refChangeTx.wait();
 

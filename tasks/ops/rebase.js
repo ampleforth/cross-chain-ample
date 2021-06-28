@@ -52,8 +52,8 @@ txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
   });
 
 txTask(
-  'report_rebase:base_chain',
-  'Reports most recent rebase to bridge on base chain for list of given satellite chains',
+  'chain_bridge:report_rebase',
+  'Reports most recent rebase to bridge on base chain for list of given satellite chains through chain bridge',
 )
   .addParam(
     'satelliteChainNetworks',
@@ -124,6 +124,32 @@ txTask(
     const txR = await tx.wait();
     console.log(txR.transactionHash);
   });
+
+txTask(
+  'matic:report_rebase',
+  'Reports most recent rebase to bridge on base chain for list of given satellite chains through matic bridge',
+).setAction(async (args, hre) => {
+  const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+  if (txParams.gasPrice == 0) {
+    txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+  }
+  const sender = await loadSignerSync(args, hre.ethers.provider);
+  const senderAddress = await sender.getAddress();
+  console.log('Sender:', senderAddress);
+  console.log(txParams);
+
+  const baseChainNetwork = hre.network.name;
+  const baseChainProvider = hre.ethers.provider;
+  const rebaseGateway = await getDeployedContractInstance(
+    baseChainNetwork,
+    'matic/rebaseGateway',
+    baseChainProvider,
+  );
+  const tx = await rebaseGateway.connect(sender).reportRebase(txParams);
+
+  const txR = await tx.wait();
+  console.log(txR.transactionHash);
+});
 
 txTask(
   'rebase:satellite_chain',

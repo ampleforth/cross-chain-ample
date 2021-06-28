@@ -125,9 +125,7 @@ txTask('testnet:deploy:ampleforth', 'Deploy ampleforth contract suite')
     await writeDeploymentData(hre.network.name, 'orchestrator', orchestrator);
     await writeDeploymentData(hre.network.name, 'rateOracle', rateOracle);
     await writeDeploymentData(hre.network.name, 'cpiOracle', cpiOracle);
-    await writeBulkDeploymentData(hre.network.name, {
-      isBaseChain: true,
-    });
+    await writeBulkDeploymentData(hre.network.name, { isBaseChain: true });
 
     console.log('------------------------------------------------------------');
     console.log('Verify on etherscan');
