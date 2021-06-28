@@ -209,7 +209,13 @@ describe('AMPLChainBridgeGateway:unlock', () => {
           .unlock(depositorAddress, recipientAddress, 1001, 25000),
       )
         .to.emit(gateway, 'XCTransferIn')
-        .withArgs(ethers.constants.AddressZero, recipientAddress, 25000, 2002, 50000);
+        .withArgs(
+          ethers.constants.AddressZero,
+          recipientAddress,
+          25000,
+          2002,
+          50000,
+        );
     });
 
     it('should unlock from vault', async function () {
@@ -235,7 +241,13 @@ describe('AMPLChainBridgeGateway:unlock', () => {
           .unlock(depositorAddress, recipientAddress, 1001, 100000),
       )
         .to.emit(gateway, 'XCTransferIn')
-        .withArgs(ethers.constants.AddressZero, recipientAddress, 100000, 500, 50000);
+        .withArgs(
+          ethers.constants.AddressZero,
+          recipientAddress,
+          100000,
+          500,
+          50000,
+        );
     });
 
     it('should unlock from vault', async function () {
@@ -261,7 +273,13 @@ describe('AMPLChainBridgeGateway:unlock', () => {
           .unlock(depositorAddress, recipientAddress, 1001, 25000),
       )
         .to.emit(gateway, 'XCTransferIn')
-        .withArgs(ethers.constants.AddressZero, recipientAddress, 25000, 2002, 50000);
+        .withArgs(
+          ethers.constants.AddressZero,
+          recipientAddress,
+          25000,
+          2002,
+          50000,
+        );
     });
 
     it('should unlock from vault', async function () {

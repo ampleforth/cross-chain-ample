@@ -37,8 +37,7 @@ const ContractABIPaths = {
   AMPLMaticRebaseGateway: 'contracts/base-chain/bridge-gateways',
   AMPLMaticTransferGateway: 'contracts/base-chain/bridge-gateways',
   MaticXCAmpleRebaseGateway: 'contracts/satellite-chain/bridge-gateways',
-  MaticXCAmpleTransferGateway:
-    'contracts/satellite-chain/bridge-gateways',
+  MaticXCAmpleTransferGateway: 'contracts/satellite-chain/bridge-gateways',
 
   // utilities
   ChainBridgeBatchRebaseReport: 'contracts/_utilities',
