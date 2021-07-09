@@ -37,7 +37,7 @@ task(
       );
 
       const queryTimeFrame = network.toLowerCase().includes('bsc')
-        ? 2 * 3600
+        ? 12 * 3600
         : 7 * 24 * 3600;
       const endBlock = await provider.getBlockNumber();
 
@@ -71,6 +71,7 @@ task(
         endBlock,
         queryTimeFrame,
       );
+      console.log('TransferOuts', transferOuts.length);
 
       const transferIns = await filterContractEvents(
         ethers,
@@ -82,6 +83,7 @@ task(
         endBlock,
         queryTimeFrame,
       );
+      console.log('TransferIns', transferIns.length);
 
       let deposits = await filterContractEvents(
         ethers,
@@ -97,6 +99,7 @@ task(
         d.originChainID = chainID;
         return d;
       });
+      console.log('Deposits', deposits.length);
 
       let proposals = await filterContractEvents(
         ethers,
@@ -112,10 +115,11 @@ task(
         d.destinationChainID = chainID;
         return d;
       });
+      console.log('Proposals', proposals.length);
 
       allTransferOuts = allTransferOuts.concat(transferOuts);
-      allTransferDeposits = allTransferDeposits.concat(deposits);
       allTransferIns = allTransferIns.concat(transferIns);
+      allTransferDeposits = allTransferDeposits.concat(deposits);
       allTransferProposals = allTransferProposals.concat(proposals);
     }
 
@@ -126,6 +130,24 @@ task(
     allTransferProposals = allTransferProposals.filter((d) => {
       return d.parsed.args.resourceID == XC_TRANSFER_RESOURCE_ID;
     });
+
+    const fs = require('fs');
+    fs.writeFileSync(
+      'allTransferOuts.json',
+      JSON.stringify(allTransferOuts, null, 2),
+    );
+    fs.writeFileSync(
+      'allTransferIns.json',
+      JSON.stringify(allTransferIns, null, 2),
+    );
+    fs.writeFileSync(
+      'allTransferDeposits.json',
+      JSON.stringify(allTransferDeposits, null, 2),
+    );
+    fs.writeFileSync(
+      'allTransferProposals.json',
+      JSON.stringify(allTransferProposals, null, 2),
+    );
 
     const xcDepositTxHashesLookup = _.reduce(
       allTransferOuts,

@@ -178,27 +178,65 @@ const filterContractEvents = async (
   endBlock,
   timeFrameSec = 7 * 24 * 3600,
 ) => {
+  startBlock = startBlock || 0;
   endBlock = endBlock || (await provider.getBlockNumber());
-  const freq = timeFrameSec * BLOCKS_PER_SEC;
+  const maxFreq = timeFrameSec * BLOCKS_PER_SEC;
+  const minFreq = maxFreq / 16;
+
+  freq = maxFreq;
+
+  const updateFreq = (u) => {
+    freq = u < 0 ? freq / 2 : freq * 2;
+    freq = freq > maxFreq ? maxFreq : freq;
+    freq = freq < minFreq ? minFreq : freq;
+  };
+
+  const sleep = (sec) => {
+    return new Promise((resolve) => setTimeout(resolve, sec * 1000));
+  };
+
+  console.log(address, event, startBlock, endBlock, timeFrameSec);
 
   let logs = [];
   for (let i = startBlock; i <= endBlock; i += freq) {
-    // console.log(i, startBlock, endBlock)
-    const _logs = await provider.getLogs({
-      address: address,
-      fromBlock: ethers.utils.hexlify(i),
-      toBlock: ethers.utils.hexlify(i + freq > endBlock ? endBlock : i + freq),
-    });
+    console.log(startBlock, endBlock, i, logs.length);
+    const getLogs = async (tries = 10) => {
+      if (tries == 0) {
+        throw 'Max tries reached';
+      }
+      try {
+        const r = await provider.getLogs({
+          address: address,
+          fromBlock: ethers.utils.hexlify(i),
+          toBlock: ethers.utils.hexlify(
+            i + freq > endBlock ? endBlock : i + freq,
+          ),
+        });
+        // updateFreq(+1);
+        return r;
+      } catch (e) {
+        console.log('Failed', e);
+        // updateFreq(-1);
+        await sleep(10 - tries);
+        return getLogs(tries - 1);
+      }
+    };
+    const _logs = await getLogs();
     logs = logs.concat(_logs);
+    await sleep(0.1);
   }
 
   const contractInterface = new ethers.utils.Interface(abi);
   const decodedEvents = logs.reduce((m, log) => {
     try {
       log.parsed = contractInterface.parseLog(log);
+      if (!log.parsed) {
+        throw 'Parse error';
+      }
       log.parsed.name == event ? m.push(log) : m;
       return m;
     } catch (e) {
+      console.log(e, log);
       return m;
     }
   }, []);
