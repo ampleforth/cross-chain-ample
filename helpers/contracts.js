@@ -50,9 +50,11 @@ const getCompiledContractFactory = (ethers, contract) => {
 };
 
 const deployContract = async (ethers, contractName, signer, args, txParams) => {
+  console.log("Deploying", contractName)
   const Factory = await getCompiledContractFactory(ethers, contractName);
   const contract = await Factory.connect(signer).deploy(...args, txParams);
-  await contract.deployTransaction.wait();
+  await contract.deployTransaction.wait(2);
+  console.log("Deployed")
   return contract;
 };
 
@@ -69,6 +71,7 @@ const deployProxyContract = async (
   initializerDef,
   txParams,
 ) => {
+  console.log("Deploying proxy", contractName)
   const ProxyAdminFactory = await getCompiledContractFactory(
     ethers,
     'ProxyAdmin',
@@ -80,7 +83,9 @@ const deployProxyContract = async (
     initializerDef,
     txParams,
   );
-  await contract.deployTransaction.wait();
+  await contract.deployTransaction.wait(2);
+  console.log("Deployed")
+
   const defaultProxyAdmin = ProxyAdminFactory.connect(signer).attach(
     await getAdminAddress(signer.provider, contract.address),
   );
@@ -89,7 +94,7 @@ const deployProxyContract = async (
     newProxyAdmin.address,
     txParams,
   );
-  await refChangeTx.wait();
+  await refChangeTx.wait(2);
 
   return contract;
 };
@@ -180,16 +185,7 @@ const filterContractEvents = async (
 ) => {
   startBlock = startBlock || 0;
   endBlock = endBlock || (await provider.getBlockNumber());
-  const maxFreq = timeFrameSec * BLOCKS_PER_SEC;
-  const minFreq = maxFreq / 16;
-
-  freq = maxFreq;
-
-  const updateFreq = (u) => {
-    freq = u < 0 ? freq / 2 : freq * 2;
-    freq = freq > maxFreq ? maxFreq : freq;
-    freq = freq < minFreq ? minFreq : freq;
-  };
+  const freq = timeFrameSec * BLOCKS_PER_SEC;
 
   const sleep = (sec) => {
     return new Promise((resolve) => setTimeout(resolve, sec * 1000));
@@ -212,11 +208,9 @@ const filterContractEvents = async (
             i + freq > endBlock ? endBlock : i + freq,
           ),
         });
-        // updateFreq(+1);
         return r;
       } catch (e) {
         console.log('Failed', e);
-        // updateFreq(-1);
         await sleep(10 - tries);
         return getLogs(tries - 1);
       }

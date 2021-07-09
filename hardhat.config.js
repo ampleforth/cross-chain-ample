@@ -104,7 +104,7 @@ module.exports = {
       url: 'https://bsc-dataseed.binance.org'
     },
     prodMaticSatChain: {
-      url: 'https://matic-mainnet-full-rpc.bwarelabs.com'
+      url: 'https://polygon-mainnet.infura.io/v3/' + process.env.INFURA_SECRET
     }
   }
 };

@@ -299,5 +299,84 @@
     ],
     "hash": "0xc9422a7cd0b7714446d9ab0da2c84fed5a2e990e94191391c90070b9e1354f39",
     "blockNumber": 12556990
+  },
+  "matic/tokenVault": {
+    "address": "0xCFedb6b85283fBBD0f5F30c5F75324A4B91819c5",
+    "abi": [
+      "event GatewayLocked(address indexed bridgeGateway, address indexed token, address indexed depositor, uint256 amount)",
+      "event GatewayUnlocked(address indexed bridgeGateway, address indexed token, address indexed recipient, uint256 amount)",
+      "event GatewayWhitelistUpdated(address indexed bridgeGateway, bool active)",
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "function addBridgeGateway(address bridgeGateway)",
+      "function lock(address token, address depositor, uint256 amount)",
+      "function owner() view returns (address)",
+      "function removeBridgeGateway(address bridgeGateway)",
+      "function renounceOwnership()",
+      "function totalLocked(address token) view returns (uint256)",
+      "function transferOwnership(address newOwner)",
+      "function unlock(address token, address recipient, uint256 amount)",
+      "function whitelistedBridgeGateways(address) view returns (bool)"
+    ],
+    "hash": "0x683b07ef236abe98019a94cd081190799fd7301a777d1f872a9b2afab1aa2e83",
+    "blockNumber": 12794368
+  },
+  "matic/transferGateway": {
+    "address": "0x27B4fdaEd477F018FD2e2024C7dC5291F0b83543",
+    "abi": [
+      "constructor(address _checkpointManager, address _fxRoot, address ampl_, address vault_)",
+      "event XCTransferIn(address indexed senderInSourceChain, address indexed recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
+      "event XCTransferOut(address indexed sender, address indexed recipientInTargetChain, uint256 amount, uint256 recordedGlobalAMPLSupply)",
+      "function SEND_MESSAGE_EVENT_SIG() view returns (bytes32)",
+      "function ampl() view returns (address)",
+      "function checkpointManager() view returns (address)",
+      "function fxChildTunnel() view returns (address)",
+      "function fxRoot() view returns (address)",
+      "function processedExits(bytes32) view returns (bool)",
+      "function receiveMessage(bytes inputData)",
+      "function setFxChildTunnel(address _fxChildTunnel)",
+      "function transfer(address recipientInTargetChain, uint256 amount)",
+      "function vault() view returns (address)"
+    ],
+    "hash": "0x39fa938b0113a65b12c48ab765fa83cbce50295b462e22454eb449f51de40773",
+    "blockNumber": 12795546
+  },
+  "matic/rebaseGateway": {
+    "address": "0x6625aa109bc11d18Aa6f219d453E9dBA728A7681",
+    "abi": [
+      "constructor(address _checkpointManager, address _fxRoot, address ampl_, address policy_)",
+      "event XCRebaseReportIn(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply, uint256 recordedGlobalAmpleforthEpoch, uint256 recordedGlobalAMPLSupply)",
+      "event XCRebaseReportOut(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
+      "function SEND_MESSAGE_EVENT_SIG() view returns (bytes32)",
+      "function ampl() view returns (address)",
+      "function checkpointManager() view returns (address)",
+      "function fxChildTunnel() view returns (address)",
+      "function fxRoot() view returns (address)",
+      "function policy() view returns (address)",
+      "function processedExits(bytes32) view returns (bool)",
+      "function receiveMessage(bytes inputData)",
+      "function reportRebase()",
+      "function setFxChildTunnel(address _fxChildTunnel)"
+    ],
+    "hash": "0x3b7c71b85cf77fabc9232aba4052d9ea5549268460c09fe27c3d7ef8405eca7b",
+    "blockNumber": 12795542
+  },
+  "batchRebaseReporter": {
+    "address": "0x25fbC7D475B5013f631E5BB7f9Da57A8d1522179",
+    "abi": [
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "event TransactionFailed(address indexed destination, uint256 index, bytes data, bytes reason)",
+      "function addTransaction(address destination, uint256 value, bytes data)",
+      "function checkExecution(uint256 index) payable returns (bool)",
+      "function executeAll() payable returns (bool)",
+      "function owner() view returns (address)",
+      "function removeTransaction(uint256 index)",
+      "function renounceOwnership()",
+      "function setTransactionEnabled(uint256 index, bool enabled)",
+      "function transactions(uint256) view returns (bool enabled, address destination, uint256 value, bytes data)",
+      "function transactionsSize() view returns (uint256)",
+      "function transferOwnership(address newOwner)"
+    ],
+    "hash": "0x3974b71ec5143a95f56f8ec20707f3d6bc46a0c9c31c407a96bf2d07d6c1e029",
+    "blockNumber": 12801448
   }
 }
