@@ -154,6 +154,8 @@ module.exports = {
           'bscscan',
           'ropsten',
           'matic',
+          'dev1',
+          'dev2',
 
           // names
           'nithin',
