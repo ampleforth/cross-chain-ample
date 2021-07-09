@@ -10,6 +10,7 @@ require('@nomiclabs/hardhat-etherscan');
 require('./tasks/deploy/ampleforth');
 require('./tasks/deploy/chain_bridge');
 require('./tasks/deploy/matic');
+require('./tasks/deploy/rebase_reporter');
 
 require('./tasks/ops/rebase');
 require('./tasks/ops/xc_transfer');
@@ -78,29 +79,32 @@ module.exports = {
     },
 
     // meter-passport
-    devRopstenBaseChain: {
+    dev1RopstenBaseChain: {
       url: 'https://eth-ropsten.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
     },
-    devBscTestnetSatChain: {
+    dev1BscTestnetSatChain: {
       url: 'https://data-seed-prebsc-1-s1.binance.org:8545'
     },
-    devMeterTestnetSatChain: {
-      url: 'http://s11.meter.io:8545'
+    dev1MeterTestnetSatChain: {
+      url: 'https://rpctest.meter.io'
     },
 
     // matic
-    devGoerliBaseChain: {
+    dev2GoerliBaseChain: {
       url: 'https://eth-goerli.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
     },
-    devMumbaiSatChain: {
+    dev2MumbaiSatChain: {
       url: 'https://matic-testnet-archive-rpc.bwarelabs.com'
     },
 
     prodEthereumBaseChain: {
-      url: 'https://eth-mainnet.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
+      url: 'https://mainnet.infura.io/v3/' + process.env.INFURA_SECRET
     },
     prodBscSatChain: {
-      url: 'https://bsc-dataseed.binance.org/'
+      url: 'https://bsc-dataseed.binance.org'
+    },
+    prodMaticSatChain: {
+      url: 'https://matic-mainnet-full-rpc.bwarelabs.com'
     }
   }
 };

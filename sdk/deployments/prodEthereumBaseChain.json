@@ -207,7 +207,8 @@
       "function revokeRole(bytes32 role, address account)",
       "function transferFunds(address[] addrs, uint256[] amounts)",
       "function voteProposal(uint8 chainID, uint64 depositNonce, bytes32 resourceID, bytes32 dataHash)"
-    ]
+    ],
+    "blockNumber": 12551276
   },
   "chainBridge/genericHandler": {
     "address": "0x517828d2549cEC09386f89a67E92825E26740240",

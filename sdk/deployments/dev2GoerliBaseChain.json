@@ -243,5 +243,24 @@
     ],
     "hash": "0x995b2710219cf09c47ff0f9ebc1eb454a3bfe90ab53e69a1455613249fbfe56b",
     "blockNumber": 5031511
+  },
+  "batchRebaseReporter": {
+    "address": "0x36ebc6ff9aDb001Ac216bA9F55dcd384B8cFeC6A",
+    "abi": [
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "event TransactionFailed(address indexed destination, uint256 index, bytes data, bytes reason)",
+      "function addTransaction(address destination, uint256 value, bytes data)",
+      "function checkExecution(uint256 index) payable returns (bool)",
+      "function executeAll() payable returns (bool)",
+      "function owner() view returns (address)",
+      "function removeTransaction(uint256 index)",
+      "function renounceOwnership()",
+      "function setTransactionEnabled(uint256 index, bool enabled)",
+      "function transactions(uint256) view returns (bool enabled, address destination, uint256 value, bytes data)",
+      "function transactionsSize() view returns (uint256)",
+      "function transferOwnership(address newOwner)"
+    ],
+    "hash": "0x0deba6485ddef65b18e70b03f4eca3a66c5b29df28dea3da825d6eac5ccb914d",
+    "blockNumber": 5060206
   }
 }
