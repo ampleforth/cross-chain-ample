@@ -36,6 +36,17 @@ contract MockDownstream is Mock {
         emit FunctionArguments(uintVals, intVals);
     }
 
+    function updateWithValue(uint256 u) external payable {
+        require(msg.value == u, "Incorrect fee supplied");
+
+        emit FunctionCalled("MockDownstream", "updateWithValue", msg.sender);
+
+        uint256[] memory uintVals = new uint256[](1);
+        uintVals[0] = u;
+        int256[] memory intVals = new int256[](0);
+        emit FunctionArguments(uintVals, intVals);
+    }
+
     function reverts() external {
         emit FunctionCalled("MockDownstream", "reverts", msg.sender);
 

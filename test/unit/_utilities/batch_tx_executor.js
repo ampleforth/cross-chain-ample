@@ -22,7 +22,7 @@ async function setupContracts () {
 }
 
 describe('BatchTxExecutor', function () {
-  before('setup BatchTxExecutor contract', setupContracts);
+  beforeEach('setup BatchTxExecutor contract', setupContracts);
 
   describe('when sent ether', async function () {
     it('should reject', async function () {
@@ -33,7 +33,7 @@ describe('BatchTxExecutor', function () {
   });
 
   describe('when transaction list is empty', async function () {
-    before('calling executeAll', async function () {
+    beforeEach('calling executeAll', async function () {
       await expect(await batchExecutor.callStatic.executeAll()).to.be.true;
       r = batchExecutor.executeAll();
     });
@@ -48,13 +48,13 @@ describe('BatchTxExecutor', function () {
   });
 
   describe('when there is a single transaction', async function () {
-    before('adding a transaction', async function () {
+    beforeEach('adding a transaction', async function () {
       const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
         12345,
       );
       await batchExecutor
         .connect(deployer)
-        .addTransaction(mockDownstream.address, updateOneArgEncoded.data);
+        .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
       await expect(await batchExecutor.callStatic.executeAll()).to.be.true;
       r = batchExecutor.connect(deployer).executeAll();
     });
@@ -79,14 +79,21 @@ describe('BatchTxExecutor', function () {
   });
 
   describe('when there are two transactions', async function () {
-    before('adding a transaction', async function () {
+    beforeEach('adding 2 transactions', async function () {
+      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
+        12345,
+      );
+      await batchExecutor
+        .connect(deployer)
+        .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
+
       const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
         12345,
         23456,
       );
       await batchExecutor
         .connect(deployer)
-        .addTransaction(mockDownstream.address, updateTwoArgsEncoded.data);
+        .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
       await expect(await batchExecutor.callStatic.executeAll()).to.be.true;
       r = batchExecutor.connect(deployer).executeAll();
     });
@@ -120,8 +127,69 @@ describe('BatchTxExecutor', function () {
     });
   });
 
-  describe('when 1st transaction is disabled', async function () {
-    before('disabling a transaction', async function () {
+  describe('when there a transaction with non zero value', async function () {
+    beforeEach('adding a transaction', async function () {
+      const updateWithValueEncoded = await mockDownstream.populateTransaction.updateWithValue(
+        '1000000000000000000',
+      );
+
+      await batchExecutor
+        .connect(deployer)
+        .addTransaction(
+          mockDownstream.address,
+          '1000000000000000000',
+          updateWithValueEncoded.data,
+        );
+
+      await expect(
+        await batchExecutor.callStatic.checkExecution(0, {
+          value: '1000000000000000000'
+        }),
+      ).to.be.true;
+      await expect(
+        await batchExecutor.callStatic.executeAll({
+          value: '1000000000000000000'
+        }),
+      ).to.be.true;
+      r = batchExecutor
+        .connect(deployer)
+        .executeAll({ value: '1000000000000000000' });
+    });
+
+    it('should call the transaction', async function () {
+      await expect(r)
+        .to.emit(mockDownstream, 'FunctionCalled')
+        .withArgs('MockDownstream', 'updateWithValue', batchExecutor.address);
+
+      await expect(r)
+        .to.emit(mockDownstream, 'FunctionArguments')
+        .withArgs(['1000000000000000000'], []);
+    });
+
+    it('should transfer eth', async function () {
+      expect(await ethers.provider.getBalance(mockDownstream.address)).to.eq(
+        '1000000000000000000',
+      );
+    });
+  });
+
+  describe('when 1st out of 2 is disabled', async function () {
+    beforeEach('disabling a transaction', async function () {
+      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
+        12345,
+      );
+      await batchExecutor
+        .connect(deployer)
+        .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
+
+      const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
+        12345,
+        23456,
+      );
+      await batchExecutor
+        .connect(deployer)
+        .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
+
       await batchExecutor.connect(deployer).setTransactionEnabled(0, false);
       await expect(await batchExecutor.callStatic.executeAll()).to.be.true;
       r = batchExecutor.connect(deployer).executeAll();
@@ -146,8 +214,23 @@ describe('BatchTxExecutor', function () {
     });
   });
 
-  describe('when a transaction is removed', async function () {
-    before('removing 1st transaction', async function () {
+  describe('when 1st out of 2 is removed', async function () {
+    beforeEach('removing 1st transaction', async function () {
+      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
+        12345,
+      );
+      await batchExecutor
+        .connect(deployer)
+        .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
+
+      const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
+        12345,
+        23456,
+      );
+      await batchExecutor
+        .connect(deployer)
+        .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
+
       await batchExecutor.connect(deployer).removeTransaction(0);
       await expect(await batchExecutor.callStatic.executeAll()).to.be.true;
       r = batchExecutor.connect(deployer).executeAll();
@@ -173,8 +256,25 @@ describe('BatchTxExecutor', function () {
   });
 
   describe('when all transactions are removed', async function () {
-    before('removing 1st transaction', async function () {
+    beforeEach('removing 2 tx', async function () {
+      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
+        12345,
+      );
+      await batchExecutor
+        .connect(deployer)
+        .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
+
+      const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
+        12345,
+        23456,
+      );
+      await batchExecutor
+        .connect(deployer)
+        .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
+
       await batchExecutor.connect(deployer).removeTransaction(0);
+      await batchExecutor.connect(deployer).removeTransaction(0);
+
       await expect(await batchExecutor.callStatic.executeAll()).to.be.true;
       r = batchExecutor.connect(deployer).executeAll();
     });
@@ -189,18 +289,18 @@ describe('BatchTxExecutor', function () {
   });
 
   describe('when a transaction reverts', async function () {
-    before('adding 3 transactions', async function () {
+    beforeEach('adding 3 transactions', async function () {
       const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
         123,
       );
       await batchExecutor
         .connect(deployer)
-        .addTransaction(mockDownstream.address, updateOneArgEncoded.data);
+        .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
 
       const revertsEncoded = await mockDownstream.populateTransaction.reverts();
       await batchExecutor
         .connect(deployer)
-        .addTransaction(mockDownstream.address, revertsEncoded.data);
+        .addTransaction(mockDownstream.address, 0, revertsEncoded.data);
 
       const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
         12345,
@@ -208,7 +308,7 @@ describe('BatchTxExecutor', function () {
       );
       await batchExecutor
         .connect(deployer)
-        .addTransaction(mockDownstream.address, updateTwoArgsEncoded.data);
+        .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
     });
 
     it('should NOT revert', async function () {
@@ -234,7 +334,7 @@ describe('BatchTxExecutor', function () {
         await expect(
           batchExecutor
             .connect(deployer)
-            .addTransaction(mockDownstream.address, updateNoArgEncoded.data),
+            .addTransaction(mockDownstream.address, 0, updateNoArgEncoded.data),
         ).to.not.be.reverted;
       });
 
@@ -243,12 +343,21 @@ describe('BatchTxExecutor', function () {
         await expect(
           batchExecutor
             .connect(user)
-            .addTransaction(mockDownstream.address, updateNoArgEncoded.data),
+            .addTransaction(mockDownstream.address, 0, updateNoArgEncoded.data),
         ).to.be.reverted;
       });
     });
 
     describe('setTransactionEnabled', async function () {
+      beforeEach('adding 1 tx', async function () {
+        const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
+          12345,
+        );
+        await batchExecutor
+          .connect(deployer)
+          .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
+      });
+
       it('should be callable by owner', async function () {
         expect(await batchExecutor.transactionsSize()).to.gt(0);
         await expect(
@@ -257,9 +366,9 @@ describe('BatchTxExecutor', function () {
       });
 
       it('should revert if index out of bounds', async function () {
-        expect(await batchExecutor.transactionsSize()).to.lt(5);
+        expect(await batchExecutor.transactionsSize()).to.lt(6);
         await expect(
-          batchExecutor.connect(deployer).setTransactionEnabled(5, true),
+          batchExecutor.connect(deployer).setTransactionEnabled(6, true),
         ).to.be.reverted;
       });
 
@@ -271,6 +380,15 @@ describe('BatchTxExecutor', function () {
     });
 
     describe('removeTransaction', async function () {
+      beforeEach('adding 1 tx', async function () {
+        const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
+          12345,
+        );
+        await batchExecutor
+          .connect(deployer)
+          .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
+      });
+
       it('should not be callable by others', async function () {
         expect(await batchExecutor.transactionsSize()).to.gt(0);
         await expect(batchExecutor.connect(user).removeTransaction(0)).to.be
@@ -278,8 +396,8 @@ describe('BatchTxExecutor', function () {
       });
 
       it('should revert if index out of bounds', async function () {
-        expect(await batchExecutor.transactionsSize()).to.lt(5);
-        await expect(batchExecutor.connect(deployer).removeTransaction(5)).to.be
+        expect(await batchExecutor.transactionsSize()).to.lt(6);
+        await expect(batchExecutor.connect(deployer).removeTransaction(6)).to.be
           .reverted;
       });
 
