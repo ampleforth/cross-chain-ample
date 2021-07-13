@@ -94,7 +94,7 @@ module.exports = {
       url: 'https://eth-goerli.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
     },
     dev2MumbaiSatChain: {
-      url: 'https://matic-testnet-archive-rpc.bwarelabs.com'
+      url: 'https://polygon-mumbai.infura.io/v3/' + process.env.INFURA_SECRET
     },
 
     prodEthereumBaseChain: {

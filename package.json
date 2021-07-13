@@ -18,6 +18,7 @@
     "lint"
   ],
   "dependencies": {
+    "@maticnetwork/maticjs": "^2.0.43",
     "@openzeppelin/contracts": "^3.4.0",
     "@openzeppelin/contracts-upgradeable": "^3.3.0",
     "@openzeppelin/upgrades": "^2.8.0",

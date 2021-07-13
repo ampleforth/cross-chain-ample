@@ -163,3 +163,47 @@ txTask('matic:xc_transfer', 'Executes cross chain transfer through matic')
 
     console.log(txR.transactionHash);
   });
+
+txTask(
+  'matic:xc_transfer:commit',
+  'Commits the cross chain transfer from matic to base chain',
+)
+  .addParam('txHash', 'The transaction hash of the xc transfer on matic')
+  .addParam('baseChainNetwork', 'The network name base chain')
+  .addParam('satChainNetwork', 'The network name matic satellite chain')
+  .setAction(async (args, hre) => {
+    const baseChainProvider = getEthersProvider(args.baseChainNetwork);
+    const satChainProvider = getEthersProvider(args.satChainNetwork);
+
+    const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if (txParams.gasPrice == 0) {
+      txParams.gasPrice = await baseChainProvider.getGasPrice();
+    }
+    const sender = await loadSignerSync(args, baseChainProvider);
+    const senderAddress = await sender.getAddress();
+    console.log('Sender:', senderAddress);
+
+    const baseChainTransferGateway = await getDeployedContractInstance(
+      args.baseChainNetwork,
+      'matic/transferGateway',
+      baseChainProvider,
+    );
+
+    const maticPOSClient = new require('@maticnetwork/maticjs').MaticPOSClient({
+      network: baseChainProvider.includes('prod') ? 'mainnet' : 'testnet',
+      version: baseChainProvider.includes('prod') ? 'v1' : 'mumbai',
+      maticProvider: satChainProvider.connection.url,
+      parentProvider: baseChainProvider.connection.url,
+    });
+
+    const proof = await maticPOSClient.posRootChainManager.customPayload(
+      args.txHash,
+      await baseChainTransferGateway.SEND_MESSAGE_EVENT_SIG(),
+    );
+
+    const tx = await baseChainTransferGateway
+      .connect(sender)
+      .receiveMessage(proof);
+    const txR = await tx.wait();
+    console.log(txR.transactionHash);
+  });
