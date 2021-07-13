@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.6.12;
+pragma solidity 0.7.3;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
-import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
+import {ChainBridgeRebaseGateway} from "../../base-bridge-gateways/ChainBridgeRebaseGateway.sol";
+import {
+    ChainBridgeTransferGateway
+} from "../../base-bridge-gateways/ChainBridgeTransferGateway.sol";
+
 import {IXCAmpleController} from "../../_interfaces/IXCAmpleController.sol";
 import {IXCAmpleControllerGateway} from "../../_interfaces/IXCAmpleControllerGateway.sol";
 import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
@@ -32,7 +36,11 @@ import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
  *      and burns xc-amples from the sender's wallet.
  *
  */
-contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
+contract ChainBridgeXCAmpleGateway is
+    ChainBridgeRebaseGateway,
+    ChainBridgeTransferGateway,
+    Ownable
+{
     using SafeMath for uint256;
 
     address public immutable xcAmple;
@@ -45,6 +53,7 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
      */
     function reportRebase(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)
         external
+        override
         onlyOwner
     {
         uint256 recordedGlobalAmpleforthEpoch = IXCAmpleController(xcController)
@@ -79,11 +88,17 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         address recipient,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) external onlyOwner {
+    ) external override onlyOwner {
         uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply();
         uint256 mintAmount = amount.mul(recordedGlobalAMPLSupply).div(globalAMPLSupply);
 
-        emit XCTransferIn(recipient, globalAMPLSupply, mintAmount, recordedGlobalAMPLSupply);
+        emit XCTransferIn(
+            address(0),
+            recipient,
+            globalAMPLSupply,
+            mintAmount,
+            recordedGlobalAMPLSupply
+        );
 
         IXCAmpleControllerGateway(xcController).mint(recipient, mintAmount);
     }
@@ -100,7 +115,7 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
         address recipientAddressInTargetChain,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) external onlyOwner {
+    ) external override onlyOwner {
         uint256 recordedGlobalAMPLSupply = IXCAmple(xcAmple).globalAMPLSupply();
         require(
             globalAMPLSupply == recordedGlobalAMPLSupply,
@@ -109,14 +124,14 @@ contract ChainBridgeXCAmpleGateway is IBridgeGateway, Ownable {
 
         IXCAmpleControllerGateway(xcController).burn(sender, amount);
 
-        emit XCTransferOut(sender, amount, recordedGlobalAMPLSupply);
+        emit XCTransferOut(sender, address(0), amount, recordedGlobalAMPLSupply);
     }
 
     constructor(
         address bridgeHandler,
         address xcAmple_,
         address xcController_
-    ) public {
+    ) {
         xcAmple = xcAmple_;
         xcController = xcController_;
 

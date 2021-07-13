@@ -28,8 +28,16 @@ const ContractABIPaths = {
   BatchTxExecutor: 'contracts/_utilities',
 
   TokenVault: 'contracts/base-chain',
+
   AMPLChainBridgeGateway: 'contracts/base-chain/bridge-gateways',
   ChainBridgeXCAmpleGateway: 'contracts/satellite-chain/bridge-gateways',
+  AMPLChainBridgeGateway: 'contracts/base-chain/bridge-gateways',
+  ChainBridgeXCAmpleGateway: 'contracts/satellite-chain/bridge-gateways',
+
+  AMPLMaticRebaseGateway: 'contracts/base-chain/bridge-gateways',
+  AMPLMaticTransferGateway: 'contracts/base-chain/bridge-gateways',
+  MaticXCAmpleRebaseGateway: 'contracts/satellite-chain/bridge-gateways',
+  MaticXCAmpleTransferGateway: 'contracts/satellite-chain/bridge-gateways',
 
   // utilities
   ChainBridgeBatchRebaseReport: 'contracts/_utilities',
@@ -42,9 +50,11 @@ const getCompiledContractFactory = (ethers, contract) => {
 };
 
 const deployContract = async (ethers, contractName, signer, args, txParams) => {
+  // console.log('Deploying', contractName);
   const Factory = await getCompiledContractFactory(ethers, contractName);
   const contract = await Factory.connect(signer).deploy(...args, txParams);
   await contract.deployTransaction.wait();
+  // console.log('Deployed');
   return contract;
 };
 
@@ -61,6 +71,7 @@ const deployProxyContract = async (
   initializerDef,
   txParams,
 ) => {
+  // console.log('Deploying proxy', contractName);
   const ProxyAdminFactory = await getCompiledContractFactory(
     ethers,
     'ProxyAdmin',
@@ -73,12 +84,15 @@ const deployProxyContract = async (
     txParams,
   );
   await contract.deployTransaction.wait();
+  // console.log('Deployed');
+
   const defaultProxyAdmin = ProxyAdminFactory.connect(signer).attach(
     await getAdminAddress(signer.provider, contract.address),
   );
   const refChangeTx = await defaultProxyAdmin.changeProxyAdmin(
     contract.address,
     newProxyAdmin.address,
+    txParams,
   );
   await refChangeTx.wait();
 
@@ -169,27 +183,54 @@ const filterContractEvents = async (
   endBlock,
   timeFrameSec = 7 * 24 * 3600,
 ) => {
+  startBlock = startBlock || 0;
   endBlock = endBlock || (await provider.getBlockNumber());
   const freq = timeFrameSec * BLOCKS_PER_SEC;
 
+  const sleep = (sec) => {
+    return new Promise((resolve) => setTimeout(resolve, sec * 1000));
+  };
+
+  console.log(address, event, startBlock, endBlock, timeFrameSec);
+
   let logs = [];
   for (let i = startBlock; i <= endBlock; i += freq) {
-    // console.log(i, startBlock, endBlock)
-    const _logs = await provider.getLogs({
-      address: address,
-      fromBlock: ethers.utils.hexlify(i),
-      toBlock: ethers.utils.hexlify(i + freq > endBlock ? endBlock : i + freq),
-    });
+    console.log(startBlock, endBlock, i, logs.length);
+    const getLogs = async (tries = 10) => {
+      if (tries == 0) {
+        throw 'Max tries reached';
+      }
+      try {
+        const r = await provider.getLogs({
+          address: address,
+          fromBlock: ethers.utils.hexlify(i),
+          toBlock: ethers.utils.hexlify(
+            i + freq > endBlock ? endBlock : i + freq,
+          ),
+        });
+        return r;
+      } catch (e) {
+        console.log('Failed', e);
+        await sleep(10 - tries);
+        return getLogs(tries - 1);
+      }
+    };
+    const _logs = await getLogs();
     logs = logs.concat(_logs);
+    await sleep(0.1);
   }
 
   const contractInterface = new ethers.utils.Interface(abi);
   const decodedEvents = logs.reduce((m, log) => {
     try {
       log.parsed = contractInterface.parseLog(log);
+      if (!log.parsed) {
+        throw 'Parse error';
+      }
       log.parsed.name == event ? m.push(log) : m;
       return m;
     } catch (e) {
+      console.log(e, log);
       return m;
     }
   }, []);

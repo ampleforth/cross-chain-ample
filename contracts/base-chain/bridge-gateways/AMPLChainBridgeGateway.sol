@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.6.12;
+pragma solidity 0.7.3;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
+import {ChainBridgeRebaseGateway} from "../../base-bridge-gateways/ChainBridgeRebaseGateway.sol";
+import {
+    ChainBridgeTransferGateway
+} from "../../base-bridge-gateways/ChainBridgeTransferGateway.sol";
+
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IAmpleforth} from "uFragments/contracts/interfaces/IAmpleforth.sol";
 import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
-import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
 
 /**
  * @title AMPLChainBridgeGateway: AMPL-ChainBridge Gateway Contract
@@ -35,7 +39,7 @@ import {IBridgeGateway} from "../../_interfaces/IBridgeGateway.sol";
  *      and the total ERC-20 AMPL supply on the current chain, at the time of unlock.
  *
  */
-contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
+contract AMPLChainBridgeGateway is ChainBridgeRebaseGateway, ChainBridgeTransferGateway, Ownable {
     using SafeMath for uint256;
 
     address public immutable ampl;
@@ -50,6 +54,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
      */
     function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)
         external
+        override
         onlyOwner
     {
         uint256 recordedGlobalAmpleforthEpoch = IAmpleforth(policy).epoch();
@@ -80,7 +85,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         address recipientAddressInTargetChain,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) external onlyOwner {
+    ) external override onlyOwner {
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
 
         require(
@@ -90,7 +95,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
 
         ITokenVault(vault).lock(ampl, sender, amount);
 
-        emit XCTransferOut(sender, amount, recordedGlobalAMPLSupply);
+        emit XCTransferOut(sender, address(0), amount, recordedGlobalAMPLSupply);
     }
 
     /**
@@ -106,11 +111,17 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         address recipient,
         uint256 amount,
         uint256 globalAMPLSupply
-    ) external onlyOwner {
+    ) external override onlyOwner {
         uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
         uint256 unlockAmount = amount.mul(recordedGlobalAMPLSupply).div(globalAMPLSupply);
 
-        emit XCTransferIn(recipient, globalAMPLSupply, unlockAmount, recordedGlobalAMPLSupply);
+        emit XCTransferIn(
+            address(0),
+            recipient,
+            globalAMPLSupply,
+            unlockAmount,
+            recordedGlobalAMPLSupply
+        );
 
         ITokenVault(vault).unlock(ampl, recipient, unlockAmount);
     }
@@ -120,7 +131,7 @@ contract AMPLChainBridgeGateway is IBridgeGateway, Ownable {
         address ampl_,
         address policy_,
         address vault_
-    ) public {
+    ) {
         ampl = ampl_;
         policy = policy_;
         vault = vault_;

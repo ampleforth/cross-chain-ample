@@ -130,7 +130,13 @@ describe('ChainBridgeXCAmpleGateway:mint', () => {
           .mint(depositorAddress, recipientAddress, 1001, 25000),
       )
         .to.emit(gateway, 'XCTransferIn')
-        .withArgs(recipientAddress, 25000, 2002, 50000);
+        .withArgs(
+          ethers.constants.AddressZero,
+          recipientAddress,
+          25000,
+          2002,
+          50000,
+        );
     });
 
     it('should mint from xcController', async function () {
@@ -156,7 +162,13 @@ describe('ChainBridgeXCAmpleGateway:mint', () => {
           .mint(depositorAddress, recipientAddress, 1001, 100000),
       )
         .to.emit(gateway, 'XCTransferIn')
-        .withArgs(recipientAddress, 100000, 500, 50000);
+        .withArgs(
+          ethers.constants.AddressZero,
+          recipientAddress,
+          100000,
+          500,
+          50000,
+        );
     });
 
     it('should mint from xcController', async function () {
@@ -182,7 +194,13 @@ describe('ChainBridgeXCAmpleGateway:mint', () => {
           .mint(depositorAddress, recipientAddress, 1001, 25000),
       )
         .to.emit(gateway, 'XCTransferIn')
-        .withArgs(recipientAddress, 25000, 2002, 50000);
+        .withArgs(
+          ethers.constants.AddressZero,
+          recipientAddress,
+          25000,
+          2002,
+          50000,
+        );
     });
 
     it('should mint from xcController', async function () {
@@ -300,7 +318,7 @@ describe('ChainBridgeXCAmpleGateway:validateAndBurn', () => {
         .validateAndBurn(depositorAddress, recipientAddress, 1001, 50000),
     )
       .to.emit(gateway, 'XCTransferOut')
-      .withArgs(depositorAddress, 1001, 50000);
+      .withArgs(depositorAddress, ethers.constants.AddressZero, 1001, 50000);
   });
 
   it('should burn from xcController', async function () {

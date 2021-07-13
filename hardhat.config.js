@@ -9,6 +9,8 @@ require('@nomiclabs/hardhat-etherscan');
 
 require('./tasks/deploy/ampleforth');
 require('./tasks/deploy/chain_bridge');
+require('./tasks/deploy/matic');
+require('./tasks/deploy/rebase_reporter');
 
 require('./tasks/ops/rebase');
 require('./tasks/ops/xc_transfer');
@@ -37,7 +39,7 @@ module.exports = {
         version: '0.5.12'
       },
       {
-        version: '0.6.12',
+        version: '0.7.3',
         settings: {
           optimizer: {
             enabled: true,
@@ -48,7 +50,7 @@ module.exports = {
     ]
   },
   mocha: {
-    timeout: 100000
+    timeout: 1000000
   },
   gasReporter: {
     currency: 'USD',
@@ -76,21 +78,33 @@ module.exports = {
       url: 'http://localhost:7555'
     },
 
-    devRopstenBaseChain: {
+    // meter-passport
+    dev1RopstenBaseChain: {
       url: 'https://eth-ropsten.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
     },
-    devBscTestnetSatChain: {
+    dev1BscTestnetSatChain: {
       url: 'https://data-seed-prebsc-1-s1.binance.org:8545'
     },
-    devMeterTestnetSatChain: {
-      url: 'http://s11.meter.io:8545'
+    dev1MeterTestnetSatChain: {
+      url: 'https://rpctest.meter.io'
+    },
+
+    // matic
+    dev2GoerliBaseChain: {
+      url: 'https://eth-goerli.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
+    },
+    dev2MumbaiSatChain: {
+      url: 'https://polygon-mumbai.infura.io/v3/' + process.env.INFURA_SECRET
     },
 
     prodEthereumBaseChain: {
-      url: 'https://eth-mainnet.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
+      url: 'https://mainnet.infura.io/v3/' + process.env.INFURA_SECRET
     },
     prodBscSatChain: {
-      url: 'https://bsc-dataseed.binance.org/'
+      url: 'https://bsc-dataseed.binance.org'
+    },
+    prodMaticSatChain: {
+      url: 'https://polygon-mainnet.infura.io/v3/' + process.env.INFURA_SECRET
     }
   }
 };

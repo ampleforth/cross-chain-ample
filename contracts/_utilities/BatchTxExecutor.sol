@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.6.12;
+pragma solidity 0.7.3;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -15,6 +15,7 @@ contract BatchTxExecutor is Ownable {
     struct Transaction {
         bool enabled;
         address destination;
+        uint256 value;
         bytes data;
     }
 
@@ -24,22 +25,33 @@ contract BatchTxExecutor is Ownable {
 
     /**
      * @notice Executes all transactions marked enabled.
-     *         If any transaction in the transaction list reverts, it breaks execution
-     *         and returns false.
+     *         If any transaction in the transaction list reverts, it returns false.
      */
-    function executeAll() external returns (bool) {
+    function executeAll() external payable returns (bool) {
+        bool exeuctionSuccess = true;
+
         for (uint256 i = 0; i < transactions.length; i++) {
             Transaction storage t = transactions[i];
             if (t.enabled) {
-                (bool result, bytes memory reason) = t.destination.call(t.data);
+                (bool result, bytes memory reason) = t.destination.call{value: t.value}(t.data);
                 if (!result) {
                     emit TransactionFailed(t.destination, i, t.data, reason);
-                    return false;
+                    exeuctionSuccess = false;
                 }
             }
         }
 
-        return true;
+        return exeuctionSuccess;
+    }
+
+    /**
+     * @notice Helper function to re-trigger specific transaction in case of failure.
+     * @param index Transaction to execute
+     */
+    function checkExecution(uint256 index) external payable returns (bool) {
+        Transaction storage t = transactions[index];
+        (bool result, ) = t.destination.call{value: t.value}(t.data);
+        return result;
     }
 
     /**
@@ -47,8 +59,14 @@ contract BatchTxExecutor is Ownable {
      * @param destination Address of contract destination
      * @param data Transaction data payload
      */
-    function addTransaction(address destination, bytes calldata data) external onlyOwner {
-        transactions.push(Transaction({enabled: true, destination: destination, data: data}));
+    function addTransaction(
+        address destination,
+        uint256 value,
+        bytes calldata data
+    ) external onlyOwner {
+        transactions.push(
+            Transaction({enabled: true, destination: destination, value: value, data: data})
+        );
     }
 
     /**

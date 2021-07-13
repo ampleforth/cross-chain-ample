@@ -1,7 +1,23 @@
 {
-  "isBaseChain": true,
+  "proxyAdmin": {
+    "address": "0xC1f2219c2482F0731070de5Eb98A03446aD3E17e",
+    "abi": [
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "function changeProxyAdmin(address proxy, address newAdmin)",
+      "function getProxyAdmin(address proxy) view returns (address)",
+      "function getProxyImplementation(address proxy) view returns (address)",
+      "function isOwner() view returns (bool)",
+      "function owner() view returns (address)",
+      "function renounceOwnership()",
+      "function transferOwnership(address newOwner)",
+      "function upgrade(address proxy, address implementation)",
+      "function upgradeAndCall(address proxy, address implementation, bytes data) payable"
+    ],
+    "hash": "0x5dfbe0ed4ca7f87e37c4d80b9822ae61e8d1ec597cc898bbb488ed4b47e98ea0",
+    "blockNumber": 5009415
+  },
   "ampl": {
-    "address": "0xD46bA6D942050d489DBd938a2C909A5d5039A161",
+    "address": "0x28C07523b22ADb47424A835a124C1A31236FFfE4",
     "abi": [
       "event Approval(address indexed owner, address indexed spender, uint256 value)",
       "event LogMonetaryPolicyUpdated(address monetaryPolicy)",
@@ -39,10 +55,12 @@
       "function transferAllFrom(address from, address to) returns (bool)",
       "function transferFrom(address from, address to, uint256 value) returns (bool)",
       "function transferOwnership(address newOwner)"
-    ]
+    ],
+    "hash": "0x4d1e6d61e74e66ba555f8de96dfabf84113e8b0ae5157f97e69334f135c0c849",
+    "blockNumber": 5009435
   },
   "policy": {
-    "address": "0x1B228a749077b8e307C5856cE62Ef35d96Dca2ea",
+    "address": "0xE5D1351801aE21BA9A4d4880b58ce72F60b31546",
     "abi": [
       "event LogRebase(uint256 indexed epoch, uint256 exchangeRate, uint256 cpi, int256 requestedSupplyAdjustment, uint256 timestampSec)",
       "event OwnershipRenounced(address indexed previousOwner)",
@@ -73,10 +91,12 @@
       "function setRebaseTimingParameters(uint256 minRebaseTimeIntervalSec_, uint256 rebaseWindowOffsetSec_, uint256 rebaseWindowLengthSec_)",
       "function transferOwnership(address newOwner)",
       "function uFrags() view returns (address)"
-    ]
+    ],
+    "hash": "0xb16493028b8023bfe132d9408fa5d5fd78080bab7b37fa7b6da9f4b8a4708696",
+    "blockNumber": 5009470
   },
   "orchestrator": {
-    "address": "0x6FB00a180781E75F87E2B690Af0196bAa77C7e7C",
+    "address": "0xadA6A0bC5453EF35A6Edb20CD7EBF876f56eafEC",
     "abi": [
       "constructor(address policy_)",
       "event OwnershipRenounced(address indexed previousOwner)",
@@ -93,10 +113,12 @@
       "function transactions(uint256) view returns (bool enabled, address destination, bytes data)",
       "function transactionsSize() view returns (uint256)",
       "function transferOwnership(address newOwner)"
-    ]
+    ],
+    "hash": "0x6e1dc4e78ede462b11a28e87ec51f3dc32ba2e3c0a267402292e003add14b39b",
+    "blockNumber": 5009476
   },
   "rateOracle": {
-    "address": "0x99C9775E076FDF99388C029550155032Ba2d8914",
+    "address": "0x10a2DCc3033c4fA215D33661062cD6783269c672",
     "abi": [
       "function reportDelaySec() view returns (uint256)",
       "function pushReport(uint256 payload)",
@@ -122,10 +144,12 @@
       "event ReportTimestampOutOfRange(address provider)",
       "event ProviderReportPushed(address indexed provider, uint256 payload, uint256 timestamp)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)"
-    ]
+    ],
+    "hash": "0x1ac360d2ede6b26bd3880c5f9eee9015e8ddff38a221d3f67567163c47afdaf2",
+    "blockNumber": 5009448
   },
   "cpiOracle": {
-    "address": "0xa759F960dD59A1aD32c995ecabE802a0C35F244F",
+    "address": "0x969517831c8Ef24a756bE5fb0d7f565960810B59",
     "abi": [
       "function reportDelaySec() view returns (uint256)",
       "function pushReport(uint256 payload)",
@@ -151,157 +175,13 @@
       "event ReportTimestampOutOfRange(address provider)",
       "event ProviderReportPushed(address indexed provider, uint256 payload, uint256 timestamp)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)"
-    ]
-  },
-  "chainBridge/bridge": {
-    "address": "0xbD515E41DF155112Cc883f8981CB763a286261be",
-    "abi": [
-      "constructor(uint8 chainID, address[] initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry)",
-      "event Deposit(uint8 indexed destinationChainID, bytes32 indexed resourceID, uint64 indexed depositNonce)",
-      "event Paused(address account)",
-      "event ProposalEvent(uint8 indexed originChainID, uint64 indexed depositNonce, uint8 indexed status, bytes32 resourceID, bytes32 dataHash)",
-      "event ProposalVote(uint8 indexed originChainID, uint64 indexed depositNonce, uint8 indexed status, bytes32 resourceID)",
-      "event RelayerAdded(address indexed relayer)",
-      "event RelayerRemoved(address indexed relayer)",
-      "event RelayerThresholdChanged(uint256 indexed newThreshold)",
-      "event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole)",
-      "event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)",
-      "event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender)",
-      "event Unpaused(address account)",
-      "function DEFAULT_ADMIN_ROLE() view returns (bytes32)",
-      "function RELAYER_ROLE() view returns (bytes32)",
-      "function _chainID() view returns (uint8)",
-      "function _depositCounts(uint8) view returns (uint64)",
-      "function _depositRecords(uint64, uint8) view returns (bytes)",
-      "function _expiry() view returns (uint256)",
-      "function _fee() view returns (uint256)",
-      "function _hasVotedOnProposal(uint72, bytes32, address) view returns (bool)",
-      "function _proposals(uint72, bytes32) view returns (bytes32 _resourceID, bytes32 _dataHash, uint8 _status, uint256 _proposedBlock)",
-      "function _relayerThreshold() view returns (uint256)",
-      "function _resourceIDToHandlerAddress(bytes32) view returns (address)",
-      "function _totalProposals() view returns (uint256)",
-      "function _totalRelayers() view returns (uint256)",
-      "function adminAddRelayer(address relayerAddress)",
-      "function adminChangeFee(uint256 newFee)",
-      "function adminChangeRelayerThreshold(uint256 newThreshold)",
-      "function adminPauseTransfers()",
-      "function adminRemoveRelayer(address relayerAddress)",
-      "function adminSetBurnable(address handlerAddress, address tokenAddress)",
-      "function adminSetGenericResource(address handlerAddress, bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositerOffset, bytes4 executeFunctionSig)",
-      "function adminSetResource(address handlerAddress, bytes32 resourceID, address tokenAddress)",
-      "function adminUnpauseTransfers()",
-      "function adminWithdraw(address handlerAddress, address tokenAddress, address recipient, uint256 amountOrTokenID)",
-      "function cancelProposal(uint8 chainID, uint64 depositNonce, bytes32 dataHash)",
-      "function deposit(uint8 destinationChainID, bytes32 resourceID, bytes data) payable",
-      "function executeProposal(uint8 chainID, uint64 depositNonce, bytes data, bytes32 resourceID)",
-      "function getProposal(uint8 originChainID, uint64 depositNonce, bytes32 dataHash) view returns (tuple(bytes32 _resourceID, bytes32 _dataHash, address[] _yesVotes, address[] _noVotes, uint8 _status, uint256 _proposedBlock))",
-      "function getRoleAdmin(bytes32 role) view returns (bytes32)",
-      "function getRoleMember(bytes32 role, uint256 index) view returns (address)",
-      "function getRoleMemberCount(bytes32 role) view returns (uint256)",
-      "function grantRole(bytes32 role, address account)",
-      "function hasRole(bytes32 role, address account) view returns (bool)",
-      "function isRelayer(address relayer) view returns (bool)",
-      "function paused() view returns (bool)",
-      "function renounceAdmin(address newAdmin)",
-      "function renounceRole(bytes32 role, address account)",
-      "function revokeRole(bytes32 role, address account)",
-      "function transferFunds(address[] addrs, uint256[] amounts)",
-      "function voteProposal(uint8 chainID, uint64 depositNonce, bytes32 resourceID, bytes32 dataHash)"
     ],
-    "blockNumber": 12551276
+    "hash": "0xc02e31acbf696bed3a64f414bddb7cc78f21a56eff0035da2b246aa8ad120728",
+    "blockNumber": 5009463
   },
-  "chainBridge/genericHandler": {
-    "address": "0x517828d2549cEC09386f89a67E92825E26740240",
-    "abi": [
-      "constructor(address bridgeAddress, bytes32[] initialResourceIDs, address[] initialContractAddresses, bytes4[] initialDepositFunctionSignatures, uint256[] initialDepositFunctionDepositerOffsets, bytes4[] initialExecuteFunctionSignatures)",
-      "function _bridgeAddress() view returns (address)",
-      "function _contractAddressToDepositFunctionDepositerOffset(address) view returns (uint256)",
-      "function _contractAddressToDepositFunctionSignature(address) view returns (bytes4)",
-      "function _contractAddressToExecuteFunctionSignature(address) view returns (bytes4)",
-      "function _contractAddressToResourceID(address) view returns (bytes32)",
-      "function _contractWhitelist(address) view returns (bool)",
-      "function _depositRecords(uint8, uint64) view returns (uint8 _destinationChainID, address _depositer, bytes32 _resourceID, bytes _metaData)",
-      "function _resourceIDToContractAddress(bytes32) view returns (address)",
-      "function deposit(bytes32 resourceID, uint8 destinationChainID, uint64 depositNonce, address depositer, bytes data)",
-      "function executeProposal(bytes32 resourceID, bytes data)",
-      "function getDepositRecord(uint64 depositNonce, uint8 destId) view returns (tuple(uint8 _destinationChainID, address _depositer, bytes32 _resourceID, bytes _metaData))",
-      "function setResource(bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositerOffset, bytes4 executeFunctionSig)"
-    ]
-  },
-  "chainBridge/transferGateway": {
-    "address": "0x48BC03bC755Ac3e8cc511D9d480A5bffb16F6bBb",
-    "abi": [
-      "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "event XCRebaseReportIn(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply, uint256 recordedGlobalAmpleforthEpoch, uint256 recordedGlobalAMPLSupply)",
-      "event XCRebaseReportOut(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
-      "event XCTransferIn(address recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
-      "event XCTransferOut(address sender, uint256 amount, uint256 recordedGlobalAMPLSupply)",
-      "function ampl() view returns (address)",
-      "function owner() view returns (address)",
-      "function policy() view returns (address)",
-      "function renounceOwnership()",
-      "function transferOwnership(address newOwner)",
-      "function unlock(address senderAddressInSourceChain, address recipient, uint256 amount, uint256 globalAMPLSupply)",
-      "function validateAndLock(address sender, address recipientAddressInTargetChain, uint256 amount, uint256 globalAMPLSupply)",
-      "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
-      "function vault() view returns (address)"
-    ],
-    "hash": "0x771b482b0063fbcb66f6149083cca618dfd8d685aa036360cf8f4acba615a811",
-    "blockNumber": 12556994
-  },
-  "chainBridge/rebaseGateway": {
-    "address": "0xE2d12f56293bC9FCD77378da7AceE48bc0D7E9a2",
-    "abi": [
-      "constructor(address bridgeHandler, address ampl_, address policy_, address vault_)",
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "event XCRebaseReportIn(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply, uint256 recordedGlobalAmpleforthEpoch, uint256 recordedGlobalAMPLSupply)",
-      "event XCRebaseReportOut(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
-      "event XCTransferIn(address recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
-      "event XCTransferOut(address sender, uint256 amount, uint256 recordedGlobalAMPLSupply)",
-      "function ampl() view returns (address)",
-      "function owner() view returns (address)",
-      "function policy() view returns (address)",
-      "function renounceOwnership()",
-      "function transferOwnership(address newOwner)",
-      "function unlock(address senderAddressInSourceChain, address recipient, uint256 amount, uint256 globalAMPLSupply)",
-      "function validateAndLock(address sender, address recipientAddressInTargetChain, uint256 amount, uint256 globalAMPLSupply)",
-      "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
-      "function vault() view returns (address)"
-    ],
-    "hash": "0xe466306c54f46c2852565f227cb8f419ebdcfce5b81376e299ebc4616fe8c5f3",
-    "blockNumber": 12556991
-  },
-  "chainBridge/tokenVault": {
-    "address": "0x805c7Ecba41f9321bb098ec1cf31d86d9407de2F",
-    "abi": [
-      "event GatewayLocked(address indexed bridgeGateway, address indexed token, address indexed depositor, uint256 amount)",
-      "event GatewayUnlocked(address indexed bridgeGateway, address indexed token, address indexed recipient, uint256 amount)",
-      "event GatewayWhitelistUpdated(address indexed bridgeGateway, bool active)",
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "function addBridgeGateway(address bridgeGateway)",
-      "function lock(address token, address depositor, uint256 amount)",
-      "function owner() view returns (address)",
-      "function removeBridgeGateway(address bridgeGateway)",
-      "function renounceOwnership()",
-      "function totalLocked(address token) view returns (uint256)",
-      "function transferOwnership(address newOwner)",
-      "function unlock(address token, address recipient, uint256 amount)",
-      "function whitelistedBridgeGateways(address) view returns (bool)"
-    ],
-    "hash": "0x7867408431bc02ad3faae4d5fd8b1ab0600f196700ac1dca650e83c5702d4887",
-    "blockNumber": 12478421
-  },
-  "chainBridge/batchRebaseReporter": {
-    "address": "0x454DE9c544fcAe74Eb09c57A042349d3eAD07E29",
-    "abi": [
-      "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID) payable"
-    ],
-    "hash": "0xc9422a7cd0b7714446d9ab0da2c84fed5a2e990e94191391c90070b9e1354f39",
-    "blockNumber": 12556990
-  },
+  "isBaseChain": true,
   "matic/tokenVault": {
-    "address": "0xCFedb6b85283fBBD0f5F30c5F75324A4B91819c5",
+    "address": "0x0b6Bd51DaE7097C27c9D03C9cc6b9870BFf7Af93",
     "abi": [
       "event GatewayLocked(address indexed bridgeGateway, address indexed token, address indexed depositor, uint256 amount)",
       "event GatewayUnlocked(address indexed bridgeGateway, address indexed token, address indexed recipient, uint256 amount)",
@@ -317,13 +197,15 @@
       "function unlock(address token, address recipient, uint256 amount)",
       "function whitelistedBridgeGateways(address) view returns (bool)"
     ],
-    "hash": "0x683b07ef236abe98019a94cd081190799fd7301a777d1f872a9b2afab1aa2e83",
-    "blockNumber": 12794368
+    "hash": "0xb1fe7f0d625a44a39f38737150200dff400d5405b23c820233f77082ce591fac",
+    "blockNumber": 5009515
   },
   "matic/transferGateway": {
-    "address": "0x27B4fdaEd477F018FD2e2024C7dC5291F0b83543",
+    "address": "0xc3e38E736FF021a0A92FcE4e20A882246106261b",
     "abi": [
       "constructor(address _checkpointManager, address _fxRoot, address ampl_, address vault_)",
+      "event XCRebaseReportIn(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply, uint256 recordedGlobalAmpleforthEpoch, uint256 recordedGlobalAMPLSupply)",
+      "event XCRebaseReportOut(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "event XCTransferIn(address indexed senderInSourceChain, address indexed recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
       "event XCTransferOut(address indexed sender, address indexed recipientInTargetChain, uint256 amount, uint256 recordedGlobalAMPLSupply)",
       "function SEND_MESSAGE_EVENT_SIG() view returns (bytes32)",
@@ -337,15 +219,17 @@
       "function transfer(address recipientInTargetChain, uint256 amount)",
       "function vault() view returns (address)"
     ],
-    "hash": "0x39fa938b0113a65b12c48ab765fa83cbce50295b462e22454eb449f51de40773",
-    "blockNumber": 12795546
+    "hash": "0xb21b0940c0eaaeb681c5cfbc0fdba5e452f9183bfef22711bdfed5daa9dbb53a",
+    "blockNumber": 5031516
   },
   "matic/rebaseGateway": {
-    "address": "0x6625aa109bc11d18Aa6f219d453E9dBA728A7681",
+    "address": "0xff4607f794943187034091fFA0e6FFb138BCFA84",
     "abi": [
       "constructor(address _checkpointManager, address _fxRoot, address ampl_, address policy_)",
       "event XCRebaseReportIn(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply, uint256 recordedGlobalAmpleforthEpoch, uint256 recordedGlobalAMPLSupply)",
       "event XCRebaseReportOut(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
+      "event XCTransferIn(address indexed senderInSourceChain, address indexed recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
+      "event XCTransferOut(address indexed sender, address indexed recipientInTargetChain, uint256 amount, uint256 recordedGlobalAMPLSupply)",
       "function SEND_MESSAGE_EVENT_SIG() view returns (bytes32)",
       "function ampl() view returns (address)",
       "function checkpointManager() view returns (address)",
@@ -357,11 +241,11 @@
       "function reportRebase()",
       "function setFxChildTunnel(address _fxChildTunnel)"
     ],
-    "hash": "0x3b7c71b85cf77fabc9232aba4052d9ea5549268460c09fe27c3d7ef8405eca7b",
-    "blockNumber": 12795542
+    "hash": "0x995b2710219cf09c47ff0f9ebc1eb454a3bfe90ab53e69a1455613249fbfe56b",
+    "blockNumber": 5031511
   },
   "batchRebaseReporter": {
-    "address": "0x25fbC7D475B5013f631E5BB7f9Da57A8d1522179",
+    "address": "0x36ebc6ff9aDb001Ac216bA9F55dcd384B8cFeC6A",
     "abi": [
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
       "event TransactionFailed(address indexed destination, uint256 index, bytes data, bytes reason)",
@@ -376,7 +260,7 @@
       "function transactionsSize() view returns (uint256)",
       "function transferOwnership(address newOwner)"
     ],
-    "hash": "0x3974b71ec5143a95f56f8ec20707f3d6bc46a0c9c31c407a96bf2d07d6c1e029",
-    "blockNumber": 12801448
+    "hash": "0x0deba6485ddef65b18e70b03f4eca3a66c5b29df28dea3da825d6eac5ccb914d",
+    "blockNumber": 5060206
   }
 }
