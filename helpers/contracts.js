@@ -50,11 +50,11 @@ const getCompiledContractFactory = (ethers, contract) => {
 };
 
 const deployContract = async (ethers, contractName, signer, args, txParams) => {
-  console.log('Deploying', contractName);
+  // console.log('Deploying', contractName);
   const Factory = await getCompiledContractFactory(ethers, contractName);
   const contract = await Factory.connect(signer).deploy(...args, txParams);
-  await contract.deployTransaction.wait(2);
-  console.log('Deployed');
+  await contract.deployTransaction.wait();
+  // console.log('Deployed');
   return contract;
 };
 
@@ -71,7 +71,7 @@ const deployProxyContract = async (
   initializerDef,
   txParams,
 ) => {
-  console.log('Deploying proxy', contractName);
+  // console.log('Deploying proxy', contractName);
   const ProxyAdminFactory = await getCompiledContractFactory(
     ethers,
     'ProxyAdmin',
@@ -83,8 +83,8 @@ const deployProxyContract = async (
     initializerDef,
     txParams,
   );
-  await contract.deployTransaction.wait(2);
-  console.log('Deployed');
+  await contract.deployTransaction.wait();
+  // console.log('Deployed');
 
   const defaultProxyAdmin = ProxyAdminFactory.connect(signer).attach(
     await getAdminAddress(signer.provider, contract.address),
@@ -94,7 +94,7 @@ const deployProxyContract = async (
     newProxyAdmin.address,
     txParams,
   );
-  await refChangeTx.wait(2);
+  await refChangeTx.wait();
 
   return contract;
 };
