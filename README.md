@@ -4,16 +4,45 @@
 
 Solidity contracts for cross-chain AMPL through bridges.
 
-Currently supports integration with ChainSafe's [chain-bridge](https://github.com/ChainSafe/chainbridge-solidity). However it could work with any bridge which supports generic data transfer. To integrate with a new bridge, custom bridge specific 'bridge-gateway' contracts need to be implemented which deals with bridge specific ABIs and data parsing.
+It supports integration with any cross chain bridge which supports generic data transfer. To integrate with a new bridge, custom bridge specific 'bridge-gateway' contracts need to be implemented which deals with bridge specific ABIs and data parsing.
 
 [Get up to speed](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-Bridge-Primer).
 
 ### Live Deployments
-  * [BSC](https://bscscan.com/token/0xDB021b1B247fe2F1fa57e0A87C748Cc1E321F07F)
 
+```yaml
+# Ethereum Mainnet
+
+# core protocol (controlled by Ampleforth Governance)
+token: 0xD46bA6D942050d489DBd938a2C909A5d5039A161
+policy: 0x1B228a749077b8e307C5856cE62Ef35d96Dca2ea
+orchestrator: 0x6FB00a180781E75F87E2B690Af0196bAa77C7e7C
+
+# bridge contracts (controlled by Ampleforth Bridge DAO on Ethereum)
+owner: 0x57981B1EaFe4b18EC97f8B10859B40207b364662
+batchRebaseReporter: 0x25fbC7D475B5013f631E5BB7f9Da57A8d1522179
+vaults:
+  - bridge: meter-passport
+    vault: 0x805c7Ecba41f9321bb098ec1cf31d86d9407de2F
+  - bridge: matic
+    vault: 0xCFedb6b85283fBBD0f5F30c5F75324A4B91819c5
+
+# BSC (controlled by Ampleforth Bridge DAO on BSC)
+owner: 0x1501FBc20d3D0C1FEF146B528e7Cd9a003aBf281
+token: 0xDB021b1B247fe2F1fa57e0A87C748Cc1E321F07F
+controller: 0x17F084dFF8a71e38521BCBD3Da871753Dc67aa81
+rebaseRelayer: 0x0c0144D04594AB99F4C02691B6684e3d871B589e
+
+# Matic / Polygon (controlled by Ampleforth Bridge DAO on Matic)
+owner: 0x5d96A65E51A78C511C545a0247eb2d006912b636
+token: 0xc67238827da94B15F6bA10F3d35f690809919F75
+controller: 0x0AF32F7B0733DBFe59E52712c3fBF2d1B4ebd00f
+rebaseRelayer: 0x4960382cA3151Df595b944731304F71Df7eDb35A
+```
 
 ### Working Bridges
   * [ChainBridge](https://github.com/ampleforth/ampl-bridge-solidity/wiki/AMPL-ChainBridge)
+  * [Polygon](https://docs.matic.network/docs/develop/l1-l2-communication/state-transfer/)
 
 ## Contracts
 
