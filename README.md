@@ -20,12 +20,16 @@ orchestrator: 0x6FB00a180781E75F87E2B690Af0196bAa77C7e7C
 
 # bridge contracts (controlled by Ampleforth Bridge DAO on Ethereum)
 owner: 0x57981B1EaFe4b18EC97f8B10859B40207b364662
+# reports rebase to every bridge in the list
 batchRebaseReporter: 0x25fbC7D475B5013f631E5BB7f9Da57A8d1522179
 vaults:
   - bridge: meter-passport
     vault: 0x805c7Ecba41f9321bb098ec1cf31d86d9407de2F
   - bridge: matic
     vault: 0xCFedb6b85283fBBD0f5F30c5F75324A4B91819c5
+
+# additional utility contracts
+meterPassportBatcher: 0x454de9c544fcae74eb09c57a042349d3ead07e29
 
 # BSC (controlled by Ampleforth Bridge DAO on BSC)
 owner: 0x1501FBc20d3D0C1FEF146B528e7Cd9a003aBf281
@@ -104,5 +108,10 @@ Each new bridge integration should check for the following cases.
 
 ## Deployments
 
+### Testnet
 * [Deploy meter passport DEV](https://github.com/ampleforth/cross-chain-ample/wiki/AMPL-Meter-Passport-dev-deployment)
+* [Deploy Matic DEV](https://github.com/ampleforth/cross-chain-ample/wiki/Matic-dev-deployment)
+
+### Production
 * [Deploy meter passport PROD](https://github.com/ampleforth/cross-chain-ample/wiki/AMPL-Meter-Passport-prod-deployment)
+* [Deploy Matic PROD](https://github.com/ampleforth/cross-chain-ample/wiki/Matic-prod-deployment)
