@@ -196,7 +196,7 @@ const filterContractEvents = async (
   let logs = [];
   for (let i = startBlock; i <= endBlock; i += freq) {
     console.log(startBlock, endBlock, i, logs.length);
-    const getLogs = async (tries = 10) => {
+    const getLogs = async (tries = 25) => {
       if (tries == 0) {
         throw 'Max tries reached';
       }
@@ -211,7 +211,7 @@ const filterContractEvents = async (
         return r;
       } catch (e) {
         console.log('Failed', e);
-        await sleep(10 - tries);
+        await sleep(25 - tries);
         return getLogs(tries - 1);
       }
     };
