@@ -104,6 +104,7 @@ txTask(
       );
 
       const satelliteChainIDs = [];
+      let totalFee = hre.ethers.BigNumber.from('0');
       for (let n in args.satelliteChainNetworks) {
         const network = args.satelliteChainNetworks[n];
         const provider = await getEthersProvider(network);
@@ -114,16 +115,16 @@ txTask(
         );
         const satelliteChainID = await satelliteChainBridge._chainID();
         satelliteChainIDs.push(satelliteChainID);
+
+        const fee = await baseChainBridge.getFee(satelliteChainID);
+        totalFee = totalFee.add(fee);
       }
-      const fee = await baseChainBridge._fee();
-      const totalFee = fee.mul(satelliteChainIDs.length);
       const tx = await cbBatchRebaseReporter.populateTransaction.execute(
         policy.address,
         baseChainBridge.address,
         satelliteChainIDs,
         XC_REBASE_RESOURCE_ID,
       );
-
       txDestination = cbBatchRebaseReporter.address;
       txValue = totalFee;
       txData = tx.data;

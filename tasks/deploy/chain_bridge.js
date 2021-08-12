@@ -23,6 +23,15 @@ const {
   deployChainBridgeSatelliteChainGatewayContracts,
 } = require('../../helpers/deploy');
 
+const {
+  XC_REBASE_RESOURCE_ID,
+  XC_TRANSFER_RESOURCE_ID,
+  CB_FUNCTION_SIG_baseChainReportRebase,
+  CB_FUNCTION_SIG_satelliteChainReportRebase,
+  CB_FUNCTION_SIG_baseChainTransfer,
+  CB_FUNCTION_SIG_satelliteChainTransfer,
+} = require('../../sdk/chain_bridge');
+
 task(
   'deploy:chain_bridge_use_deployed',
   'Generates deployment files for a deployed instance of Bridge',
@@ -306,4 +315,174 @@ cbDeployTask(
       xcAmple.address,
       xcAmpleController.address,
     ]);
+  });
+
+txTask(
+  'deploy:chain_bridge:add_handlers',
+  'Prepares bridge transactions to update bridge contracts',
+)
+  .addParam(
+    'satelliteChainNetworks',
+    'List of satellite chain hardhat networks',
+    [],
+    types.json,
+  )
+  .setAction(async (args, hre) => {
+    const deployer = await loadSignerSync(args, hre.ethers.provider);
+    const deployerAddress = await deployer.getAddress();
+
+    const network = hre.network.name;
+    const provider = hre.ethers.provider;
+    const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if (txParams.gasPrice == 0) {
+      txParams.gasPrice = await provider.getGasPrice();
+    }
+
+    const bridge = await getDeployedContractInstance(
+      network,
+      'chainBridge/bridge',
+      provider,
+    );
+    const genericHandler = await getDeployedContractInstance(
+      network,
+      'chainBridge/genericHandler',
+      provider,
+    );
+    const rebaseGateway = await getDeployedContractInstance(
+      network,
+      'chainBridge/rebaseGateway',
+      provider,
+    );
+    const transferGateway = await getDeployedContractInstance(
+      network,
+      'chainBridge/rebaseGateway',
+      provider,
+    );
+
+    // Base chain
+    const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
+    const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
+    const reportRebaseFnSig = CB_FUNCTION_SIG_baseChainReportRebase(
+      rebaseGateway,
+    );
+    const transferFnSig = CB_FUNCTION_SIG_baseChainTransfer(transferGateway);
+
+    if (isAdmin) {
+      await (
+        await bridge
+          .connect(deployer)
+          .adminSetGenericResource(
+            genericHandler.address,
+            XC_REBASE_RESOURCE_ID,
+            rebaseGateway.address,
+            ...reportRebaseFnSig,
+            txParams,
+          )
+      ).wait();
+
+      await (
+        await bridge
+          .connect(deployer)
+          .adminSetGenericResource(
+            genericHandler.address,
+            XC_TRANSFER_RESOURCE_ID,
+            transferGateway.address,
+            ...transferFnSig,
+            txParams,
+          )
+      ).wait();
+    } else {
+      console.log('Execute the following on-chain', network);
+      console.log('adminSetGenericResource', [
+        genericHandler.address,
+        XC_REBASE_RESOURCE_ID,
+        rebaseGateway.address,
+        ...reportRebaseFnSig,
+      ]);
+      console.log('adminSetGenericResource', [
+        genericHandler.address,
+        XC_TRANSFER_RESOURCE_ID,
+        transferGateway.address,
+        ...transferFnSig,
+      ]);
+    }
+
+    // sat chains
+    for (let n in args.satelliteChainNetworks) {
+      const network = args.satelliteChainNetworks[n];
+      const provider = await getEthersProvider(network);
+
+      const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+      if (txParams.gasPrice == 0) {
+        txParams.gasPrice = await provider.getGasPrice();
+      }
+
+      const bridge = await getDeployedContractInstance(
+        network,
+        'chainBridge/bridge',
+        provider,
+      );
+      const genericHandler = await getDeployedContractInstance(
+        network,
+        'chainBridge/genericHandler',
+        provider,
+      );
+      const rebaseGateway = await getDeployedContractInstance(
+        network,
+        'chainBridge/rebaseGateway',
+        provider,
+      );
+      const transferGateway = await getDeployedContractInstance(
+        network,
+        'chainBridge/rebaseGateway',
+        provider,
+      );
+      const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
+      const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
+      const reportRebaseFnSig = CB_FUNCTION_SIG_satelliteChainReportRebase(
+        rebaseGateway,
+      );
+      const transferFnSig = CB_FUNCTION_SIG_satelliteChainTransfer(
+        transferGateway,
+      );
+
+      if (isAdmin) {
+        await (
+          await bridge
+            .connect(deployer)
+            .adminSetGenericResource(
+              genericHandler.address,
+              XC_REBASE_RESOURCE_ID,
+              rebaseGateway.address,
+              ...reportRebaseFnSig,
+              txParams,
+            )
+        ).wait();
+        await (
+          await bridge
+            .connect(deployer)
+            .adminSetGenericResource(
+              genericHandler.address,
+              XC_TRANSFER_RESOURCE_ID,
+              transferGateway.address,
+              ...transferFnSig,
+              txParams,
+            )
+        ).wait();
+      } else {
+        console.log('Execute the following on-chain', network);
+        console.log('adminSetGenericResource', [
+          genericHandler.address,
+          XC_REBASE_RESOURCE_ID,
+          rebaseGateway.address,
+          ...reportRebaseFnSig,
+        ]);
+        console.log('adminSetGenericResource', [
+          genericHandler.address,
+          XC_TRANSFER_RESOURCE_ID,
+          transferGateway.address,
+          ...transferFnSig,
+        ]);
+      }
+    }
   });
