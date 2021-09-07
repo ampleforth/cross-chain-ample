@@ -154,7 +154,7 @@
     ]
   },
   "chainBridge/bridge": {
-    "address": "0xbD515E41DF155112Cc883f8981CB763a286261be",
+    "address": "0xa2A22B46B8df38cd7C55E6bf32Ea5a32637Cf2b1",
     "abi": [
       "constructor(uint8 chainID, address[] initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry)",
       "event Deposit(uint8 indexed destinationChainID, bytes32 indexed resourceID, uint64 indexed depositNonce)",
@@ -179,21 +179,29 @@
       "function _proposals(uint72, bytes32) view returns (bytes32 _resourceID, bytes32 _dataHash, uint8 _status, uint256 _proposedBlock)",
       "function _relayerThreshold() view returns (uint256)",
       "function _resourceIDToHandlerAddress(bytes32) view returns (address)",
+      "function _specialFee() view returns (uint256)",
+      "function _specialFeeChainID() view returns (uint8)",
       "function _totalProposals() view returns (uint256)",
       "function _totalRelayers() view returns (uint256)",
+      "function _wtokenAddress() view returns (address)",
       "function adminAddRelayer(address relayerAddress)",
       "function adminChangeFee(uint256 newFee)",
       "function adminChangeRelayerThreshold(uint256 newThreshold)",
+      "function adminChangeSpecialFee(uint256 newFee, uint8 chainID)",
       "function adminPauseTransfers()",
       "function adminRemoveRelayer(address relayerAddress)",
       "function adminSetBurnable(address handlerAddress, address tokenAddress)",
       "function adminSetGenericResource(address handlerAddress, bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositerOffset, bytes4 executeFunctionSig)",
       "function adminSetResource(address handlerAddress, bytes32 resourceID, address tokenAddress)",
       "function adminUnpauseTransfers()",
+      "function adminUpdateBridgeAddress(address handlerAddress, address newBridgeAddress)",
       "function adminWithdraw(address handlerAddress, address tokenAddress, address recipient, uint256 amountOrTokenID)",
       "function cancelProposal(uint8 chainID, uint64 depositNonce, bytes32 dataHash)",
       "function deposit(uint8 destinationChainID, bytes32 resourceID, bytes data) payable",
+      "function depositETH(uint8 destinationChainID, bytes32 resourceID, bytes data) payable",
       "function executeProposal(uint8 chainID, uint64 depositNonce, bytes data, bytes32 resourceID)",
+      "function getFee(uint8 destinationChainID) view returns (uint256)",
+      "function getFees() view returns (uint256, uint256, uint8)",
       "function getProposal(uint8 originChainID, uint64 depositNonce, bytes32 dataHash) view returns (tuple(bytes32 _resourceID, bytes32 _dataHash, address[] _yesVotes, address[] _noVotes, uint8 _status, uint256 _proposedBlock))",
       "function getRoleAdmin(bytes32 role) view returns (bytes32)",
       "function getRoleMember(bytes32 role, uint256 index) view returns (address)",
@@ -361,22 +369,12 @@
     "blockNumber": 12795542
   },
   "batchRebaseReporter": {
-    "address": "0x25fbC7D475B5013f631E5BB7f9Da57A8d1522179",
+    "address": "0x36aAf46CAB4B6E5390Fb44311b5664a71A398400",
     "abi": [
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
       "event TransactionFailed(address indexed destination, uint256 index, bytes data, bytes reason)",
-      "function addTransaction(address destination, uint256 value, bytes data)",
-      "function checkExecution(uint256 index) payable returns (bool)",
-      "function executeAll() payable returns (bool)",
-      "function owner() view returns (address)",
-      "function removeTransaction(uint256 index)",
-      "function renounceOwnership()",
-      "function setTransactionEnabled(uint256 index, bool enabled)",
-      "function transactions(uint256) view returns (bool enabled, address destination, uint256 value, bytes data)",
-      "function transactionsSize() view returns (uint256)",
-      "function transferOwnership(address newOwner)"
+      "function executeAll(address[] destinations, bytes[] data, uint256[] values) payable returns (bool)"
     ],
-    "hash": "0x3974b71ec5143a95f56f8ec20707f3d6bc46a0c9c31c407a96bf2d07d6c1e029",
-    "blockNumber": 12801448
+    "hash": "0x062d0fb489800960d83da2b93a8ca129e5f170d6dac5e44ea55669c3e8c88dd2",
+    "blockNumber": 13096932
   }
 }

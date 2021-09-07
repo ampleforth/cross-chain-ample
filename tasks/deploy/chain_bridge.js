@@ -355,7 +355,7 @@ txTask(
     );
     const transferGateway = await getDeployedContractInstance(
       network,
-      'chainBridge/rebaseGateway',
+      'chainBridge/transferGateway',
       provider,
     );
 
@@ -434,7 +434,7 @@ txTask(
       );
       const transferGateway = await getDeployedContractInstance(
         network,
-        'chainBridge/rebaseGateway',
+        'chainBridge/transferGateway',
         provider,
       );
       const adminRole = await bridge.DEFAULT_ADMIN_ROLE();

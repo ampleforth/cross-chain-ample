@@ -151,6 +151,7 @@ describe('BatchTxExecutor', function () {
           value: '1000000000000000000'
         }),
       ).to.be.true;
+      expect(await batchExecutor.totalValue()).to.be.eq('1000000000000000000');
       r = batchExecutor
         .connect(deployer)
         .executeAll({ value: '1000000000000000000' });

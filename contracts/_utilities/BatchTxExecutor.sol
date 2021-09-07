@@ -24,6 +24,20 @@ contract BatchTxExecutor is Ownable {
     Transaction[] public transactions;
 
     /**
+     * @notice Computes and returns the total value for all enabled transactions.
+     */
+    function totalValue() external view returns (uint256) {
+        uint256 fee;
+        for (uint256 i = 0; i < transactions.length; i++) {
+            Transaction storage t = transactions[i];
+            if (t.enabled) {
+                fee += t.value;
+            }
+        }
+        return fee;
+    }
+
+    /**
      * @notice Executes all transactions marked enabled.
      *         If any transaction in the transaction list reverts, it returns false.
      */

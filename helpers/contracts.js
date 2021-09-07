@@ -26,6 +26,7 @@ const ContractABIPaths = {
   XCAmple: 'contracts/satellite-chain/xc-ampleforth',
   XCAmpleController: 'contracts/satellite-chain/xc-ampleforth',
   BatchTxExecutor: 'contracts/_utilities',
+  BatchTxCaller: 'contracts/_utilities',
 
   TokenVault: 'contracts/base-chain',
 

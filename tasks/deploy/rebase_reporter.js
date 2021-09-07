@@ -33,7 +33,7 @@ txTask(
   console.log('Deploying batchRebaseReporter on base chain');
   const batchRebaseReporter = await deployContract(
     ethers,
-    'BatchTxExecutor',
+    'BatchTxCaller',
     deployer,
     [],
     txParams,
@@ -55,12 +55,17 @@ txTask(
 
 txTask(
   'deploy:rebase_reporter:prep_tx',
-  'Prepares transaction to be added to the batcher',
+  'Prepares transaction to be executed by the batcher',
 )
-  .addParam('bridge', 'The bridge reference')
   .addParam(
     'satelliteChainNetworks',
     'List of satellite chain hardhat networks',
+    [],
+    types.json,
+  )
+  .addParam(
+    'bridges',
+    'The corresponding bridge type for each of the provided network',
     [],
     types.json,
   )
@@ -85,85 +90,84 @@ txTask(
       baseChainProvider,
     );
 
-    if (args.bridge == 'chainBridge') {
-      // Chainbridge contracts
-      const baseChainBridge = await getDeployedContractInstance(
-        baseChainNetwork,
-        'chainBridge/bridge',
-        baseChainProvider,
-      );
-      const baseChainGenericHandler = await getDeployedContractInstance(
-        baseChainNetwork,
-        'chainBridge/genericHandler',
-        baseChainProvider,
-      );
-      const cbBatchRebaseReporter = await getDeployedContractInstance(
-        baseChainNetwork,
-        'chainBridge/batchRebaseReporter',
-        baseChainProvider,
-      );
-
-      const satelliteChainIDs = [];
-      let totalFee = hre.ethers.BigNumber.from('0');
-      for (let n in args.satelliteChainNetworks) {
-        const network = args.satelliteChainNetworks[n];
-        const provider = await getEthersProvider(network);
-        const satelliteChainBridge = await getDeployedContractInstance(
-          network,
-          'chainBridge/bridge',
-          provider,
-        );
-        const satelliteChainID = await satelliteChainBridge._chainID();
-        satelliteChainIDs.push(satelliteChainID);
-
-        const fee = await baseChainBridge.getFee(satelliteChainID);
-        totalFee = totalFee.add(fee);
+    // group sat networks by bridge
+    const bridgeNetowrks = {};
+    for (const n in args.satelliteChainNetworks) {
+      const network = args.satelliteChainNetworks[n];
+      const bridge = args.bridges[n];
+      if (!bridgeNetowrks[bridge]) {
+        bridgeNetowrks[bridge] = [];
       }
-      const tx = await cbBatchRebaseReporter.populateTransaction.execute(
-        policy.address,
-        baseChainBridge.address,
-        satelliteChainIDs,
-        XC_REBASE_RESOURCE_ID,
-      );
-      txDestination = cbBatchRebaseReporter.address;
-      txValue = totalFee;
-      txData = tx.data;
-    } else if (args.bridge == 'matic') {
-      const rebaseGateway = await getDeployedContractInstance(
-        baseChainNetwork,
-        `${args.bridge}/rebaseGateway`,
-        baseChainProvider,
-      );
-
-      const tx = await rebaseGateway.populateTransaction.reportRebase();
-      txDestination = rebaseGateway.address;
-      txValue = '0';
-      txData = tx.data;
-    } else {
-      console.error('Invalid bridge reference');
-      return;
+      bridgeNetowrks[bridge].push(network);
     }
 
-    const batchRebaseReporter = await getDeployedContractInstance(
-      baseChainNetwork,
-      'batchRebaseReporter',
-      baseChainProvider,
-    );
+    // Iterate through sat chains
+    // group by bridge type and build tx
+    const transactions = [];
+    for (const b in bridgeNetowrks) {
+      if (b == 'chainBridge') {
+        const baseChainBridge = await getDeployedContractInstance(
+          baseChainNetwork,
+          'chainBridge/bridge',
+          baseChainProvider,
+        );
+        const baseChainGenericHandler = await getDeployedContractInstance(
+          baseChainNetwork,
+          'chainBridge/genericHandler',
+          baseChainProvider,
+        );
+        const cbBatchRebaseReporter = await getDeployedContractInstance(
+          baseChainNetwork,
+          'chainBridge/batchRebaseReporter',
+          baseChainProvider,
+        );
 
-    if ((await batchRebaseReporter.owner()) == deployerAddress) {
-      await batchRebaseReporter
-        .connect(deployer)
-        .addTransaction(txDestination, txValue, txData);
-      console.log('Executed transaction', batchRebaseReporter.address);
-    } else {
-      console.log(
-        'Execute the following on the batcher',
-        batchRebaseReporter.address,
-      );
+        const satelliteChainIDs = [];
+        let totalFee = hre.ethers.BigNumber.from('0');
+        for (const n in bridgeNetowrks[b]) {
+          const network = bridgeNetowrks[b][n];
+          const provider = await getEthersProvider(network);
+          const satelliteChainBridge = await getDeployedContractInstance(
+            network,
+            'chainBridge/bridge',
+            provider,
+          );
+          const satelliteChainID = await satelliteChainBridge._chainID();
+          satelliteChainIDs.push(satelliteChainID);
+          const fee = await baseChainBridge.getFee(satelliteChainID);
+          totalFee = totalFee.add(fee);
+        }
+
+        const tx = await cbBatchRebaseReporter.populateTransaction.execute(
+          policy.address,
+          baseChainBridge.address,
+          satelliteChainIDs,
+          XC_REBASE_RESOURCE_ID,
+        );
+
+        transactions.push({
+          destination: cbBatchRebaseReporter.address,
+          data: tx.data,
+          value: totalFee.toString(),
+        });
+      } else if (b == 'matic') {
+        const rebaseGateway = await getDeployedContractInstance(
+          baseChainNetwork,
+          `${b}/rebaseGateway`,
+          baseChainProvider,
+        );
+
+        const tx = await rebaseGateway.populateTransaction.reportRebase();
+        transactions.push({
+          destination: rebaseGateway.address,
+          data: tx.data,
+          value: '0',
+        });
+      } else {
+        console.error('Invalid bridge reference');
+        return;
+      }
     }
 
-    console.log('addTransaction(destination, value, data)');
-    console.log('destination:', txDestination);
-    console.log('value:', txValue);
-    console.log('data:', txData);
+    console.log(transactions);
   });
