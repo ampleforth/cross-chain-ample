@@ -103,6 +103,9 @@ module.exports = {
     prodBscSatChain: {
       url: 'https://bsc-dataseed.binance.org'
     },
+    prodAvaxSatChain: {
+      url: 'https://api.avax.network/ext/bc/C/rpc'
+    },
     prodMaticSatChain: {
       url: 'https://polygon-mainnet.infura.io/v3/' + process.env.INFURA_SECRET
     }

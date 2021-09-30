@@ -97,6 +97,7 @@ txTask(
     );
 
     const satelliteChainIDs = [];
+    let totalFee = hre.ethers.BigNumber.from('0');
     for (let n in args.satelliteChainNetworks) {
       const network = args.satelliteChainNetworks[n];
       const provider = await getEthersProvider(network);
@@ -107,11 +108,12 @@ txTask(
       );
       const satelliteChainID = await satelliteChainBridge._chainID();
       satelliteChainIDs.push(satelliteChainID);
+      const fee = await baseChainBridge.getFee(satelliteChainID);
+      totalFee = totalFee.add(fee)
     }
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);
-    const fee = await baseChainBridge._fee();
-    const totalFee = fee.mul(satelliteChainIDs.length);
+    console.log('totalFee', totalFee);
 
     const tx = await batchRebaseReporter
       .connect(sender)
