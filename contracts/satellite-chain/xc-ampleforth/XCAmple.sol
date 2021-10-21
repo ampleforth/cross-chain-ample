@@ -1,15 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.7.3;
 
-import {
-    SafeMathUpgradeable
-} from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
-import {
-    IERC20Upgradeable
-} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {
-    OwnableUpgradeable
-} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {SafeMathUpgradeable} from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 /**
  * @title XC(cross-chain)Ample ERC20 token
@@ -79,12 +73,14 @@ contract XCAmple is IERC20Upgradeable, OwnableUpgradeable {
     // EIP-2612: permit – 712-signed approvals
     // https://eips.ethereum.org/EIPS/eip-2612
     string public constant EIP712_REVISION = "1";
-    bytes32 public constant EIP712_DOMAIN = keccak256(
-        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
-    );
-    bytes32 public constant PERMIT_TYPEHASH = keccak256(
-        "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
-    );
+    bytes32 public constant EIP712_DOMAIN =
+        keccak256(
+            "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+        );
+    bytes32 public constant PERMIT_TYPEHASH =
+        keccak256(
+            "Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)"
+        );
 
     // EIP-2612: keeps track of number of permits per address
     mapping(address => uint256) private _nonces;

@@ -1,15 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.7.3;
 
-import {
-    SafeMathUpgradeable
-} from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
-import {
-    SignedSafeMathUpgradeable
-} from "@openzeppelin/contracts-upgradeable/math/SignedSafeMathUpgradeable.sol";
-import {
-    OwnableUpgradeable
-} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {SafeMathUpgradeable} from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
+import {SignedSafeMathUpgradeable} from "@openzeppelin/contracts-upgradeable/math/SignedSafeMathUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {UInt256Lib} from "./UInt256Lib.sol";
 import {IXCAmple} from "../../_interfaces/IXCAmple.sol";

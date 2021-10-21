@@ -131,21 +131,19 @@ cbDeployTask(
       txParams,
     );
 
-    const {
-      rebaseGateway,
-      transferGateway,
-    } = await deployChainBridgeBaseChainGatewayContracts(
-      {
-        bridge,
-        genericHandler,
-        ampl,
-        policy,
-        tokenVault,
-      },
-      hre.ethers,
-      deployer,
-      txParams,
-    );
+    const { rebaseGateway, transferGateway } =
+      await deployChainBridgeBaseChainGatewayContracts(
+        {
+          bridge,
+          genericHandler,
+          ampl,
+          policy,
+          tokenVault,
+        },
+        hre.ethers,
+        deployer,
+        txParams,
+      );
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');
@@ -259,15 +257,13 @@ cbDeployTask(
       hre.ethers.provider,
     );
 
-    const {
-      rebaseGateway,
-      transferGateway,
-    } = await deployChainBridgeSatelliteChainGatewayContracts(
-      { xcAmple, xcAmpleController, bridge, genericHandler },
-      hre.ethers,
-      deployer,
-      txParams,
-    );
+    const { rebaseGateway, transferGateway } =
+      await deployChainBridgeSatelliteChainGatewayContracts(
+        { xcAmple, xcAmpleController, bridge, genericHandler },
+        hre.ethers,
+        deployer,
+        txParams,
+      );
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');
@@ -362,9 +358,8 @@ txTask(
     // Base chain
     const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
     const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
-    const reportRebaseFnSig = CB_FUNCTION_SIG_baseChainReportRebase(
-      rebaseGateway,
-    );
+    const reportRebaseFnSig =
+      CB_FUNCTION_SIG_baseChainReportRebase(rebaseGateway);
     const transferFnSig = CB_FUNCTION_SIG_baseChainTransfer(transferGateway);
 
     if (isAdmin) {
@@ -439,12 +434,10 @@ txTask(
       );
       const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
       const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
-      const reportRebaseFnSig = CB_FUNCTION_SIG_satelliteChainReportRebase(
-        rebaseGateway,
-      );
-      const transferFnSig = CB_FUNCTION_SIG_satelliteChainTransfer(
-        transferGateway,
-      );
+      const reportRebaseFnSig =
+        CB_FUNCTION_SIG_satelliteChainReportRebase(rebaseGateway);
+      const transferFnSig =
+        CB_FUNCTION_SIG_satelliteChainTransfer(transferGateway);
 
       if (isAdmin) {
         await (

@@ -49,9 +49,8 @@ describe('BatchTxExecutor', function () {
 
   describe('when there is a single transaction', async function () {
     beforeEach('adding a transaction', async function () {
-      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
-        12345,
-      );
+      const updateOneArgEncoded =
+        await mockDownstream.populateTransaction.updateOneArg(12345);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
@@ -80,17 +79,14 @@ describe('BatchTxExecutor', function () {
 
   describe('when there are two transactions', async function () {
     beforeEach('adding 2 transactions', async function () {
-      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
-        12345,
-      );
+      const updateOneArgEncoded =
+        await mockDownstream.populateTransaction.updateOneArg(12345);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
 
-      const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
-        12345,
-        23456,
-      );
+      const updateTwoArgsEncoded =
+        await mockDownstream.populateTransaction.updateTwoArgs(12345, 23456);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
@@ -129,9 +125,10 @@ describe('BatchTxExecutor', function () {
 
   describe('when there a transaction with non zero value', async function () {
     beforeEach('adding a transaction', async function () {
-      const updateWithValueEncoded = await mockDownstream.populateTransaction.updateWithValue(
-        '1000000000000000000',
-      );
+      const updateWithValueEncoded =
+        await mockDownstream.populateTransaction.updateWithValue(
+          '1000000000000000000',
+        );
 
       await batchExecutor
         .connect(deployer)
@@ -176,17 +173,14 @@ describe('BatchTxExecutor', function () {
 
   describe('when 1st out of 2 is disabled', async function () {
     beforeEach('disabling a transaction', async function () {
-      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
-        12345,
-      );
+      const updateOneArgEncoded =
+        await mockDownstream.populateTransaction.updateOneArg(12345);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
 
-      const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
-        12345,
-        23456,
-      );
+      const updateTwoArgsEncoded =
+        await mockDownstream.populateTransaction.updateTwoArgs(12345, 23456);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
@@ -217,17 +211,14 @@ describe('BatchTxExecutor', function () {
 
   describe('when 1st out of 2 is removed', async function () {
     beforeEach('removing 1st transaction', async function () {
-      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
-        12345,
-      );
+      const updateOneArgEncoded =
+        await mockDownstream.populateTransaction.updateOneArg(12345);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
 
-      const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
-        12345,
-        23456,
-      );
+      const updateTwoArgsEncoded =
+        await mockDownstream.populateTransaction.updateTwoArgs(12345, 23456);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
@@ -258,17 +249,14 @@ describe('BatchTxExecutor', function () {
 
   describe('when all transactions are removed', async function () {
     beforeEach('removing 2 tx', async function () {
-      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
-        12345,
-      );
+      const updateOneArgEncoded =
+        await mockDownstream.populateTransaction.updateOneArg(12345);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
 
-      const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
-        12345,
-        23456,
-      );
+      const updateTwoArgsEncoded =
+        await mockDownstream.populateTransaction.updateTwoArgs(12345, 23456);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
@@ -291,9 +279,8 @@ describe('BatchTxExecutor', function () {
 
   describe('when a transaction reverts', async function () {
     beforeEach('adding 3 transactions', async function () {
-      const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
-        123,
-      );
+      const updateOneArgEncoded =
+        await mockDownstream.populateTransaction.updateOneArg(123);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
@@ -303,10 +290,8 @@ describe('BatchTxExecutor', function () {
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, revertsEncoded.data);
 
-      const updateTwoArgsEncoded = await mockDownstream.populateTransaction.updateTwoArgs(
-        12345,
-        23456,
-      );
+      const updateTwoArgsEncoded =
+        await mockDownstream.populateTransaction.updateTwoArgs(12345, 23456);
       await batchExecutor
         .connect(deployer)
         .addTransaction(mockDownstream.address, 0, updateTwoArgsEncoded.data);
@@ -331,7 +316,8 @@ describe('BatchTxExecutor', function () {
   describe('Access Control', function () {
     describe('addTransaction', async function () {
       it('should be callable by owner', async function () {
-        const updateNoArgEncoded = await mockDownstream.populateTransaction.updateNoArg();
+        const updateNoArgEncoded =
+          await mockDownstream.populateTransaction.updateNoArg();
         await expect(
           batchExecutor
             .connect(deployer)
@@ -340,7 +326,8 @@ describe('BatchTxExecutor', function () {
       });
 
       it('should not be callable by others', async function () {
-        const updateNoArgEncoded = await mockDownstream.populateTransaction.updateNoArg();
+        const updateNoArgEncoded =
+          await mockDownstream.populateTransaction.updateNoArg();
         await expect(
           batchExecutor
             .connect(user)
@@ -351,9 +338,8 @@ describe('BatchTxExecutor', function () {
 
     describe('setTransactionEnabled', async function () {
       beforeEach('adding 1 tx', async function () {
-        const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
-          12345,
-        );
+        const updateOneArgEncoded =
+          await mockDownstream.populateTransaction.updateOneArg(12345);
         await batchExecutor
           .connect(deployer)
           .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);
@@ -382,9 +368,8 @@ describe('BatchTxExecutor', function () {
 
     describe('removeTransaction', async function () {
       beforeEach('adding 1 tx', async function () {
-        const updateOneArgEncoded = await mockDownstream.populateTransaction.updateOneArg(
-          12345,
-        );
+        const updateOneArgEncoded =
+          await mockDownstream.populateTransaction.updateOneArg(12345);
         await batchExecutor
           .connect(deployer)
           .addTransaction(mockDownstream.address, 0, updateOneArgEncoded.data);

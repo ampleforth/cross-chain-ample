@@ -5,9 +5,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
 import {ChainBridgeRebaseGateway} from "../../base-bridge-gateways/ChainBridgeRebaseGateway.sol";
-import {
-    ChainBridgeTransferGateway
-} from "../../base-bridge-gateways/ChainBridgeTransferGateway.sol";
+import {ChainBridgeTransferGateway} from "../../base-bridge-gateways/ChainBridgeTransferGateway.sol";
 
 import {IXCAmpleController} from "../../_interfaces/IXCAmpleController.sol";
 import {IXCAmpleControllerGateway} from "../../_interfaces/IXCAmpleControllerGateway.sol";
