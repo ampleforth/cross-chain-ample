@@ -213,6 +213,7 @@ task(
           'XCAmple:implementation',
           await proxyAdmin.getProxyImplementation(xcAmple.address),
         );
+        console.log('XCAmple:owner:', await xcAmple.owner());
         console.log('XCAmple:controller:', await xcAmple.controller());
         console.log(
           'XCAmple:totalSupply:',
@@ -223,6 +224,10 @@ task(
         console.log(
           'XCAmpleController:implementation',
           await proxyAdmin.getProxyImplementation(xcAmple.address),
+        );
+        console.log(
+          'XCAmpleController:owner',
+          await xcAmpleController.owner(),
         );
         console.log(
           'XCAmpleController:xcAmple',
@@ -243,6 +248,7 @@ task(
         );
 
         console.log('RebaseRelayer:', rebaseRelayer.address);
+        console.log('RebaseRelayer:owner', await rebaseRelayer.owner());
         const transactionsSize = (
           await rebaseRelayer.transactionsSize()
         ).toNumber();
