@@ -44,6 +44,10 @@ const ContractABIPaths = {
   ChainBridgeBatchRebaseReport: 'contracts/_utilities',
 };
 
+const sleep = (sec) => {
+  return new Promise((resolve) => setTimeout(resolve, sec * 1000));
+};
+
 const getCompiledContractFactory = (ethers, contract) => {
   return ethers.getContractFactory(
     `${ContractABIPaths[contract]}/${contract}.sol:${contract}`,
@@ -98,6 +102,63 @@ const deployProxyContract = async (
   await refChangeTx.wait();
 
   return contract;
+};
+
+const upgradeProxyContract = async (
+  ethers,
+  network,
+  contractName,
+  deployedContractRef,
+  signer,
+  txParams,
+  force=false,
+) => {
+  const proxyAdmin = await getDeployedContractInstance(
+    network,
+    'proxyAdmin',
+    ethers.provider,
+  );
+
+  const proxy = await getDeployedContractInstance(
+    network,
+    deployedContractRef,
+    ethers.provider,
+  );
+
+  const currentImplAddr = await proxyAdmin.getProxyImplementation(proxy.address);
+  console.log(`Current implementation for ${contractName} is at`, currentImplAddr);
+
+  // deploy new implementation
+  let newImpl;
+  if(!force) {
+    const Factory = await getCompiledContractFactory(ethers, contractName);
+    newImpl = await upgrades.prepareUpgrade(proxy.address, Factory);
+  } else {
+    console.log(`CAUTION: Skpping storage layout verification!`)
+    console.log(`CANCEL NOW to stop, this action is not reversable`)
+    await sleep(10);
+    newImpl = await deployContract(
+      ethers,
+      contractName,
+      signer,
+      [],
+      txParams,
+    );
+  }
+  console.log(`New implementation for ${contractName} is at`, newImpl.address);
+
+  if ((await proxyAdmin.owner()) == (await signer.getAddress())) {
+    await proxyAdmin
+      .connect(signer)
+      .upgrade(proxy.address, newImpl.address, txParams);
+  } else {
+    console.log('Signer not proxy onwer, cant upgrade');
+    console.log(
+      `Execute proxyAdmin.upgrade(${proxy.address}, ${newImpl.address})`,
+    );
+  }
+
+  return newImpl;
 };
 
 const getDeployedContractInstance = async (network, contractName, provider) => {
@@ -188,10 +249,6 @@ const filterContractEvents = async (
   endBlock = endBlock || (await provider.getBlockNumber());
   const freq = timeFrameSec * BLOCKS_PER_SEC;
 
-  const sleep = (sec) => {
-    return new Promise((resolve) => setTimeout(resolve, sec * 1000));
-  };
-
   console.log(address, event, startBlock, endBlock, timeFrameSec);
 
   let logs = [];
@@ -250,6 +307,7 @@ module.exports = {
   deployContract,
   deployProxyAdminContract,
   deployProxyContract,
+  upgradeProxyContract,
 
   filterContractEvents,
 };

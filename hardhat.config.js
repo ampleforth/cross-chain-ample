@@ -20,6 +20,8 @@ require('./tasks/info/ampl');
 require('./tasks/info/chain_bridge');
 require('./tasks/info/cb_ampl_tx');
 
+require('./tasks/upgrade');
+
 module.exports = {
   solidity: {
     compilers: [
