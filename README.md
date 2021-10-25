@@ -43,6 +43,13 @@ token: 0x027dbcA046ca156De9622cD1e2D907d375e53aa7
 controller: 0x24232ccAf8bB87908C419aD7dDCca8cc9e74746d
 rebaseRelayer: 0xE3a0B70676ed6e1947140Ff0b332cAe7d7f0364B
 
+# Meter (controlled by Ampleforth Bridge DAO on METER)
+# TODO: yet to transfer ownership
+owner: 0x240aa3CA55D3f8dF80936a84Ff076bF9A09370Fa
+token: 0xc67238827da94B15F6bA10F3d35f690809919F75
+controller: 0x0AF32F7B0733DBFe59E52712c3fBF2d1B4ebd00f
+rebaseRelayer: 0x4960382cA3151Df595b944731304F71Df7eDb35A
+
 # Matic / Polygon (controlled by Ampleforth Bridge DAO on Matic)
 owner: 0x5d96A65E51A78C511C545a0247eb2d006912b636
 token: 0xc67238827da94B15F6bA10F3d35f690809919F75

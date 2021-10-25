@@ -156,6 +156,7 @@ module.exports = {
           'matic',
           'dev1',
           'dev2',
+          'avax',
 
           // names
           'nithin',

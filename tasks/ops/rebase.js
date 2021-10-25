@@ -109,7 +109,7 @@ txTask(
       const satelliteChainID = await satelliteChainBridge._chainID();
       satelliteChainIDs.push(satelliteChainID);
       const fee = await baseChainBridge.getFee(satelliteChainID);
-      totalFee = totalFee.add(fee)
+      totalFee = totalFee.add(fee);
     }
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);

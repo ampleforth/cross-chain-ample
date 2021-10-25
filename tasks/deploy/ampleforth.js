@@ -102,14 +102,8 @@ txTask('testnet:deploy:ampleforth', 'Deploy ampleforth contract suite')
     console.log('Deploying contracts on base-chain');
     console.log('Deployer:', deployerAddress);
 
-    const {
-      proxyAdmin,
-      ampl,
-      policy,
-      orchestrator,
-      rateOracle,
-      cpiOracle,
-    } = await deployAMPLContracts(hre.ethers, deployer, txParams);
+    const { proxyAdmin, ampl, policy, orchestrator, rateOracle, cpiOracle } =
+      await deployAMPLContracts(hre.ethers, deployer, txParams);
     for (const w in args.fundingWallets) {
       await ampl.transfer(args.fundingWallets[w], toAmplFixedPt(args.amount));
     }
@@ -172,24 +166,18 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
       baseChainProvider,
     );
     await printRebaseInfo(baseChainPolicy);
-    const [
-      globalAmpleforthEpoch,
-      globalAMPLSupply,
-    ] = await baseChainPolicy.globalAmpleforthEpochAndAMPLSupply();
+    const [globalAmpleforthEpoch, globalAMPLSupply] =
+      await baseChainPolicy.globalAmpleforthEpochAndAMPLSupply();
 
     console.log('------------------------------------------------------------');
     console.log('Deploying Contracts on satellite-chain');
-    const {
-      proxyAdmin,
-      xcAmple,
-      xcAmpleController,
-      rebaseRelayer,
-    } = await deployXCAmpleContracts(
-      { ...args, globalAmpleforthEpoch, globalAMPLSupply },
-      hre.ethers,
-      deployer,
-      txParams,
-    );
+    const { proxyAdmin, xcAmple, xcAmpleController, rebaseRelayer } =
+      await deployXCAmpleContracts(
+        { ...args, globalAmpleforthEpoch, globalAMPLSupply },
+        hre.ethers,
+        deployer,
+        txParams,
+      );
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');

@@ -97,6 +97,7 @@ module.exports = {
       url: 'https://polygon-mumbai.infura.io/v3/' + process.env.INFURA_SECRET
     },
 
+    // prod
     prodEthereumBaseChain: {
       url: 'https://mainnet.infura.io/v3/' + process.env.INFURA_SECRET
     },
@@ -105,6 +106,9 @@ module.exports = {
     },
     prodAvaxSatChain: {
       url: 'https://api.avax.network/ext/bc/C/rpc'
+    },
+    prodMeterSatChain: {
+      url: 'https://rpc.meter.io'
     },
     prodMaticSatChain: {
       url: 'https://polygon-mainnet.infura.io/v3/' + process.env.INFURA_SECRET

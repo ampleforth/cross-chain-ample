@@ -248,9 +248,8 @@ async function deployChainBridgeBaseChainGatewayContracts(
   const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
   const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
 
-  const reportRebaseFnSig = CB_FUNCTION_SIG_baseChainReportRebase(
-    rebaseGateway,
-  );
+  const reportRebaseFnSig =
+    CB_FUNCTION_SIG_baseChainReportRebase(rebaseGateway);
 
   if (isAdmin) {
     await (
@@ -356,9 +355,8 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
   const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
   const isAdmin = await bridge.hasRole(adminRole, await deployer.getAddress());
 
-  const reportRebaseFnSig = CB_FUNCTION_SIG_satelliteChainReportRebase(
-    rebaseGateway,
-  );
+  const reportRebaseFnSig =
+    CB_FUNCTION_SIG_satelliteChainReportRebase(rebaseGateway);
   if (isAdmin) {
     await (
       await bridge.adminSetGenericResource(
