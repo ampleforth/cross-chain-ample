@@ -73,8 +73,6 @@ coverage.json
 coverage/
 coverageEnv/
 
-.openzeppelin
-
 yarn-error.log
 
 

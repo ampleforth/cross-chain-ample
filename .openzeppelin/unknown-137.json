@@ -1,0 +1,236 @@
+{
+  "manifestVersion": "3.1",
+  "impls": {
+    "b69313c7b749770a43c8c9c584ac7dcff58a786198ad5b35834ae31a5ee1e7f7": {
+      "address": "0x027dbcA046ca156De9622cD1e2D907d375e53aa7",
+      "txHash": "0x42c5d5b78118dd74337a966d7d308a4d09f4c5c8ab21f441eaf05a532ee6fc1b",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:24"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:29"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/GSN/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "controller",
+            "type": "t_address",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:32"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "_name",
+            "type": "t_string_storage",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:57"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "_symbol",
+            "type": "t_string_storage",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:58"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "_decimals",
+            "type": "t_uint8",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:59"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "globalAMPLSupply",
+            "type": "t_uint256",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:62"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "_gonsPerAMPL",
+            "type": "t_uint256",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:65"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "_totalSupply",
+            "type": "t_uint256",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:68"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "_gonBalances",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:73"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "_allowedXCAmples",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:77"
+          },
+          {
+            "contract": "XCAmple",
+            "label": "_nonces",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmple.sol:90"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_uint8": {
+            "label": "uint8"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    },
+    "40eb9e28e32b355be6fd86b258899e6af7766f9e2c89a40c25cf9a251cce30eb": {
+      "address": "0x77ca88B795C82026856b8873704443a7944961Af",
+      "txHash": "0x86bd1e6f0fd76ee55bfd2fee6353f11d8e15ed19b3dac45f0862d336fa35454f",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:24"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:29"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-upgradeable/GSN/ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "XCAmpleController",
+            "label": "xcAmple",
+            "type": "t_address",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:56"
+          },
+          {
+            "contract": "XCAmpleController",
+            "label": "rebaseRelayer",
+            "type": "t_address",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:60"
+          },
+          {
+            "contract": "XCAmpleController",
+            "label": "globalAmpleforthEpoch",
+            "type": "t_uint256",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:63"
+          },
+          {
+            "contract": "XCAmpleController",
+            "label": "lastRebaseTimestampSec",
+            "type": "t_uint256",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:66"
+          },
+          {
+            "contract": "XCAmpleController",
+            "label": "nextGlobalAmpleforthEpoch",
+            "type": "t_uint256",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:69"
+          },
+          {
+            "contract": "XCAmpleController",
+            "label": "nextGlobalAMPLSupply",
+            "type": "t_uint256",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:70"
+          },
+          {
+            "contract": "XCAmpleController",
+            "label": "whitelistedBridgeGateways",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts/satellite-chain/xc-ampleforth/XCAmpleController.sol:73"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    }
+  },
+  "admin": {
+    "address": "0x7B31EBDE39019d86D4AC8c1cA6bDBe40b8af7d80",
+    "txHash": "0x8957cc80ef7d252e5916d3a9d6338beed6ce16fefe65ee3d7f68f48f5cf500fa"
+  }
+}
