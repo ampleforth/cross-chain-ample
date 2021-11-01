@@ -1,4 +1,8 @@
 const ethers = require('ethers');
+const {
+  getAdminAddress,
+  getImplementationAddress,
+} = require('@openzeppelin/upgrades-core');
 
 const { task } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
@@ -208,11 +212,17 @@ task(
         }
 
         console.log('ProxyAdmin:', proxyAdmin.address);
+        console.log('ProxyAdmin:onwer', await proxyAdmin.owner());
         console.log('XCAmple:', xcAmple.address);
         console.log(
-          'XCAmple:implementation',
-          await proxyAdmin.getProxyImplementation(xcAmple.address),
+          'XCAmple:proxyAdmin',
+          await getAdminAddress(provider, xcAmple.address),
         );
+        console.log(
+          'XCAmple:implementation',
+          await getImplementationAddress(provider, xcAmple.address),
+        );
+
         console.log('XCAmple:owner:', await xcAmple.owner());
         console.log('XCAmple:controller:', await xcAmple.controller());
         console.log(
@@ -220,15 +230,17 @@ task(
           toAmplFloatingPt(await xcAmple.totalSupply()),
         );
 
-        console.log('XCAmpleController:', xcAmple.address);
+        console.log('XCAmpleController:', xcAmpleController.address);
+        console.log(
+          'XCAmpleController:proxyAdmin',
+          await getAdminAddress(provider, xcAmpleController.address),
+        );
         console.log(
           'XCAmpleController:implementation',
-          await proxyAdmin.getProxyImplementation(xcAmple.address),
+          await getImplementationAddress(provider, xcAmpleController.address),
         );
-        console.log(
-          'XCAmpleController:owner',
-          await xcAmpleController.owner(),
-        );
+
+        console.log('XCAmpleController:owner', await xcAmpleController.owner());
         console.log(
           'XCAmpleController:xcAmple',
           await xcAmpleController.xcAmple(),

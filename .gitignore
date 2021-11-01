@@ -96,3 +96,6 @@ sdk/deployments/geth*.json
 console.js
 
 .DS_Store
+
+
+flattened
