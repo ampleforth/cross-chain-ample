@@ -8,7 +8,6 @@ const {
 } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
-  deployContract,
   getDeployedContractInstance,
   readDeploymentData,
   writeDeploymentData,
@@ -100,6 +99,7 @@ cbDeployTask(
         hre.ethers,
         deployer,
         txParams,
+        2,
       );
       bridge = chainBridge.bridge;
       genericHandler = chainBridge.genericHandler;
@@ -129,6 +129,7 @@ cbDeployTask(
       hre.ethers,
       deployer,
       txParams,
+      2,
     );
 
     const { rebaseGateway, transferGateway } =
@@ -143,6 +144,7 @@ cbDeployTask(
         hre.ethers,
         deployer,
         txParams,
+        2,
       );
 
     console.log('------------------------------------------------------------');
@@ -263,6 +265,7 @@ cbDeployTask(
         hre.ethers,
         deployer,
         txParams,
+        2,
       );
 
     console.log('------------------------------------------------------------');
@@ -373,7 +376,7 @@ txTask(
             ...reportRebaseFnSig,
             txParams,
           )
-      ).wait();
+      ).wait(2);
 
       await (
         await bridge
@@ -385,7 +388,7 @@ txTask(
             ...transferFnSig,
             txParams,
           )
-      ).wait();
+      ).wait(2);
     } else {
       console.log('Execute the following on-chain', network);
       console.log('adminSetGenericResource', [
@@ -450,7 +453,7 @@ txTask(
               ...reportRebaseFnSig,
               txParams,
             )
-        ).wait();
+        ).wait(2);
         await (
           await bridge
             .connect(deployer)
@@ -461,7 +464,7 @@ txTask(
               ...transferFnSig,
               txParams,
             )
-        ).wait();
+        ).wait(2);
       } else {
         console.log('Execute the following on-chain', network);
         console.log('adminSetGenericResource', [

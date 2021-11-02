@@ -15,6 +15,7 @@ const ContractABIPaths = {
   UFragmentsPolicy: 'uFragments/contracts',
   Orchestrator: 'uFragments/contracts',
   MedianOracle: 'market-oracle/contracts',
+  UFragmentsTestnet: 'contracts/_test',
 
   // Chainbridge
   Bridge: 'chainbridge-solidity/contracts',
@@ -58,8 +59,9 @@ const deployContract = async (ethers, contractName, signer, args, txParams) => {
   // console.log('Deploying', contractName);
   const Factory = await getCompiledContractFactory(ethers, contractName);
   const contract = await Factory.connect(signer).deploy(...args, txParams);
-  await contract.deployTransaction.wait();
-  // console.log('Deployed');
+  if (waitBlocks > 0) {
+    await contract.deployTransaction.wait(waitBlocks);
+  }
   return contract;
 };
 
@@ -88,8 +90,9 @@ const deployProxyContract = async (
     initializerDef,
     txParams,
   );
-  await contract.deployTransaction.wait();
-  // console.log('Deployed');
+  if (waitBlocks > 0) {
+    await contract.deployTransaction.wait(waitBlocks);
+  }
 
   const defaultProxyAdmin = ProxyAdminFactory.connect(signer).attach(
     await getAdminAddress(signer.provider, contract.address),
@@ -99,7 +102,10 @@ const deployProxyContract = async (
     newProxyAdmin.address,
     txParams,
   );
-  await refChangeTx.wait();
+
+  if (waitBlocks > 0) {
+    await refChangeTx.wait(waitBlocks);
+  }
 
   return contract;
 };
@@ -141,7 +147,7 @@ const upgradeProxyContract = async (
       proxy.address,
       Factory.connect(signer),
     );
-    await sleep(180);
+    await sleep(30);
   } else {
     console.log(`CAUTION: Skpping storage layout verification!`);
     const newImpl = await deployContract(

@@ -11,7 +11,7 @@ let accounts,
   xcAmple,
   xcController,
   gateway;
-async function setupContracts () {
+async function setupContracts() {
   accounts = await ethers.getSigners();
   deployer = accounts[0];
   depositorAddress = await deployer.getAddress();

@@ -9,7 +9,7 @@ let accounts,
   controller,
   mockToken,
   mockRebaseRelayer;
-async function setupContracts () {
+async function setupContracts() {
   // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
@@ -39,7 +39,7 @@ async function setupContracts () {
     factory.connect(deployer),
     [mockToken.address, 1],
     {
-      initializer: 'initialize(address,uint256)'
+      initializer: 'initialize(address,uint256)',
     },
   );
   await controller.connect(deployer).addBridgeGateway(bridge.getAddress());

@@ -16,7 +16,7 @@ const {
 } = require('../../helpers/contracts');
 
 const {
-  deployAMPLContracts,
+  deployAMPLTestnetContracts,
   deployXCAmpleContracts,
   deployTokenVault,
 } = require('../../helpers/deploy');
@@ -103,7 +103,7 @@ txTask('testnet:deploy:ampleforth', 'Deploy ampleforth contract suite')
     console.log('Deployer:', deployerAddress);
 
     const { proxyAdmin, ampl, policy, orchestrator, rateOracle, cpiOracle } =
-      await deployAMPLContracts(hre.ethers, deployer, txParams);
+      await deployAMPLTestnetContracts(hre.ethers, deployer, txParams, 2);
     for (const w in args.fundingWallets) {
       await ampl.transfer(args.fundingWallets[w], toAmplFixedPt(args.amount));
     }
@@ -149,6 +149,7 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
     if (txParams.gasPrice == 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
+    // const txParams = {}
 
     const deployer = await loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
@@ -177,6 +178,7 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
         hre.ethers,
         deployer,
         txParams,
+        2,
       );
 
     console.log('------------------------------------------------------------');
@@ -224,7 +226,12 @@ txTask('deploy:token_vault', 'Deploy the token vault contract on base chain')
 
     console.log('------------------------------------------------------------');
     console.log('Deploying TokenVault on base chain');
-    const tokenVault = await deployTokenVault(hre.ethers, deployer, txParams);
+    const tokenVault = await deployTokenVault(
+      hre.ethers,
+      deployer,
+      txParams,
+      2,
+    );
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');

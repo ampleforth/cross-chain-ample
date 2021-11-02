@@ -1,5 +1,7 @@
 const { txTask, types, loadSignerSync } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
+const { Bridge } = require('arb-ts');
+const { hexDataLength } = require('@ethersproject/bytes');
 
 const {
   readDeploymentData,
@@ -97,7 +99,7 @@ txTask(
     );
 
     const satelliteChainIDs = [];
-    let totalFee = hre.ethers.BigNumber.from('0');
+    let totalFee = BigNumber.from('0');
     for (let n in args.satelliteChainNetworks) {
       const network = args.satelliteChainNetworks[n];
       const provider = await getEthersProvider(network);
@@ -113,8 +115,6 @@ txTask(
     }
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);
-    console.log('totalFee', totalFee);
-
     const tx = await batchRebaseReporter
       .connect(sender)
       .execute(
@@ -131,7 +131,7 @@ txTask(
 
 txTask(
   'matic:report_rebase',
-  'Reports most recent rebase to bridge on base chain for list of given satellite chains through matic bridge',
+  'Reports most recent rebase to bridge on base chain to the matic satellite chain',
 ).setAction(async (args, hre) => {
   const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
   if (txParams.gasPrice == 0) {
@@ -149,11 +149,70 @@ txTask(
     'matic/rebaseGateway',
     baseChainProvider,
   );
-  const tx = await rebaseGateway.connect(sender).reportRebase(txParams);
+  const tx = await rebaseGateway.connect(sender).reportRebaseInit(txParams);
 
   const txR = await tx.wait();
   console.log(txR.transactionHash);
 });
+
+txTask(
+  'arbitrum:report_rebase',
+  'Reports most recent rebase to bridge on base chain to the arbitrum, satellite chain',
+)
+  .addParam(
+    'satChainNetwork',
+    'The network name of the satellite chain network',
+  )
+  .setAction(async (args, hre) => {
+    const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if (txParams.gasPrice == 0) {
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
+    const sender = await loadSignerSync(args, hre.ethers.provider);
+    const senderAddress = await sender.getAddress();
+    console.log('Sender:', senderAddress);
+    console.log(txParams);
+
+    const baseChainNetwork = hre.network.name;
+    const baseChainProvider = hre.ethers.provider;
+    const baseChainSigner = loadSignerSync(args, baseChainProvider);
+
+    const satChainProvider = getEthersProvider(args.satChainNetwork);
+    const satChainSigner = loadSignerSync(args, satChainProvider);
+
+    const policy = await getDeployedContractInstance(
+      hre.network.name,
+      'policy',
+      hre.ethers.provider,
+    );
+
+    const rebaseGateway = await getDeployedContractInstance(
+      baseChainNetwork,
+      'arbitrum/rebaseGateway',
+      baseChainProvider,
+    );
+
+    const arb = await Bridge.init(baseChainSigner, satChainSigner);
+    const fnDataBytes = ethers.utils.defaultAbiCoder.encode(
+      ['uint256', 'uint256'],
+      await policy.globalAmpleforthEpochAndAMPLSupply(),
+    );
+    const fnBytesLength = hexDataLength(fnDataBytes) + 4;
+    const [_submissionPriceWei, nextUpdateTimestamp] =
+      await arb.l2Bridge.getTxnSubmissionPrice(fnBytesLength);
+    const submissionPriceWei = _submissionPriceWei.mul(5); // buffer can be reduced
+    const maxGas = 500000;
+    const gasPriceBid = await satChainProvider.getGasPrice();
+    const callValue = submissionPriceWei.add(gasPriceBid.mul(maxGas));
+    txParams.value = callValue;
+
+    const tx = await rebaseGateway
+      .connect(sender)
+      .reportRebaseInit(submissionPriceWei, maxGas, gasPriceBid, txParams);
+
+    const txR = await tx.wait();
+    console.log(txR.transactionHash);
+  });
 
 txTask(
   'rebase:satellite_chain',
