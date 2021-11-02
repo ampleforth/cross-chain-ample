@@ -44,6 +44,10 @@ const ContractABIPaths = {
   ChainBridgeBatchRebaseReport: 'contracts/_utilities',
 };
 
+const sleep = (sec) => {
+  return new Promise((resolve) => setTimeout(resolve, sec * 1000));
+};
+
 const getCompiledContractFactory = (ethers, contract) => {
   return ethers.getContractFactory(
     `${ContractABIPaths[contract]}/${contract}.sol:${contract}`,
@@ -98,6 +102,91 @@ const deployProxyContract = async (
   await refChangeTx.wait();
 
   return contract;
+};
+
+const upgradeProxyContract = async (
+  ethers,
+  network,
+  contractName,
+  deployedContractRef,
+  signer,
+  txParams,
+  force = false,
+) => {
+  const proxyAdmin = await getDeployedContractInstance(
+    network,
+    'proxyAdmin',
+    ethers.provider,
+  );
+
+  const proxy = await getDeployedContractInstance(
+    network,
+    deployedContractRef,
+    ethers.provider,
+  );
+
+  const currentImplAddr = await proxyAdmin.getProxyImplementation(
+    proxy.address,
+  );
+  console.log(
+    `Current implementation for ${contractName} is at`,
+    currentImplAddr,
+  );
+
+  // deploy new implementation
+  let newImplAddress;
+  if (!force) {
+    const Factory = await getCompiledContractFactory(ethers, contractName);
+    newImplAddress = await upgrades.prepareUpgrade(
+      proxy.address,
+      Factory.connect(signer),
+    );
+    await sleep(180);
+  } else {
+    console.log(`CAUTION: Skpping storage layout verification!`);
+    console.log(`CANCEL NOW to stop, this action is not reversable`);
+    await sleep(10);
+    const newImpl = await deployContract(
+      ethers,
+      contractName,
+      signer,
+      [],
+      txParams,
+    );
+    newImplAddress = newImpl.address;
+  }
+  console.log(`New implementation for ${contractName} is at`, newImplAddress);
+
+  if ((await proxyAdmin.owner()) == (await signer.getAddress())) {
+    await proxyAdmin
+      .connect(signer)
+      .upgrade(proxy.address, newImplAddress, txParams);
+
+    await proxyAdmin
+      .connect(signer)
+      .upgrade(
+        proxy.address,
+        '0x82E415d7F43D2f56d431124c58221Faa249Ded42',
+        txParams,
+      );
+  } else {
+    console.log('Signer not proxy onwer, cant upgrade');
+    console.log(
+      `Execute proxyAdmin.upgrade(${proxy.address}, ${newImplAddress})`,
+    );
+  }
+
+  const contractData = await readContractDeploymentData(
+    network,
+    deployedContractRef,
+  );
+  const impl = new ethers.Contract(
+    newImplAddress,
+    contractData.abi,
+    ethers.provider,
+  );
+  await impl.deployed();
+  return impl;
 };
 
 const getDeployedContractInstance = async (network, contractName, provider) => {
@@ -188,10 +277,6 @@ const filterContractEvents = async (
   endBlock = endBlock || (await provider.getBlockNumber());
   const freq = timeFrameSec * BLOCKS_PER_SEC;
 
-  const sleep = (sec) => {
-    return new Promise((resolve) => setTimeout(resolve, sec * 1000));
-  };
-
   console.log(address, event, startBlock, endBlock, timeFrameSec);
 
   let logs = [];
@@ -250,6 +335,7 @@ module.exports = {
   deployContract,
   deployProxyAdminContract,
   deployProxyContract,
+  upgradeProxyContract,
 
   filterContractEvents,
 };

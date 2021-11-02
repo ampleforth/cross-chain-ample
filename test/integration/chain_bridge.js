@@ -259,9 +259,7 @@ async function execXCSend (
         .connect(fromAccount)
         .approve(baseChainAmplContracts.tokenVault.address, amount);
     } else {
-      await amplContractsMap[fromChain].xcAmple
-        .connect(fromAccount)
-        .approve(amplContractsMap[fromChain].xcAmpleController.address, amount);
+      // NO Approval required!
     }
   }
 
@@ -764,7 +762,7 @@ describe('Transfers scenarios', function () {
     });
 
     describe('user does not approve Controller on satellite chain', function () {
-      it('should revert', async function () {
+      it('should NOT revert', async function () {
         // Setup by placing amples on satellite chain
         await checkBalancesAndSupply(
           ['100000', '100000'],
@@ -804,7 +802,7 @@ describe('Transfers scenarios', function () {
             toAmplFixedPt('1'),
             false, // Use existing approval and don't auto-approve.
           ),
-        ).to.be.reverted;
+        ).not.to.be.reverted;
       });
     });
   });

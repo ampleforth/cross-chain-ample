@@ -73,8 +73,6 @@ coverage.json
 coverage/
 coverageEnv/
 
-.openzeppelin
-
 yarn-error.log
 
 
@@ -98,3 +96,6 @@ sdk/deployments/geth*.json
 console.js
 
 .DS_Store
+
+
+flattened
