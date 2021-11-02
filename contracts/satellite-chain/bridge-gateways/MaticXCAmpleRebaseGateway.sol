@@ -2,8 +2,8 @@
 pragma solidity 0.7.3;
 
 import {FxBaseChildTunnel} from "fx-portal/contracts/tunnel/FxBaseChildTunnel.sol";
-import {Layer2RebaseGateway} from "../../base-bridge-gateways/Layer2RebaseGateway.sol";
 
+import {IMaticSCRebaseGateway} from "../../_interfaces/bridge-gateways/IMaticGateway.sol";
 import {IXCAmpleController} from "../../_interfaces/IXCAmpleController.sol";
 import {IXCAmpleControllerGateway} from "../../_interfaces/IXCAmpleControllerGateway.sol";
 import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
@@ -16,14 +16,12 @@ import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
  *      the xc-ample contracts.
  *
  */
-contract MaticXCAmpleRebaseGateway is Layer2RebaseGateway, FxBaseChildTunnel {
+contract MaticXCAmpleRebaseGateway is IMaticSCRebaseGateway, FxBaseChildTunnel {
     address public immutable xcAmple;
     address public immutable xcController;
 
     /**
-     * @dev Forwards the most recent rebase information from the matic bridge to the xc-ample controller.
-     *      "globalAmpleforthEpoch": Ampleforth monetary policy epoch from ethereum.
-     *      "globalAMPLSupply": AMPL ERC-20 total supply from ethereum.
+     * @dev Bridge callback.
      */
     function _processMessageFromRoot(
         uint256 stateId,
@@ -34,6 +32,17 @@ contract MaticXCAmpleRebaseGateway is Layer2RebaseGateway, FxBaseChildTunnel {
         uint256 globalAMPLSupply;
         (globalAmpleforthEpoch, globalAMPLSupply) = abi.decode(data, (uint256, uint256));
 
+        _executeReportRebase(globalAmpleforthEpoch, globalAMPLSupply);
+    }
+
+    /*
+     * @dev Forwards the most recent rebase information from the matic bridge to the xc-ample controller.
+     * @param globalAmpleforthEpoch Ampleforth monetary policy epoch from ethereum.
+     * @param globalAMPLSupply AMPL ERC-20 total supply from ethereum.
+     */
+    function _executeReportRebase(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)
+        internal
+    {
         uint256 recordedGlobalAmpleforthEpoch = IXCAmpleController(xcController)
             .globalAmpleforthEpoch();
 

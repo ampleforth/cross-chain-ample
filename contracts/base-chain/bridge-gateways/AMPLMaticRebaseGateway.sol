@@ -2,8 +2,8 @@
 pragma solidity 0.7.3;
 
 import {FxBaseRootTunnel} from "fx-portal/contracts/tunnel/FxBaseRootTunnel.sol";
-import {Layer2RebaseGateway} from "../../base-bridge-gateways/Layer2RebaseGateway.sol";
 
+import {IMaticBCRebaseGateway} from "../../_interfaces/bridge-gateways/IMaticGateway.sol";
 import {IAmpleforth} from "uFragments/contracts/interfaces/IAmpleforth.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -15,16 +15,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  *      the Ampleforth policy.
  *
  */
-contract AMPLMaticRebaseGateway is Layer2RebaseGateway, FxBaseRootTunnel {
+contract AMPLMaticRebaseGateway is IMaticBCRebaseGateway, FxBaseRootTunnel {
     address public immutable ampl;
     address public immutable policy;
-
-    /**
-     * @dev No-op as rebase report is one-way.
-     */
-    function _processMessageFromChild(bytes memory data) internal override {
-        return;
-    }
 
     /**
      * @dev Builds the payload and transmits rebase report to matic.
@@ -36,6 +29,13 @@ contract AMPLMaticRebaseGateway is Layer2RebaseGateway, FxBaseRootTunnel {
         emit XCRebaseReportOut(recordedGlobalAmpleforthEpoch, recordedGlobalAMPLSupply);
 
         _sendMessageToChild(abi.encode(recordedGlobalAmpleforthEpoch, recordedGlobalAMPLSupply));
+    }
+
+    /**
+     * @dev Bridge callback. No-op as rebase report is one-way.
+     */
+    function _processMessageFromChild(bytes memory data) internal override {
+        return;
     }
 
     constructor(

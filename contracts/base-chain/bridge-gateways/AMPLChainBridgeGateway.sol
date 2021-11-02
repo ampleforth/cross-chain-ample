@@ -4,9 +4,7 @@ pragma solidity 0.7.3;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
-import {ChainBridgeRebaseGateway} from "../../base-bridge-gateways/ChainBridgeRebaseGateway.sol";
-import {ChainBridgeTransferGateway} from "../../base-bridge-gateways/ChainBridgeTransferGateway.sol";
-
+import {IChainBridgeBCRebaseGateway, IChainBridgeBCTransferGateway} from "../../_interfaces/bridge-gateways/IChainBridgeGateway.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IAmpleforth} from "uFragments/contracts/interfaces/IAmpleforth.sol";
 import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
@@ -18,7 +16,9 @@ import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
  *      It's a pass-through contract between the ChainBridge handler contract and
  *      the Ampleforth policy and the Token vault.
  *
- *      The contract is owned by the ChainBridge handler contract.
+ *      The contract is owned by the ChainBridge handler contract and only it can
+ *      execute functions.The user interacts with the bridge contract and the bridge
+ *      callsback into this gateway.
  *
  *      When rebase is transmitted across the bridge, It checks the consistency of rebase data
  *      from the ChainBridge handler contract with the recorded on-chain value.
@@ -37,7 +37,11 @@ import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
  *      and the total ERC-20 AMPL supply on the current chain, at the time of unlock.
  *
  */
-contract AMPLChainBridgeGateway is ChainBridgeRebaseGateway, ChainBridgeTransferGateway, Ownable {
+contract AMPLChainBridgeGateway is
+    IChainBridgeBCRebaseGateway,
+    IChainBridgeBCTransferGateway,
+    Ownable
+{
     using SafeMath for uint256;
 
     address public immutable ampl;
@@ -74,13 +78,13 @@ contract AMPLChainBridgeGateway is ChainBridgeRebaseGateway, ChainBridgeTransfer
      * @dev Validates the data from the handler and transfers specified amount from
      *      the sender's wallet and locks it in the vault contract.
      * @param sender Address of the sender wallet on the base chain.
-     * @param recipientAddressInTargetChain Address of the recipient wallet in the target chain.
+     * @param recipientInTargetChain Address of the recipient wallet in the target chain.
      * @param amount Amount of tokens to be locked on the current chain (source chain).
      * @param globalAMPLSupply AMPL ERC-20 total supply at the time of transfer locking.
      */
     function validateAndLock(
         address sender,
-        address recipientAddressInTargetChain,
+        address recipientInTargetChain,
         uint256 amount,
         uint256 globalAMPLSupply
     ) external override onlyOwner {
@@ -99,13 +103,13 @@ contract AMPLChainBridgeGateway is ChainBridgeRebaseGateway, ChainBridgeTransfer
     /**
      * @dev Calculates the amount of amples to be unlocked based on the share of total supply and
      *      transfers it to the recipient.
-     * @param senderAddressInSourceChain Address of the sender wallet in the transaction originating chain.
+     * @param senderInSourceChain Address of the sender wallet in the transaction originating chain.
      * @param recipient Address of the recipient wallet in the current chain (target chain).
      * @param amount Amount of tokens that were {locked/burnt} on the base chain.
      * @param globalAMPLSupply AMPL ERC-20 total supply at the time of transfer.
      */
     function unlock(
-        address senderAddressInSourceChain,
+        address senderInSourceChain,
         address recipient,
         uint256 amount,
         uint256 globalAMPLSupply
