@@ -144,8 +144,6 @@ const upgradeProxyContract = async (
     await sleep(180);
   } else {
     console.log(`CAUTION: Skpping storage layout verification!`);
-    console.log(`CANCEL NOW to stop, this action is not reversable`);
-    await sleep(10);
     const newImpl = await deployContract(
       ethers,
       contractName,
@@ -158,17 +156,13 @@ const upgradeProxyContract = async (
   console.log(`New implementation for ${contractName} is at`, newImplAddress);
 
   if ((await proxyAdmin.owner()) == (await signer.getAddress())) {
-    await proxyAdmin
-      .connect(signer)
-      .upgrade(proxy.address, newImplAddress, txParams);
+    console.log(`CAUTION: Executing live upgrade!`);
+    console.log(`CANCEL NOW to stop, this action is not reversable`);
+    await sleep(15);
 
     await proxyAdmin
       .connect(signer)
-      .upgrade(
-        proxy.address,
-        '0x82E415d7F43D2f56d431124c58221Faa249Ded42',
-        txParams,
-      );
+      .upgrade(proxy.address, newImplAddress, txParams);
   } else {
     console.log('Signer not proxy onwer, cant upgrade');
     console.log(
