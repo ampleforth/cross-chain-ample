@@ -258,5 +258,14 @@
     ],
     "hash": "0xbb5bda37bdd726212b9c9cc5c08045d8b4eeec3631d24ba4a3293b8f34362b54",
     "blockNumber": 9535779
+  },
+  "batchRebaseReporter": {
+    "address": "0x9b8a5d60567C342DFF24cA04fCab64e41d518b1C",
+    "abi": [
+      "event TransactionFailed(address indexed destination, uint256 index, bytes data, bytes reason)",
+      "function executeAll(address[] destinations, bytes[] data, uint256[] values) payable returns (bool)"
+    ],
+    "hash": "0x5478a4b326b9472b1e9c64350ada1e0b381c455efb2e6ffe03437848b9d1624f",
+    "blockNumber": 9612686
   }
 }

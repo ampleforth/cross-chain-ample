@@ -253,6 +253,14 @@ task(
           'XCAmpleController:totalSupply',
           toAmplFloatingPt(globalAMPLSupply),
         );
+        console.log(
+          'XCAmpleController:nextGlobalAmpleforthEpoch',
+          (await xcAmpleController.nextGlobalAmpleforthEpoch()).toString(),
+        );
+        console.log(
+          'XCAmpleController:nextGlobalAMPLSupply',
+          toAmplFloatingPt(await xcAmpleController.nextGlobalAMPLSupply()),
+        );
         console.log('XCAmpleController:gatewayWhitelist', gatewayWhitelist);
         console.log(
           'XCAmpleController:rebaseRelayer',

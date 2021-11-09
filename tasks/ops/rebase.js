@@ -201,7 +201,7 @@ txTask(
     const [_submissionPriceWei, nextUpdateTimestamp] =
       await arb.l2Bridge.getTxnSubmissionPrice(fnBytesLength);
     const submissionPriceWei = _submissionPriceWei.mul(5); // buffer can be reduced
-    const maxGas = 500000;
+    const maxGas = 200000;
     const gasPriceBid = await satChainProvider.getGasPrice();
     const callValue = submissionPriceWei.add(gasPriceBid.mul(maxGas));
     txParams.value = callValue;
