@@ -14,7 +14,7 @@ const {
 const { printRebaseInfo, execRebase } = require('../../sdk/ampleforth');
 
 txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
-  .addParam('rebasePerc', 'The rebase percentage to be applied', 0, types.float)
+  .addParam('rebasePerc', 'The rebase percentage to be applied', '0')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
     if (txParams.gasPrice == 0) {
