@@ -4,10 +4,13 @@ pragma experimental ABIEncoderV2;
 
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/Initializable.sol";
+
+// solhint-disable-next-line max-line-length
 import {GatewayMessageHandler} from "arb-bridge-peripherals/contracts/tokenbridge/libraries/gateway/GatewayMessageHandler.sol";
 import {L2ArbitrumMessenger} from "arb-bridge-peripherals/contracts/tokenbridge/arbitrum/L2ArbitrumMessenger.sol";
 import {AddressAliasHelper} from "arb-bridge-eth/contracts/libraries/AddressAliasHelper.sol";
 
+// solhint-disable-next-line max-line-length
 import {IArbitrumBCRebaseGateway, IArbitrumBCTransferGateway, IArbitrumSCRebaseGateway, IArbitrumSCTransferGateway} from "../../_interfaces/bridge-gateways/IArbitrumGateway.sol";
 import {IXCAmpleController} from "../../_interfaces/IXCAmpleController.sol";
 import {IXCAmpleControllerGateway} from "../../_interfaces/IXCAmpleControllerGateway.sol";

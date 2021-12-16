@@ -2,7 +2,7 @@ const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
 let accounts, deployer, user, batchExecutor, mockDownstream, r;
-async function setupContracts() {
+async function setupContracts () {
   // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
@@ -140,12 +140,12 @@ describe('BatchTxExecutor', function () {
 
       await expect(
         await batchExecutor.callStatic.checkExecution(0, {
-          value: '1000000000000000000',
+          value: '1000000000000000000'
         }),
       ).to.be.true;
       await expect(
         await batchExecutor.callStatic.executeAll({
-          value: '1000000000000000000',
+          value: '1000000000000000000'
         }),
       ).to.be.true;
       expect(await batchExecutor.totalValue()).to.be.eq('1000000000000000000');

@@ -35,9 +35,9 @@ const execRebase = async (
 ) => {
   // Casting percChange to Bignumber.js instance to handle floating points
   const newRate = new BigNumber(AMPL_BASE_RATE.toString())
-      .times(100 + parseFloat(percChange))
-      .div(100)
-      .toString(10);
+    .times(100 + parseFloat(percChange))
+    .div(100)
+    .toString(10);
 
   const rateTx = await rateOracle.connect(signer).pushReport(newRate, txParams);
   await rateTx.wait();

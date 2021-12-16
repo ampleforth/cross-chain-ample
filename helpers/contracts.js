@@ -55,7 +55,14 @@ const getCompiledContractFactory = (ethers, contract) => {
   );
 };
 
-const deployContract = async (ethers, contractName, signer, args, txParams, waitBlocks=0) => {
+const deployContract = async (
+  ethers,
+  contractName,
+  signer,
+  args,
+  txParams,
+  waitBlocks = 0,
+) => {
   // console.log('Deploying', contractName);
   const Factory = await getCompiledContractFactory(ethers, contractName);
   const contract = await Factory.connect(signer).deploy(...args, txParams);
@@ -77,7 +84,7 @@ const deployProxyContract = async (
   args,
   initializerDef,
   txParams,
-  waitBlocks=0
+  waitBlocks = 0,
 ) => {
   // console.log('Deploying proxy', contractName);
   const ProxyAdminFactory = await getCompiledContractFactory(

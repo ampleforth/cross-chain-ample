@@ -16,7 +16,7 @@ let accounts,
   xcController,
   gateway;
 
-async function setupContracts() {
+async function setupContracts () {
   accounts = await ethers.getSigners();
   deployer = accounts[0];
   depositor = deployer;
@@ -228,13 +228,12 @@ describe('ArbitrumXCAmpleGateway:finalizeInboundTransfer:accessControl', () => {
 });
 
 describe('ArbitrumXCAmpleGateway:finalizeInboundTransfer', () => {
-  let r, seqNumber;
+  let r;
 
   describe('when supply is out of sync', function () {
     before('setup ArbitrumXCAmpleGateway contract', async function () {
       await setupContracts();
 
-      const exitNum = 0;
       const data = ethers.utils.defaultAbiCoder.encode(['uint256'], [50000]);
 
       await xcAmple.updateGlobalAMPLSupply(100000);
@@ -279,7 +278,6 @@ describe('ArbitrumXCAmpleGateway:finalizeInboundTransfer', () => {
     before('setup ArbitrumXCAmpleGateway contract', async function () {
       await setupContracts();
 
-      const exitNum = 0;
       const data = ethers.utils.defaultAbiCoder.encode(['uint256'], [50000]);
 
       r = gateway

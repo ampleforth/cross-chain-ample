@@ -1,4 +1,4 @@
-const { ethers } = require('hardhat');
+const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
 let accounts,
@@ -18,12 +18,12 @@ let accounts,
   xcAmple,
   gateway;
 
-// l2 gas paramters
+// l2 gas parameters
 const maxSubmissionCost = 1;
 const maxGas = 500000;
 const gasPriceBid = 0;
 
-async function setupContracts() {
+async function setupContracts () {
   accounts = await ethers.getSigners();
   deployer = accounts[0];
   depositor = deployer;
@@ -172,7 +172,7 @@ describe('AMPLArbitrumGateway:outboundTransfer:accessControl', () => {
       ['uint256', 'bytes'],
       [
         maxSubmissionCost,
-        ethers.utils.defaultAbiCoder.encode(['uint256'], ['123']),
+        ethers.utils.defaultAbiCoder.encode(['uint256'], ['123'])
       ],
     );
 
@@ -281,7 +281,7 @@ describe('AMPLArbitrumGateway:finalizeInboundTransfer:accessControl', () => {
 });
 
 describe('AMPLArbitrumGateway:finalizeInboundTransfer', () => {
-  let r, seqNumber;
+  let r;
 
   describe('when supply is out of sync', function () {
     before('setup AMPLArbitrumGateway contract', async function () {

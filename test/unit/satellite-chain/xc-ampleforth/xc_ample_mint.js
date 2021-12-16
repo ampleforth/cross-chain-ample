@@ -2,7 +2,7 @@ const { ethers, upgrades } = require('hardhat');
 const { expect } = require('chai');
 
 const DECIMALS = 9;
-const toUFrgDenomination = (ample) => ethers.utils.parseUnits(ample, DECIMALS);
+const toUFrgDenomination = ample => ethers.utils.parseUnits(ample, DECIMALS);
 
 const INITIAL_SUPPLY = ethers.utils.parseUnits('50', 6 + DECIMALS);
 const MAX_SUPPLY = ethers.BigNumber.from('2').pow(128).sub(1);
@@ -10,7 +10,7 @@ const unitTokenAmount = toUFrgDenomination('1');
 
 let accounts, deployer, otherUser, xcAmple, initialSupply;
 
-async function setupContracts() {
+async function setupContracts () {
   // prepare signers
   accounts = await ethers.getSigners();
   deployer = accounts[0];
@@ -24,7 +24,7 @@ async function setupContracts() {
     factory.connect(deployer),
     ['XCAmple', 'xcAMPL', INITIAL_SUPPLY],
     {
-      initializer: 'initialize(string,string,uint256)',
+      initializer: 'initialize(string,string,uint256)'
     },
   );
   await xcAmple.setController(deployer.getAddress());

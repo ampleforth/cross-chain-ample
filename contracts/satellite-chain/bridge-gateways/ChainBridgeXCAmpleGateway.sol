@@ -4,6 +4,7 @@ pragma solidity 0.7.3;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
+// solhint-disable-next-line max-line-length
 import {IChainBridgeSCRebaseGateway, IChainBridgeSCTransferGateway} from "../../_interfaces/bridge-gateways/IChainBridgeGateway.sol";
 import {IXCAmpleController} from "../../_interfaces/IXCAmpleController.sol";
 import {IXCAmpleControllerGateway} from "../../_interfaces/IXCAmpleControllerGateway.sol";
