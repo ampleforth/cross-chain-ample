@@ -267,8 +267,6 @@ contract AMPLArbitrumGateway is
         (exitNum, globalAMPLSupply) = abi.decode(_data, (uint256, uint256));
 
         // Log inbound transfer and release funds
-        // NOTE: this fails with the aribturm UI which approves this contract NOT the vault.
-        // TODO: safe transfer from user to self and then forward to the vault.
         uint256 unlockAmount;
         {
             uint256 recordedGlobalAMPLSupply = IERC20(ampl).totalSupply();
