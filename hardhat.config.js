@@ -130,6 +130,9 @@ module.exports = {
     prodBscSatChain: {
       url: 'https://bsc-dataseed.binance.org',
     },
+    prodAvaxSatChain: {
+      url: 'https://api.avax.network/ext/bc/C/rpc'
+    },
     prodMeterSatChain: {
       url: 'https://rpc.meter.io',
     },
