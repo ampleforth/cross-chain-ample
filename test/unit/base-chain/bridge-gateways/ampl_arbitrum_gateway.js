@@ -44,7 +44,7 @@ async function setupContracts () {
     .deploy();
 
   const uFragmentsFactory = await ethers.getContractFactory(
-    'uFragments/contracts/UFragments.sol:UFragments',
+    'ampleforth-contracts/contracts/UFragments.sol:UFragments',
   );
   ampl = await upgrades.deployProxy(
     uFragmentsFactory.connect(deployer),

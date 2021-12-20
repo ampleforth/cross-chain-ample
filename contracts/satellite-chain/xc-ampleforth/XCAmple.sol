@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.7.3;
 
-import {SafeMathUpgradeable} from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {SafeMathUpgradeable} from "openzeppelin-contracts-upgradeable-3.3.0/contracts/math/SafeMathUpgradeable.sol";
+import {IERC20Upgradeable} from "openzeppelin-contracts-upgradeable-3.3.0/contracts/token/ERC20/IERC20Upgradeable.sol";
+import {OwnableUpgradeable} from "openzeppelin-contracts-upgradeable-3.3.0/contracts/access/OwnableUpgradeable.sol";
 
 /**
  * @title XC(cross-chain)Ample ERC20 token

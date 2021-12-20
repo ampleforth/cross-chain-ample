@@ -11,9 +11,9 @@ const ContractABIPaths = {
   ProxyAdmin: '@openzeppelin/upgrades/contracts/upgradeability',
 
   // Ampleforth
-  UFragments: 'uFragments/contracts',
-  UFragmentsPolicy: 'uFragments/contracts',
-  Orchestrator: 'uFragments/contracts',
+  UFragments: 'ampleforth-contracts/contracts',
+  UFragmentsPolicy: 'ampleforth-contracts/contracts',
+  Orchestrator: 'ampleforth-contracts/contracts',
   MedianOracle: 'market-oracle/contracts',
   UFragmentsTestnet: 'contracts/_test',
 

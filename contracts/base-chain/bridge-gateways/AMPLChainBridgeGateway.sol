@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.7.3;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {Ownable} from "openzeppelin-contracts-3.4.1/contracts/access/Ownable.sol";
+import {SafeMath} from "openzeppelin-contracts-3.4.1/contracts/math/SafeMath.sol";
 
 // solhint-disable-next-line max-line-length
 import {IChainBridgeBCRebaseGateway, IChainBridgeBCTransferGateway} from "../../_interfaces/bridge-gateways/IChainBridgeGateway.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IAmpleforth} from "uFragments/contracts/interfaces/IAmpleforth.sol";
+import {IERC20} from "openzeppelin-contracts-3.4.1/contracts/token/ERC20/IERC20.sol";
+import {IAmpleforth} from "ampleforth-contracts/contracts/interfaces/IAmpleforth.sol";
 import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
 
 /**

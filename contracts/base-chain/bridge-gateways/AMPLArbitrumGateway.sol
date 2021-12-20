@@ -2,17 +2,17 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Initializable} from "@openzeppelin/contracts/proxy/Initializable.sol";
+import {SafeMath} from "openzeppelin-contracts-3.4.1/contracts/math/SafeMath.sol";
+import {Initializable} from "openzeppelin-contracts-3.4.1/contracts/proxy/Initializable.sol";
 // solhint-disable-next-line max-line-length
 import {GatewayMessageHandler} from "arb-bridge-peripherals/contracts/tokenbridge/libraries/gateway/GatewayMessageHandler.sol";
 import {L1ArbitrumMessenger} from "arb-bridge-peripherals/contracts/tokenbridge/ethereum/L1ArbitrumMessenger.sol";
 
 // solhint-disable-next-line max-line-length
 import {IArbitrumBCRebaseGateway, IArbitrumBCTransferGateway, IArbitrumSCRebaseGateway, IArbitrumSCTransferGateway} from "../../_interfaces/bridge-gateways/IArbitrumGateway.sol";
-import {IAmpleforth} from "uFragments/contracts/interfaces/IAmpleforth.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import {IAmpleforth} from "ampleforth-contracts/contracts/interfaces/IAmpleforth.sol";
+import {IERC20} from "openzeppelin-contracts-3.4.1/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "openzeppelin-contracts-3.4.1/contracts/token/ERC20/SafeERC20.sol";
 import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
 
 /// @dev Abstract l2 gateway contarct implementation to define function selectors

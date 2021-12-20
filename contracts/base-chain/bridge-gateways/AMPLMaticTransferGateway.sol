@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.7.3;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
+import {SafeMath} from "openzeppelin-contracts-3.4.1/contracts/math/SafeMath.sol";
 
 import {FxBaseRootTunnel} from "fx-portal/contracts/tunnel/FxBaseRootTunnel.sol";
 
 import {IMaticTransferGateway} from "../../_interfaces/bridge-gateways/IMaticGateway.sol";
 import {ITokenVault} from "../../_interfaces/ITokenVault.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "openzeppelin-contracts-3.4.1/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title AMPLMaticTransferGateway: AMPL-Matic Transfer Gateway Contract

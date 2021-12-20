@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.7.3;
 
-import {SafeMathUpgradeable} from "@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
-import {SignedSafeMathUpgradeable} from "@openzeppelin/contracts-upgradeable/math/SignedSafeMathUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {SafeMathUpgradeable} from "openzeppelin-contracts-upgradeable-3.3.0/contracts/math/SafeMathUpgradeable.sol";
+// solhint-disable-next-line max-line-length
+import {SignedSafeMathUpgradeable} from "openzeppelin-contracts-upgradeable-3.3.0/contracts/math/SignedSafeMathUpgradeable.sol";
+import {OwnableUpgradeable} from "openzeppelin-contracts-upgradeable-3.3.0/contracts/access/OwnableUpgradeable.sol";
 
 import {UInt256Lib} from "./UInt256Lib.sol";
 import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
