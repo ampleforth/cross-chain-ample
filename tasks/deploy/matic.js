@@ -1,21 +1,17 @@
 const {
   txTask,
   loadSignerSync,
-  etherscanVerify,
+  etherscanVerify
 } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
-  deployContract,
   getDeployedContractInstance,
-  readDeploymentData,
-  writeDeploymentData,
-  writeBulkDeploymentData,
-  getCompiledContractFactory,
+  writeDeploymentData
 } = require('../../helpers/contracts');
 
 const {
   deployMaticBaseChainGatewayContracts,
-  deployMaticSatelliteChainGatewayContracts,
+  deployMaticSatelliteChainGatewayContracts
 } = require('../../helpers/deploy');
 
 txTask(
@@ -26,12 +22,11 @@ txTask(
   .addParam('fxRoot', 'The address of the matic fx root')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const deployer = loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
-    const chainAddresses = await readDeploymentData(hre.network.name);
 
     console.log('------------------------------------------------------------');
     console.log('Deploying contracts on base-chain');
@@ -63,7 +58,7 @@ txTask(
           policy,
           tokenVault,
           checkpointManagerAddress: args.checkpointManager,
-          fxRootAddress: args.fxRoot,
+          fxRootAddress: args.fxRoot
         },
         hre.ethers,
         deployer,
@@ -90,13 +85,13 @@ txTask(
       args.checkpointManager,
       args.fxRoot,
       ampl.address,
-      tokenVault.address,
+      tokenVault.address
     ]);
     await etherscanVerify(hre, rebaseGateway.address, [
       args.checkpointManager,
       args.fxRoot,
       ampl.address,
-      policy.address,
+      policy.address
     ]);
   });
 
@@ -107,12 +102,11 @@ txTask(
   .addParam('fxChild', 'The address of the matic fx child')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const deployer = loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
-    const chainAddresses = await readDeploymentData(hre.network.name);
 
     console.log('------------------------------------------------------------');
     console.log('Deploying contracts on satellite-chain');
@@ -158,12 +152,12 @@ txTask(
     await etherscanVerify(hre, transferGateway.address, [
       args.fxChild,
       xcAmple.address,
-      xcAmpleController.address,
+      xcAmpleController.address
     ]);
     await etherscanVerify(hre, rebaseGateway.address, [
       args.fxChild,
       xcAmple.address,
-      xcAmpleController.address,
+      xcAmpleController.address
     ]);
   });
 
@@ -175,7 +169,7 @@ txTask('deploy:matic_connection', 'Connects the two gateway contracts')
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
 

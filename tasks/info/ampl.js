@@ -1,14 +1,14 @@
-const ethers = require('ethers');
+const { types } = require('hardhat/config');
 const {
   getAdminAddress,
-  getImplementationAddress,
+  getImplementationAddress
 } = require('@openzeppelin/upgrades-core');
 
 const { task } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
   readDeploymentData,
-  getDeployedContractInstance,
+  getDeployedContractInstance
 } = require('../../helpers/contracts');
 
 const { toAmplFloatingPt } = require('../../sdk/ampleforth');
@@ -17,7 +17,7 @@ task('info:ampl', 'Prints AMPL token data from given networks')
   .addParam('networks', 'List of hardhat networks', [], types.json)
   .addParam('bridge', 'Name of the bridge')
   .setAction(async (args, hre) => {
-    for (let n in args.networks) {
+    for (const n in args.networks) {
       const network = args.networks[n];
       const chainAddresses = await readDeploymentData(network);
       const provider = getEthersProvider(network);
@@ -85,7 +85,7 @@ task('info:ampl:balance', 'Prints AMPL token balance from given networks')
   .addParam('networks', 'List of hardhat networks', [], types.json)
   .addParam('wallet', 'The wallet to check')
   .setAction(async (args, hre) => {
-    for (let n in args.networks) {
+    for (const n in args.networks) {
       const network = args.networks[n];
       const chainAddresses = await readDeploymentData(network);
       const provider = getEthersProvider(network);
@@ -110,6 +110,7 @@ task('info:ampl:balance', 'Prints AMPL token balance from given networks')
         const [globalAmpleforthEpoch, globalAMPLSupply] =
           await policy.globalAmpleforthEpochAndAMPLSupply();
         const balance = await ampl.balanceOf(args.wallet);
+        console.log('Global epoch:', globalAmpleforthEpoch.toString());
         console.log('Global supply:', toAmplFloatingPt(globalAMPLSupply));
         console.log(`Balance(${args.wallet}):`, toAmplFloatingPt(balance));
       } else {
@@ -126,6 +127,7 @@ task('info:ampl:balance', 'Prints AMPL token balance from given networks')
         const [globalAmpleforthEpoch, globalAMPLSupply] =
           await xcAmpleController.globalAmpleforthEpochAndAMPLSupply();
         const balance = await xcAmple.balanceOf(args.wallet);
+        console.log('Global epoch:', globalAmpleforthEpoch.toString());
         console.log('Global supply:', toAmplFloatingPt(globalAMPLSupply));
         console.log(`Balance(${args.wallet}):`, toAmplFloatingPt(balance));
       }
@@ -139,7 +141,7 @@ task(
 )
   .addParam('networks', 'List of hardhat networks', [], types.json)
   .setAction(async (args, hre) => {
-    for (let n in args.networks) {
+    for (const n in args.networks) {
       const network = args.networks[n];
       const chainAddresses = await readDeploymentData(network);
       const provider = getEthersProvider(network);
@@ -212,7 +214,7 @@ task(
         }
 
         console.log('ProxyAdmin:', proxyAdmin.address);
-        console.log('ProxyAdmin:onwer', await proxyAdmin.owner());
+        console.log('ProxyAdmin:owner', await proxyAdmin.owner());
         console.log('XCAmple:', xcAmple.address);
         console.log(
           'XCAmple:proxyAdmin',

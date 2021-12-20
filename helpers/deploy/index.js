@@ -9,5 +9,5 @@ module.exports = {
   ...vault,
   ...chainBridge,
   ...matic,
-  ...arbitrum,
+  ...arbitrum
 };

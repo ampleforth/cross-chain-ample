@@ -3,7 +3,7 @@ const { getEthersProvider } = require('../../helpers/utils');
 
 const {
   readDeploymentData,
-  getDeployedContractInstance,
+  getDeployedContractInstance
 } = require('../../helpers/contracts');
 const { executeXCTransfer } = require('../../sdk/chain_bridge');
 const { toAmplFixedPt, printRebaseInfo } = require('../../sdk/ampleforth');
@@ -20,7 +20,7 @@ txTask(
   .addParam('targetChainNetwork', 'The hre network of target chain')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const sender = await loadSignerSync(args, hre.ethers.provider);
@@ -113,7 +113,7 @@ txTask('matic:xc_transfer', 'Executes cross chain transfer through matic')
   .addParam('amount', 'The amount of AMPL to transfer', 0, types.float)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const sender = await loadSignerSync(args, hre.ethers.provider);
@@ -176,7 +176,7 @@ txTask(
     const satChainProvider = getEthersProvider(args.satChainNetwork);
 
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await baseChainProvider.getGasPrice();
     }
     const sender = await loadSignerSync(args, baseChainProvider);
@@ -189,11 +189,12 @@ txTask(
       baseChainProvider,
     );
 
-    const maticPOSClient = new require('@maticnetwork/maticjs').MaticPOSClient({
+    const maticjs = require('@maticnetwork/maticjs');
+    const maticPOSClient = new maticjs.MaticPOSClient({
       network: baseChainProvider.includes('prod') ? 'mainnet' : 'testnet',
       version: baseChainProvider.includes('prod') ? 'v1' : 'mumbai',
       maticProvider: satChainProvider.connection.url,
-      parentProvider: baseChainProvider.connection.url,
+      parentProvider: baseChainProvider.connection.url
     });
 
     const proof = await maticPOSClient.posRootChainManager.customPayload(

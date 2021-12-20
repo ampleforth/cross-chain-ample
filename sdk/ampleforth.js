@@ -3,13 +3,13 @@ const BigNumber = require('bignumber.js');
 
 const AMPL_DECIMALS = 9;
 
-const toAmplFloatingPt = (ample) =>
+const toAmplFloatingPt = ample =>
   ethers.utils.formatUnits(
     `${ample.toFixed ? ample.toFixed(AMPL_DECIMALS) : ample}`,
     AMPL_DECIMALS,
   );
 
-const toAmplFixedPt = (ample) =>
+const toAmplFixedPt = ample =>
   ethers.utils.parseUnits(
     `${ample.toFixed ? ample.toFixed(AMPL_DECIMALS) : ample}`,
     AMPL_DECIMALS,
@@ -57,5 +57,5 @@ module.exports = {
   AMPL_BASE_CPI,
 
   printRebaseInfo,
-  execRebase,
+  execRebase
 };

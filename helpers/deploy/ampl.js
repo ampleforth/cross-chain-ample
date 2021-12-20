@@ -3,10 +3,10 @@ const { AMPL_BASE_RATE, AMPL_BASE_CPI } = require('../../sdk/ampleforth');
 const {
   deployContract,
   deployProxyAdminContract,
-  deployProxyContract,
+  deployProxyContract
 } = require('../contracts');
 
-async function deployAMPLTestnetContracts(
+async function deployAMPLTestnetContracts (
   ethers,
   deployer,
   txParams = {},
@@ -64,7 +64,7 @@ async function deployAMPLTestnetContracts(
     deployer,
     [deployerAddress, ampl.address, AMPL_BASE_CPI.toString()],
     {
-      initializer: 'initialize(address,address,uint256)',
+      initializer: 'initialize(address,address,uint256)'
     },
     txParams,
     waitBlocks,
@@ -107,11 +107,11 @@ async function deployAMPLTestnetContracts(
     policy,
     orchestrator,
     rateOracle,
-    cpiOracle,
+    cpiOracle
   };
 }
 
-async function deployXCAmpleContracts(
+async function deployXCAmpleContracts (
   { tokenSymbol, tokenName, globalAmpleforthEpoch, globalAMPLSupply },
   ethers,
   deployer,
@@ -138,7 +138,7 @@ async function deployXCAmpleContracts(
     deployer,
     [xcAmple.address, globalAmpleforthEpoch],
     {
-      initializer: 'initialize(address,uint256)',
+      initializer: 'initialize(address,uint256)'
     },
     txParams,
     waitBlocks,
@@ -165,5 +165,5 @@ async function deployXCAmpleContracts(
 
 module.exports = {
   deployAMPLTestnetContracts,
-  deployXCAmpleContracts,
+  deployXCAmpleContracts
 };

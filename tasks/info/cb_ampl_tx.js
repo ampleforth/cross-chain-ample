@@ -1,4 +1,5 @@
 const ethers = require('ethers');
+const { types } = require('hardhat/config');
 const _ = require('underscore');
 
 const { task } = require('../../helpers/tasks');
@@ -6,7 +7,7 @@ const { getEthersProvider } = require('../../helpers/utils');
 const {
   readDeploymentData,
   getDeployedContractInstance,
-  filterContractEvents,
+  filterContractEvents
 } = require('../../helpers/contracts');
 
 const { XC_TRANSFER_RESOURCE_ID } = require('../../sdk/chain_bridge');
@@ -23,7 +24,7 @@ task(
     let allTransferIns = [];
     let allTransferProposals = [];
 
-    for (let n in args.networks) {
+    for (const n in args.networks) {
       const network = args.networks[n];
       const chainAddresses = await readDeploymentData(network);
       const provider = getEthersProvider(network);
@@ -48,12 +49,6 @@ task(
       );
 
       const chainID = await bridge._chainID();
-
-      const handler = await getDeployedContractInstance(
-        network,
-        'chainBridge/genericHandler',
-        provider,
-      );
 
       const gateway = await getDeployedContractInstance(
         network,
@@ -95,7 +90,7 @@ task(
         endBlock,
         queryTimeFrame,
       );
-      deposits = _.map(deposits, (d) => {
+      deposits = _.map(deposits, d => {
         d.originChainID = chainID;
         return d;
       });
@@ -111,7 +106,7 @@ task(
         endBlock,
         queryTimeFrame,
       );
-      proposals = _.map(proposals, (d) => {
+      proposals = _.map(proposals, d => {
         d.destinationChainID = chainID;
         return d;
       });
@@ -124,11 +119,11 @@ task(
     }
 
     // Filter
-    allTransferDeposits = allTransferDeposits.filter((d) => {
-      return d.parsed.args.resourceID == XC_TRANSFER_RESOURCE_ID;
+    allTransferDeposits = allTransferDeposits.filter(d => {
+      return d.parsed.args.resourceID === XC_TRANSFER_RESOURCE_ID;
     });
-    allTransferProposals = allTransferProposals.filter((d) => {
-      return d.parsed.args.resourceID == XC_TRANSFER_RESOURCE_ID;
+    allTransferProposals = allTransferProposals.filter(d => {
+      return d.parsed.args.resourceID === XC_TRANSFER_RESOURCE_ID;
     });
 
     const fs = require('fs');
@@ -160,7 +155,7 @@ task(
 
     const transferPhase1 = _.chain(allTransferOuts)
       .concat(allTransferDeposits)
-      .groupBy((d) => d.transactionHash)
+      .groupBy(d => d.transactionHash)
       .pick((v, k) => xcDepositTxHashesLookup[k])
       .map((v, k) => {
         return {
@@ -177,7 +172,7 @@ task(
             'resourceID',
             'depositNonce',
           ),
-          originChainID: v[1].originChainID,
+          originChainID: v[1].originChainID
         };
       })
       .reduce((m, v) => {
@@ -197,7 +192,7 @@ task(
 
     const transferPhase2 = _.chain(allTransferIns)
       .concat(allTransferProposals)
-      .groupBy((d) => d.transactionHash)
+      .groupBy(d => d.transactionHash)
       .pick((v, k) => xcProposalTxHashesLookup[k])
       .map((v, k) => {
         return {
@@ -215,7 +210,7 @@ task(
             'resourceID',
             'depositNonce',
           ),
-          destinationChainID: v[v.length - 1].destinationChainID,
+          destinationChainID: v[v.length - 1].destinationChainID
         };
       })
       .reduce((m, v) => {
@@ -236,13 +231,13 @@ task(
 
           recipient: p.recipient,
           proposalTransactionHash: p.transactionHash,
-          recievedAmount: p.amount ? p.amount.toString() : '0',
+          receivedAmount: p.amount ? p.amount.toString() : '0',
           totalSupplyOnSource: p.recordedGlobalAMPLSupply
             ? p.recordedGlobalAMPLSupply.toString()
             : '0',
           totalSupplyOnTarget: p.globalAMPLSupply
             ? p.globalAMPLSupply.toString()
-            : '0',
+            : '0'
         };
       })
       .values()
@@ -259,10 +254,10 @@ task(
         { id: 'totalSupplyAtDeposit', title: 'totalSupplyAtDeposit' },
         { id: 'recipient', title: 'recipient' },
         { id: 'proposalTransactionHash', title: 'proposalTransactionHash' },
-        { id: 'recievedAmount', title: 'recievedAmount' },
+        { id: 'receivedAmount', title: 'receivedAmount' },
         { id: 'totalSupplyOnSource', title: 'totalSupplyOnSource' },
-        { id: 'totalSupplyOnTarget', title: 'totalSupplyOnTarget' },
-      ],
+        { id: 'totalSupplyOnTarget', title: 'totalSupplyOnTarget' }
+      ]
     });
     await csvWriter.writeRecords(dt);
     console.log('Output written to :', args.outputCsvPath);

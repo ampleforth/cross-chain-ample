@@ -4,31 +4,30 @@ const {
   txTask,
   cbDeployTask,
   loadSignerSync,
-  etherscanVerify,
+  etherscanVerify
 } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
   getDeployedContractInstance,
-  readDeploymentData,
   writeDeploymentData,
   writeBulkDeploymentData,
-  getCompiledContractFactory,
+  getCompiledContractFactory
 } = require('../../helpers/contracts');
 
 const {
   deployChainBridgeContracts,
   deployChainBridgeHelpers,
   deployChainBridgeBaseChainGatewayContracts,
-  deployChainBridgeSatelliteChainGatewayContracts,
+  deployChainBridgeSatelliteChainGatewayContracts
 } = require('../../helpers/deploy');
 
 const {
   XC_REBASE_RESOURCE_ID,
   XC_TRANSFER_RESOURCE_ID,
-  CB_FUNCTION_SIG_baseChainReportRebase,
-  CB_FUNCTION_SIG_satelliteChainReportRebase,
-  CB_FUNCTION_SIG_baseChainTransfer,
-  CB_FUNCTION_SIG_satelliteChainTransfer,
+  CB_FUNCTION_SIG_BC_REPORT_REBASE,
+  CB_FUNCTION_SIG_SC_REPORT_REBASE,
+  CB_FUNCTION_SIG_BC_TRANSFER,
+  CB_FUNCTION_SIG_SC_TRANSFER
 } = require('../../sdk/chain_bridge');
 
 task(
@@ -49,14 +48,14 @@ task(
     await writeBulkDeploymentData(hre.network.name, {
       'chainBridge/bridge': {
         address: args.bridgeAddress,
-        abi: Bridge.interface.format(),
-      },
+        abi: Bridge.interface.format()
+      }
     });
     await writeBulkDeploymentData(hre.network.name, {
       'chainBridge/genericHandler': {
         address: args.genericHandlerAddress,
-        abi: GenericHandler.interface.format(),
-      },
+        abi: GenericHandler.interface.format()
+      }
     });
   });
 
@@ -67,19 +66,18 @@ cbDeployTask(
   .addParam('useDeployed', 'Use deployed bridge', false, types.boolean)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const deployer = loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
-    const chainAddresses = await readDeploymentData(hre.network.name);
 
     console.log('------------------------------------------------------------');
     console.log('Deploying contracts on base-chain');
     console.log('Deployer:', deployerAddress);
     console.log(txParams);
 
-    let bridge, genericHandler, erc20Handler, erc721Handler;
+    let bridge, genericHandler;
 
     if (args.useDeployed) {
       console.log('Using deployed bridge');
@@ -139,7 +137,7 @@ cbDeployTask(
           genericHandler,
           ampl,
           policy,
-          tokenVault,
+          tokenVault
         },
         hre.ethers,
         deployer,
@@ -178,7 +176,7 @@ cbDeployTask(
       [],
       await bridge._relayerThreshold(),
       await bridge._fee(),
-      await bridge._expiry(),
+      await bridge._expiry()
     ]);
     await etherscanVerify(hre, genericHandler.address, [
       bridge.address,
@@ -186,19 +184,19 @@ cbDeployTask(
       [],
       [],
       [],
-      [],
+      []
     ]);
     await etherscanVerify(hre, transferGateway.address, [
       genericHandler.address,
       ampl.address,
       policy.address,
-      tokenVault.address,
+      tokenVault.address
     ]);
     await etherscanVerify(hre, rebaseGateway.address, [
       genericHandler.address,
       ampl.address,
       policy.address,
-      tokenVault.address,
+      tokenVault.address
     ]);
     await etherscanVerify(hre, batchRebaseReporter.address);
   });
@@ -210,19 +208,18 @@ cbDeployTask(
   .addParam('useDeployed', 'Use deployed bridge', false, types.boolean)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const deployer = loadSignerSync(args, hre.ethers.provider);
     const deployerAddress = await deployer.getAddress();
-    const chainAddresses = await readDeploymentData(hre.network.name);
 
     console.log('------------------------------------------------------------');
     console.log('Deploying contracts on satellite-chain');
     console.log('Deployer:', deployerAddress);
     console.log(txParams);
 
-    let bridge, genericHandler, erc20Handler, erc721Handler;
+    let bridge, genericHandler;
 
     if (args.useDeployed) {
       console.log('Using deployed bridge');
@@ -294,7 +291,7 @@ cbDeployTask(
       [],
       await bridge._relayerThreshold(),
       await bridge._fee(),
-      await bridge._expiry(),
+      await bridge._expiry()
     ]);
     await etherscanVerify(hre, genericHandler.address, [
       bridge.address,
@@ -302,17 +299,17 @@ cbDeployTask(
       [],
       [],
       [],
-      [],
+      []
     ]);
     await etherscanVerify(hre, transferGateway.address, [
       genericHandler.address,
       xcAmple.address,
-      xcAmpleController.address,
+      xcAmpleController.address
     ]);
     await etherscanVerify(hre, rebaseGateway.address, [
       genericHandler.address,
       xcAmple.address,
-      xcAmpleController.address,
+      xcAmpleController.address
     ]);
   });
 
@@ -333,7 +330,7 @@ txTask(
     const network = hre.network.name;
     const provider = hre.ethers.provider;
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await provider.getGasPrice();
     }
 
@@ -361,9 +358,8 @@ txTask(
     // Base chain
     const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
     const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
-    const reportRebaseFnSig =
-      CB_FUNCTION_SIG_baseChainReportRebase(rebaseGateway);
-    const transferFnSig = CB_FUNCTION_SIG_baseChainTransfer(transferGateway);
+    const reportRebaseFnSig = CB_FUNCTION_SIG_BC_REPORT_REBASE(rebaseGateway);
+    const transferFnSig = CB_FUNCTION_SIG_BC_TRANSFER(transferGateway);
 
     if (isAdmin) {
       await (
@@ -395,23 +391,23 @@ txTask(
         genericHandler.address,
         XC_REBASE_RESOURCE_ID,
         rebaseGateway.address,
-        ...reportRebaseFnSig,
+        ...reportRebaseFnSig
       ]);
       console.log('adminSetGenericResource', [
         genericHandler.address,
         XC_TRANSFER_RESOURCE_ID,
         transferGateway.address,
-        ...transferFnSig,
+        ...transferFnSig
       ]);
     }
 
     // sat chains
-    for (let n in args.satelliteChainNetworks) {
+    for (const n in args.satelliteChainNetworks) {
       const network = args.satelliteChainNetworks[n];
       const provider = await getEthersProvider(network);
 
       const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-      if (txParams.gasPrice == 0) {
+      if (txParams.gasPrice === 0) {
         txParams.gasPrice = await provider.getGasPrice();
       }
 
@@ -437,10 +433,8 @@ txTask(
       );
       const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
       const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
-      const reportRebaseFnSig =
-        CB_FUNCTION_SIG_satelliteChainReportRebase(rebaseGateway);
-      const transferFnSig =
-        CB_FUNCTION_SIG_satelliteChainTransfer(transferGateway);
+      const reportRebaseFnSig = CB_FUNCTION_SIG_SC_REPORT_REBASE(rebaseGateway);
+      const transferFnSig = CB_FUNCTION_SIG_SC_TRANSFER(transferGateway);
 
       if (isAdmin) {
         await (
@@ -471,13 +465,13 @@ txTask(
           genericHandler.address,
           XC_REBASE_RESOURCE_ID,
           rebaseGateway.address,
-          ...reportRebaseFnSig,
+          ...reportRebaseFnSig
         ]);
         console.log('adminSetGenericResource', [
           genericHandler.address,
           XC_TRANSFER_RESOURCE_ID,
           transferGateway.address,
-          ...transferFnSig,
+          ...transferFnSig
         ]);
       }
     }

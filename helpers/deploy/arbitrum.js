@@ -1,6 +1,6 @@
 const { deployContract } = require('../contracts');
 
-async function deployArbitrumBaseChainGatewayContracts(
+async function deployArbitrumBaseChainGatewayContracts (
   { ampl, policy, tokenVault },
   ethers,
   deployer,
@@ -17,7 +17,7 @@ async function deployArbitrumBaseChainGatewayContracts(
   );
 
   const deployerAddress = await deployer.getAddress();
-  if ((await tokenVault.owner()) == deployerAddress) {
+  if ((await tokenVault.owner()) === deployerAddress) {
     await (
       await tokenVault.connect(deployer).addBridgeGateway(gateway.address)
     ).wait(waitBlocks);
@@ -32,7 +32,7 @@ async function deployArbitrumBaseChainGatewayContracts(
   return { gateway };
 }
 
-async function deployArbitrumSatelliteChainGatewayContracts(
+async function deployArbitrumSatelliteChainGatewayContracts (
   { xcAmple, xcAmpleController },
   ethers,
   deployer,
@@ -49,7 +49,7 @@ async function deployArbitrumSatelliteChainGatewayContracts(
   );
 
   const deployerAddress = await deployer.getAddress();
-  if ((await xcAmpleController.owner()) == deployerAddress) {
+  if ((await xcAmpleController.owner()) === deployerAddress) {
     await (
       await xcAmpleController
         .connect(deployer)
@@ -68,5 +68,5 @@ async function deployArbitrumSatelliteChainGatewayContracts(
 
 module.exports = {
   deployArbitrumBaseChainGatewayContracts,
-  deployArbitrumSatelliteChainGatewayContracts,
+  deployArbitrumSatelliteChainGatewayContracts
 };

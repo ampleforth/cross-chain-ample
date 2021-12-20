@@ -4,8 +4,8 @@ pragma solidity 0.7.3;
 import {FxBaseRootTunnel} from "fx-portal/contracts/tunnel/FxBaseRootTunnel.sol";
 
 import {IMaticBCRebaseGateway} from "../../_interfaces/bridge-gateways/IMaticGateway.sol";
-import {IAmpleforth} from "uFragments/contracts/interfaces/IAmpleforth.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IAmpleforth} from "ampleforth-contracts/contracts/interfaces/IAmpleforth.sol";
+import {IERC20} from "openzeppelin-contracts-3.4.1/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title AMPLMaticRebaseGateway: AMPL-Matic Rebase Gateway Contract

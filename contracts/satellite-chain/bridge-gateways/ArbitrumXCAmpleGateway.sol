@@ -2,8 +2,8 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Initializable} from "@openzeppelin/contracts/proxy/Initializable.sol";
+import {SafeMath} from "openzeppelin-contracts-3.4.1/contracts/math/SafeMath.sol";
+import {Initializable} from "openzeppelin-contracts-3.4.1/contracts/proxy/Initializable.sol";
 
 // solhint-disable-next-line max-line-length
 import {GatewayMessageHandler} from "arb-bridge-peripherals/contracts/tokenbridge/libraries/gateway/GatewayMessageHandler.sol";

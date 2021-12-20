@@ -4,7 +4,7 @@ const AbiCoder = ethers.utils.defaultAbiCoder;
 const getFunctionSignature = (contract, functionName) => {
   const functions = contract.interface.functions;
   const selected = Object.keys(functions).filter(
-    (f) => functions[f].name === functionName,
+    f => functions[f].name === functionName,
   )[0];
   return contract.interface.getSighash(functions[selected]);
 };
@@ -13,7 +13,7 @@ const toHex = (covertThis, padding) => {
   return ethers.utils.hexZeroPad(ethers.utils.hexlify(covertThis), padding);
 };
 
-const createResourceID = (d) => {
+const createResourceID = d => {
   const hash = ethers.utils.keccak256(
     ethers.utils.solidityPack(['string'], [d]),
   );
@@ -30,40 +30,40 @@ const XC_TRANSFER_RESOURCE_ID = createResourceID(
 
 const CB_BLANK_FUNCTION_SIG = '0x00000000';
 
-const CB_FUNCTION_SIG_baseChainReportRebase = (gatewayContract) => {
+const CB_FUNCTION_SIG_BC_REPORT_REBASE = gatewayContract => {
   return [
     getFunctionSignature(gatewayContract, 'validateRebaseReport'),
     0,
-    CB_BLANK_FUNCTION_SIG,
+    CB_BLANK_FUNCTION_SIG
   ];
 };
 
-const CB_FUNCTION_SIG_satelliteChainReportRebase = (gatewayContract) => {
+const CB_FUNCTION_SIG_SC_REPORT_REBASE = gatewayContract => {
   return [
     CB_BLANK_FUNCTION_SIG,
     0,
-    getFunctionSignature(gatewayContract, 'reportRebase'),
+    getFunctionSignature(gatewayContract, 'reportRebase')
   ];
 };
 
-const CB_FUNCTION_SIG_baseChainTransfer = (gatewayContract) => {
+const CB_FUNCTION_SIG_BC_TRANSFER = gatewayContract => {
   return [
     getFunctionSignature(gatewayContract, 'validateAndLock'),
     12,
-    getFunctionSignature(gatewayContract, 'unlock'),
+    getFunctionSignature(gatewayContract, 'unlock')
   ];
 };
 
-const CB_FUNCTION_SIG_satelliteChainTransfer = (gatewayContract) => {
+const CB_FUNCTION_SIG_SC_TRANSFER = gatewayContract => {
   return [
     getFunctionSignature(gatewayContract, 'validateAndBurn'),
     // https://github.com/ChainSafe/chainbridge-solidity/blob/master/contracts/handlers/GenericHandler.sol#L170
     12, // Padding for the depositor address validation
-    getFunctionSignature(gatewayContract, 'mint'),
+    getFunctionSignature(gatewayContract, 'mint')
   ];
 };
 
-const createGenericDepositData = (hexMetaData) => {
+const createGenericDepositData = hexMetaData => {
   if (hexMetaData === null) {
     return '0x' + toHex(0, 32).substr(2);
   }
@@ -111,7 +111,7 @@ const executeXCRebase = async (
     );
   const txR = await tx.wait();
 
-  const depositEvent = txR.events.filter((e) => e.event == 'Deposit')[0];
+  const depositEvent = txR.events.filter(e => e.event === 'Deposit')[0];
   const depositNonce = depositEvent.args.depositNonce;
   const resourceID = depositEvent.args.resourceID;
 
@@ -151,7 +151,7 @@ const executeXCTransfer = async (
     );
   const txR = await tx.wait();
 
-  const depositEvent = txR.events.filter((e) => e.event == 'Deposit')[0];
+  const depositEvent = txR.events.filter(e => e.event === 'Deposit')[0];
   const depositNonce = depositEvent.args.depositNonce;
   const resourceID = depositEvent.args.resourceID;
 
@@ -165,11 +165,11 @@ module.exports = {
   XC_REBASE_RESOURCE_ID,
   XC_TRANSFER_RESOURCE_ID,
 
-  CB_FUNCTION_SIG_baseChainReportRebase,
-  CB_FUNCTION_SIG_satelliteChainReportRebase,
-  CB_FUNCTION_SIG_baseChainTransfer,
-  CB_FUNCTION_SIG_satelliteChainTransfer,
+  CB_FUNCTION_SIG_BC_REPORT_REBASE,
+  CB_FUNCTION_SIG_SC_REPORT_REBASE,
+  CB_FUNCTION_SIG_BC_TRANSFER,
+  CB_FUNCTION_SIG_SC_TRANSFER,
 
   executeXCRebase,
-  executeXCTransfer,
+  executeXCTransfer
 };

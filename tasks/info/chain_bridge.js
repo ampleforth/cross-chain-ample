@@ -1,57 +1,58 @@
 const ethers = require('ethers');
+const { types } = require('hardhat/config');
 
 const { task } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
   readDeploymentData,
-  getDeployedContractInstance,
+  getDeployedContractInstance
 } = require('../../helpers/contracts');
 
 class BridgeData {
-  constructor() {
+  constructor () {
     this.depositData = {};
     this.deposits = {};
     this.proposals = {};
     this.votes = {};
   }
 
-  load(chainID, deposits, proposals, votes) {
+  load (chainID, deposits, proposals, votes) {
     this.deposits[chainID] = deposits;
     this.proposals[chainID] = proposals;
     this.votes[chainID] = votes;
   }
 
-  rollupData() {
+  rollupData () {
     const chains = Object.keys(this.deposits);
     for (const c in chains) {
       const chainID = chains[c];
-      this.deposits[chainID].map((d) => this.recordDeposit(chainID, d));
+      this.deposits[chainID].map(d => this.recordDeposit(chainID, d));
     }
     for (const c in chains) {
       const chainID = chains[c];
-      this.proposals[chainID].map((d) => this.recordProposal(d));
+      this.proposals[chainID].map(d => this.recordProposal(d));
     }
     for (const c in chains) {
       const chainID = chains[c];
-      this.votes[chainID].map((d) => this.recordVote(d));
+      this.votes[chainID].map(d => this.recordVote(d));
     }
   }
 
-  depositKey(sourceChainID, e) {
+  depositKey (sourceChainID, e) {
     return `${sourceChainID}-${e.depositNonce.toNumber()}`;
   }
 
-  recordDeposit(sourceChainID, e) {
+  recordDeposit (sourceChainID, e) {
     this.depositData[this.depositKey(sourceChainID, e)] = {
       sourceChainID,
       destinationChainID: e.destinationChainID.toString(),
       depositNonce: e.depositNonce.toString(),
       executionStatus: 0,
-      votes: 0,
+      votes: 0
     };
   }
 
-  recordProposal(e) {
+  recordProposal (e) {
     const k = this.depositKey(e.originChainID, e);
     let d = this.depositData[k];
     if (!d) {
@@ -59,13 +60,13 @@ class BridgeData {
         sourceChainID: e.originChainID,
         depositNonce: e.depositNonce.toString(),
         executionStatus: 0,
-        votes: 0,
+        votes: 0
       };
     }
     d.executionStatus = e.status;
   }
 
-  recordVote(e) {
+  recordVote (e) {
     const k = this.depositKey(e.originChainID, e);
     const d = this.depositData[k];
     d.votes++;
@@ -75,10 +76,9 @@ class BridgeData {
 task('info:chain_bridge', 'Prints AMPL token data from given networks')
   .addParam('networks', 'List of hardhat networks', [], types.json)
   .setAction(async (args, hre) => {
-    const bridgeData = {};
     const bd = new BridgeData();
 
-    for (let n in args.networks) {
+    for (const n in args.networks) {
       const network = args.networks[n];
       const chainAddresses = await readDeploymentData(network);
       const provider = getEthersProvider(network);
@@ -120,14 +120,14 @@ task('info:chain_bridge', 'Prints AMPL token data from given networks')
         chainAddresses['chainBridge/bridge'].blockNumber,
       );
       const depositLogs = await bridge.queryFilter('Deposit', startBlock);
-      const deposits = depositLogs.map((d) => d.args);
+      const deposits = depositLogs.map(d => d.args);
       const proposalLogs = await bridge.queryFilter(
         'ProposalEvent',
         startBlock,
       );
-      const proposals = proposalLogs.map((d) => d.args);
+      const proposals = proposalLogs.map(d => d.args);
       const voteLogs = await bridge.queryFilter('ProposalVote', startBlock);
-      const votes = voteLogs.map((d) => d.args);
+      const votes = voteLogs.map(d => d.args);
       bd.load(chainID, deposits, proposals, votes);
     }
 

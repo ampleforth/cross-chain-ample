@@ -1,34 +1,30 @@
+const { types } = require('hardhat/config');
 const {
   task,
   txTask,
   loadSignerSync,
-  etherscanVerify,
+  etherscanVerify
 } = require('../../helpers/tasks');
 const { fetchAndParseYAML, getEthersProvider } = require('../../helpers/utils');
 const {
   getCompiledContractFactory,
   getDeployedContractInstance,
   writeBulkDeploymentData,
-  writeDeploymentData,
-  deployContract,
-  deployProxyAdminContract,
-  deployProxyContract,
+  writeDeploymentData
 } = require('../../helpers/contracts');
 
 const {
   deployAMPLTestnetContracts,
   deployXCAmpleContracts,
-  deployTokenVault,
+  deployTokenVault
 } = require('../../helpers/deploy');
 const {
-  AMPL_BASE_RATE,
-  AMPL_BASE_CPI,
   execRebase,
   printRebaseInfo,
-  toAmplFixedPt,
+  toAmplFixedPt
 } = require('../../sdk/ampleforth');
 
-//https://raw.githubusercontent.com/ampleforth/uFragments-eth-integration/master/migrations/deployments/mainnet-prod.yaml?token=ABPZMDSUSVNH45HUWCMM3R3AJDVOW
+// https://raw.githubusercontent.com/ampleforth/uFragments-eth-integration/master/migrations/deployments/mainnet-prod.yaml?token=ABPZMDSUSVNH45HUWCMM3R3AJDVOW
 task(
   'deploy:use_deployed',
   'Generates deployment files for a deployed instance of Ampleforth',
@@ -60,24 +56,24 @@ task(
       isBaseChain: true,
       ampl: {
         address: addresses.UFragments,
-        abi: UFragments.interface.format(),
+        abi: UFragments.interface.format()
       },
       policy: {
         address: addresses.UFragmentsPolicy,
-        abi: UFragmentsPolicy.interface.format(),
+        abi: UFragmentsPolicy.interface.format()
       },
       orchestrator: {
         address: addresses.Orchestrator,
-        abi: Orchestrator.interface.format(),
+        abi: Orchestrator.interface.format()
       },
       rateOracle: {
         address: addresses.RateOracle,
-        abi: MedianOracle.interface.format(),
+        abi: MedianOracle.interface.format()
       },
       cpiOracle: {
         address: addresses.CpiOracle,
-        abi: MedianOracle.interface.format(),
-      },
+        abi: MedianOracle.interface.format()
+      }
     });
   });
 
@@ -91,7 +87,7 @@ txTask('testnet:deploy:ampleforth', 'Deploy ampleforth contract suite')
   .addParam('amount', 'Amount of ampl to transfer', 0, types.float)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
 
@@ -146,7 +142,7 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
   .addParam('tokenName', 'The symbol of the cross-chain ample ERC-20 token')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     // const txParams = {}
@@ -192,7 +188,7 @@ txTask('deploy:ampleforth_xc', 'Deploy cross chain ampleforth contract suite')
     );
     await writeDeploymentData(hre.network.name, 'rebaseRelayer', rebaseRelayer);
     await writeBulkDeploymentData(hre.network.name, {
-      isBaseChain: false,
+      isBaseChain: false
     });
 
     console.log('------------------------------------------------------------');
@@ -213,7 +209,7 @@ txTask('deploy:token_vault', 'Deploy the token vault contract on base chain')
   .addParam('bridge', 'The bridge which secures the vault')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
 

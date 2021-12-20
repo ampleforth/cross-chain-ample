@@ -2,7 +2,7 @@
 // Importing uFragments contract dependencies to be compiled for integration tests
 pragma solidity 0.7.6;
 
-import {UFragments} from "uFragments/contracts/UFragments.sol";
+import {UFragments} from "ampleforth-contracts/contracts/UFragments.sol";
 
 contract UFragmentsTestnet is UFragments {
     event Result(bool result, bytes reason);

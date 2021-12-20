@@ -1,19 +1,20 @@
 const fs = require('fs');
+const path = require('path');
 const { getAdminAddress } = require('@openzeppelin/upgrades-core');
 
-const DEPLOYMENT_CONFIG_PATH = __dirname + '/../sdk/deployments';
+const DEPLOYMENT_CONFIG_PATH = path.join(__dirname, '/../sdk/deployments');
 const { getEthersProvider } = require('./utils');
 
 const BLOCKS_PER_SEC = 1 / 15;
 
 const ContractABIPaths = {
-  // Openzepppelin
+  // Openzeppelin
   ProxyAdmin: '@openzeppelin/upgrades/contracts/upgradeability',
 
   // Ampleforth
-  UFragments: 'uFragments/contracts',
-  UFragmentsPolicy: 'uFragments/contracts',
-  Orchestrator: 'uFragments/contracts',
+  UFragments: 'ampleforth-contracts/contracts',
+  UFragmentsPolicy: 'ampleforth-contracts/contracts',
+  Orchestrator: 'ampleforth-contracts/contracts',
   MedianOracle: 'market-oracle/contracts',
   UFragmentsTestnet: 'contracts/_test',
 
@@ -33,8 +34,6 @@ const ContractABIPaths = {
 
   AMPLChainBridgeGateway: 'contracts/base-chain/bridge-gateways',
   ChainBridgeXCAmpleGateway: 'contracts/satellite-chain/bridge-gateways',
-  AMPLChainBridgeGateway: 'contracts/base-chain/bridge-gateways',
-  ChainBridgeXCAmpleGateway: 'contracts/satellite-chain/bridge-gateways',
 
   AMPLMaticRebaseGateway: 'contracts/base-chain/bridge-gateways',
   AMPLMaticTransferGateway: 'contracts/base-chain/bridge-gateways',
@@ -42,11 +41,11 @@ const ContractABIPaths = {
   MaticXCAmpleTransferGateway: 'contracts/satellite-chain/bridge-gateways',
 
   // utilities
-  ChainBridgeBatchRebaseReport: 'contracts/_utilities',
+  ChainBridgeBatchRebaseReport: 'contracts/_utilities'
 };
 
-const sleep = (sec) => {
-  return new Promise((resolve) => setTimeout(resolve, sec * 1000));
+const sleep = sec => {
+  return new Promise(resolve => setTimeout(resolve, sec * 1000));
 };
 
 const getCompiledContractFactory = (ethers, contract) => {
@@ -92,7 +91,7 @@ const deployProxyContract = async (
     'ProxyAdmin',
   );
   const Factory = await getCompiledContractFactory(ethers, contractName);
-  const contract = await upgrades.deployProxy(
+  const contract = await hre.upgrades.deployProxy(
     Factory.connect(signer),
     args,
     initializerDef,
@@ -151,13 +150,13 @@ const upgradeProxyContract = async (
   let newImplAddress;
   if (!force) {
     const Factory = await getCompiledContractFactory(ethers, contractName);
-    newImplAddress = await upgrades.prepareUpgrade(
+    newImplAddress = await hre.upgrades.prepareUpgrade(
       proxy.address,
       Factory.connect(signer),
     );
     await sleep(30);
   } else {
-    console.log(`CAUTION: Skpping storage layout verification!`);
+    console.log('CAUTION: Skipping storage layout verification!');
     const newImpl = await deployContract(
       ethers,
       contractName,
@@ -169,16 +168,16 @@ const upgradeProxyContract = async (
   }
   console.log(`New implementation for ${contractName} is at`, newImplAddress);
 
-  if ((await proxyAdmin.owner()) == (await signer.getAddress())) {
-    console.log(`CAUTION: Executing live upgrade!`);
-    console.log(`CANCEL NOW to stop, this action is not reversable`);
+  if ((await proxyAdmin.owner()) === (await signer.getAddress())) {
+    console.log('CAUTION: Executing live upgrade!');
+    console.log('CANCEL NOW to stop, this action is not reversible');
     await sleep(15);
 
     await proxyAdmin
       .connect(signer)
       .upgrade(proxy.address, newImplAddress, txParams);
   } else {
-    console.log('Signer not proxy onwer, cant upgrade');
+    console.log('Signer not proxy owner, cant upgrade');
     console.log(
       `Execute proxyAdmin.upgrade(${proxy.address}, ${newImplAddress})`,
     );
@@ -199,10 +198,15 @@ const upgradeProxyContract = async (
 
 const getDeployedContractInstance = async (network, contractName, provider) => {
   const contractData = await readContractDeploymentData(network, contractName);
-  return new ethers.Contract(contractData.address, contractData.abi, provider);
+  // TODO: pass ethers down
+  return new hre.ethers.Contract(
+    contractData.address,
+    contractData.abi,
+    provider,
+  );
 };
 
-const readDeploymentData = (network) => {
+const readDeploymentData = network => {
   const addressFile = `${DEPLOYMENT_CONFIG_PATH}/${network}.json`;
   return JSON.parse(fs.readFileSync(addressFile));
 };
@@ -236,12 +240,12 @@ const writeDeploymentData = async (network, contractRef, contract) => {
       address: contract.address,
       abi: contract.interface.format(),
       hash: tx.hash,
-      blockNumber: txR.blockNumber,
+      blockNumber: txR.blockNumber
     };
   } else {
     chainAddresses[contractRef] = {
       address: contract.address,
-      abi: contract.interface.format(),
+      abi: contract.interface.format()
     };
   }
 
@@ -265,7 +269,7 @@ const writeProxyDeploymentData = async (network, contractRef, contract) => {
     proxyAdmin: await getAdminAddress(
       getEthersProvider(network),
       contract.address,
-    ),
+    )
   };
 
   fs.writeFileSync(addressFile, JSON.stringify(chainAddresses, null, 2));
@@ -291,8 +295,8 @@ const filterContractEvents = async (
   for (let i = startBlock; i <= endBlock; i += freq) {
     console.log(startBlock, endBlock, i, logs.length);
     const getLogs = async (tries = 25) => {
-      if (tries == 0) {
-        throw 'Max tries reached';
+      if (tries === 0) {
+        throw new Error('Max tries reached');
       }
       try {
         const r = await provider.getLogs({
@@ -300,7 +304,7 @@ const filterContractEvents = async (
           fromBlock: ethers.utils.hexlify(i),
           toBlock: ethers.utils.hexlify(
             i + freq > endBlock ? endBlock : i + freq,
-          ),
+          )
         });
         return r;
       } catch (e) {
@@ -319,9 +323,11 @@ const filterContractEvents = async (
     try {
       log.parsed = contractInterface.parseLog(log);
       if (!log.parsed) {
-        throw 'Parse error';
+        throw new Error('Parse error');
       }
-      log.parsed.name == event ? m.push(log) : m;
+      if (log.parsed.name === event) {
+        m.push(log);
+      }
       return m;
     } catch (e) {
       console.log(e, log);
@@ -336,6 +342,7 @@ module.exports = {
   readContractDeploymentData,
   writeBulkDeploymentData,
   writeDeploymentData,
+  writeProxyDeploymentData,
 
   getCompiledContractFactory,
   getDeployedContractInstance,
@@ -345,5 +352,5 @@ module.exports = {
   deployProxyContract,
   upgradeProxyContract,
 
-  filterContractEvents,
+  filterContractEvents
 };
