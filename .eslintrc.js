@@ -14,7 +14,7 @@ module.exports = {
     contract: true,
     expect: true,
     Promise: true,
-    web3: true,
+    hre: true,
   },
   plugins: ['prettier', 'spellcheck', 'chai-friendly'],
   rules: {
@@ -86,6 +86,7 @@ module.exports = {
           'initializer',
           'nomiclabs',
           'upgradable',
+          'upgradeability',
           'ethersproject',
           'hexlify',
           'utf8',
@@ -93,6 +94,7 @@ module.exports = {
           'keccak256',
           'Sighash',
           'ecsign',
+          'rollup',
 
           // shorthand
           'args',
@@ -109,6 +111,9 @@ module.exports = {
           'perc',
           'opcode',
           'aprox',
+          'impl',
+          'param',
+          'desc',
 
           // project-specific
           'rebase',
@@ -159,6 +164,12 @@ module.exports = {
           'dev3',
           'avax',
           'arbitrum',
+          'mumbai',
+          'maticjs',
+          'maticnetwork',
+          'passphrase',
+          'erc721',
+          'batcher',
 
           // names
           'nithin',

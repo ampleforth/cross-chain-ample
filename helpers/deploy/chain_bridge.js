@@ -1,15 +1,15 @@
 const {
   XC_REBASE_RESOURCE_ID,
   XC_TRANSFER_RESOURCE_ID,
-  CB_FUNCTION_SIG_baseChainReportRebase,
-  CB_FUNCTION_SIG_satelliteChainReportRebase,
-  CB_FUNCTION_SIG_baseChainTransfer,
-  CB_FUNCTION_SIG_satelliteChainTransfer,
+  CB_FUNCTION_SIG_BC_REPORT_REBASE,
+  CB_FUNCTION_SIG_SC_REPORT_REBASE,
+  CB_FUNCTION_SIG_BC_TRANSFER,
+  CB_FUNCTION_SIG_SC_TRANSFER
 } = require('../../sdk/chain_bridge');
 
 const { deployContract } = require('../contracts');
 
-async function deployChainBridgeHelpers(
+async function deployChainBridgeHelpers (
   bridge,
   { chainId, relayers, relayerThreshold, fee, expiry },
   ethers,
@@ -27,11 +27,11 @@ async function deployChainBridgeHelpers(
   );
 
   return {
-    batchRebaseReporter,
+    batchRebaseReporter
   };
 }
 
-async function deployChainBridgeContracts(
+async function deployChainBridgeContracts (
   { chainId, relayers, relayerThreshold, fee, expiry },
   ethers,
   deployer,
@@ -68,11 +68,11 @@ async function deployChainBridgeContracts(
   return {
     bridge,
     genericHandler,
-    ...helpers,
+    ...helpers
   };
 }
 
-async function deployChainBridgeBaseChainGatewayContracts(
+async function deployChainBridgeBaseChainGatewayContracts (
   { ampl, policy, bridge, genericHandler, tokenVault },
   ethers,
   deployer,
@@ -100,8 +100,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
   const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
   const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
 
-  const reportRebaseFnSig =
-    CB_FUNCTION_SIG_baseChainReportRebase(rebaseGateway);
+  const reportRebaseFnSig = CB_FUNCTION_SIG_BC_REPORT_REBASE(rebaseGateway);
 
   if (isAdmin) {
     await (
@@ -124,11 +123,11 @@ async function deployChainBridgeBaseChainGatewayContracts(
       genericHandler.address,
       XC_REBASE_RESOURCE_ID,
       rebaseGateway.address,
-      ...reportRebaseFnSig,
+      ...reportRebaseFnSig
     ]);
   }
 
-  const transferFnSig = CB_FUNCTION_SIG_baseChainTransfer(transferGateway);
+  const transferFnSig = CB_FUNCTION_SIG_BC_TRANSFER(transferGateway);
   if (isAdmin) {
     await (
       await bridge
@@ -150,11 +149,11 @@ async function deployChainBridgeBaseChainGatewayContracts(
       genericHandler.address,
       XC_TRANSFER_RESOURCE_ID,
       transferGateway.address,
-      ...transferFnSig,
+      ...transferFnSig
     ]);
   }
 
-  if ((await tokenVault.owner()) == deployerAddress) {
+  if ((await tokenVault.owner()) === deployerAddress) {
     await (
       await tokenVault
         .connect(deployer)
@@ -171,7 +170,7 @@ async function deployChainBridgeBaseChainGatewayContracts(
   return { rebaseGateway, transferGateway };
 }
 
-async function deployChainBridgeSatelliteChainGatewayContracts(
+async function deployChainBridgeSatelliteChainGatewayContracts (
   { xcAmple, xcAmpleController, bridge, genericHandler },
   ethers,
   deployer,
@@ -210,8 +209,7 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
   const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
   const isAdmin = await bridge.hasRole(adminRole, await deployer.getAddress());
 
-  const reportRebaseFnSig =
-    CB_FUNCTION_SIG_satelliteChainReportRebase(rebaseGateway);
+  const reportRebaseFnSig = CB_FUNCTION_SIG_SC_REPORT_REBASE(rebaseGateway);
   if (isAdmin) {
     await (
       await bridge.adminSetGenericResource(
@@ -231,11 +229,11 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
       genericHandler.address,
       XC_REBASE_RESOURCE_ID,
       rebaseGateway.address,
-      ...reportRebaseFnSig,
+      ...reportRebaseFnSig
     ]);
   }
 
-  const transferFnSig = CB_FUNCTION_SIG_satelliteChainTransfer(transferGateway);
+  const transferFnSig = CB_FUNCTION_SIG_SC_TRANSFER(transferGateway);
   if (isAdmin) {
     await (
       await bridge.adminSetGenericResource(
@@ -255,7 +253,7 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
       genericHandler.address,
       XC_TRANSFER_RESOURCE_ID,
       transferGateway.address,
-      ...transferFnSig,
+      ...transferFnSig
     ]);
   }
 
@@ -266,5 +264,5 @@ module.exports = {
   deployChainBridgeContracts,
   deployChainBridgeHelpers,
   deployChainBridgeBaseChainGatewayContracts,
-  deployChainBridgeSatelliteChainGatewayContracts,
+  deployChainBridgeSatelliteChainGatewayContracts
 };

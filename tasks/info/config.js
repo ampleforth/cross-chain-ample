@@ -1,24 +1,16 @@
-const {
-  types,
-  task,
-  txTask,
-  cbDeployTask,
-  loadSignerSync,
-} = require('../../helpers/tasks');
+const { types, task } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
-  deployContract,
   getDeployedContractInstance,
-  readDeploymentData,
-  writeDeploymentData,
+  readDeploymentData
 } = require('../../helpers/contracts');
 
-task('config:chain_bridge', 'Generates chian_bridge config file')
+task('config:chain_bridge', 'Generates chain_bridge config file')
   .addParam('networks', 'List of hardhat networks', [], types.json)
   .addParam('relayerAddress', 'Address of the relayer')
   .setAction(async (args, hre) => {
     const chains = [];
-    for (let n in args.networks) {
+    for (const n in args.networks) {
       const network = args.networks[n];
       const chainAddresses = await readDeploymentData(network);
       const provider = getEthersProvider(network);
@@ -40,8 +32,8 @@ task('config:chain_bridge', 'Generates chian_bridge config file')
           startBlock: `${(
             chainAddresses['chainBridge/bridge'].blockNumber || 0
           ).toString()}`,
-          http: 'true',
-        },
+          http: 'true'
+        }
       });
     }
     const chainBridgeConfig = { chains };

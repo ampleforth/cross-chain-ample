@@ -3,21 +3,15 @@ const { getEthersProvider } = require('../../helpers/utils');
 const { Bridge } = require('arb-ts');
 const { hexDataLength } = require('@ethersproject/bytes');
 
-const {
-  readDeploymentData,
-  getDeployedContractInstance,
-} = require('../../helpers/contracts');
-const {
-  executeXCRebase,
-  XC_REBASE_RESOURCE_ID,
-} = require('../../sdk/chain_bridge');
+const { getDeployedContractInstance } = require('../../helpers/contracts');
+const { XC_REBASE_RESOURCE_ID } = require('../../sdk/chain_bridge');
 const { printRebaseInfo, execRebase } = require('../../sdk/ampleforth');
 
 txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
   .addParam('rebasePerc', 'The rebase percentage to be applied', '0')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const sender = await loadSignerSync(args, hre.ethers.provider);
@@ -65,7 +59,7 @@ txTask(
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const sender = await loadSignerSync(args, hre.ethers.provider);
@@ -87,11 +81,6 @@ txTask(
       'chainBridge/bridge',
       baseChainProvider,
     );
-    const baseChainGenericHandler = await getDeployedContractInstance(
-      baseChainNetwork,
-      'chainBridge/genericHandler',
-      baseChainProvider,
-    );
     const batchRebaseReporter = await getDeployedContractInstance(
       baseChainNetwork,
       'chainBridge/batchRebaseReporter',
@@ -99,8 +88,8 @@ txTask(
     );
 
     const satelliteChainIDs = [];
-    let totalFee = BigNumber.from('0');
-    for (let n in args.satelliteChainNetworks) {
+    let totalFee = hre.ethers.BigNumber.from('0');
+    for (const n in args.satelliteChainNetworks) {
       const network = args.satelliteChainNetworks[n];
       const provider = await getEthersProvider(network);
       const satelliteChainBridge = await getDeployedContractInstance(
@@ -134,7 +123,7 @@ txTask(
   'Reports most recent rebase to bridge on base chain to the matic satellite chain',
 ).setAction(async (args, hre) => {
   const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-  if (txParams.gasPrice == 0) {
+  if (txParams.gasPrice === 0) {
     txParams.gasPrice = await hre.ethers.provider.getGasPrice();
   }
   const sender = await loadSignerSync(args, hre.ethers.provider);
@@ -165,7 +154,7 @@ txTask(
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
     const sender = await loadSignerSync(args, hre.ethers.provider);
@@ -193,13 +182,14 @@ txTask(
     );
 
     const arb = await Bridge.init(baseChainSigner, satChainSigner);
-    const fnDataBytes = ethers.utils.defaultAbiCoder.encode(
+    const fnDataBytes = hre.ethers.utils.defaultAbiCoder.encode(
       ['uint256', 'uint256'],
       await policy.globalAmpleforthEpochAndAMPLSupply(),
     );
     const fnBytesLength = hexDataLength(fnDataBytes) + 4;
-    const [_submissionPriceWei, nextUpdateTimestamp] =
-      await arb.l2Bridge.getTxnSubmissionPrice(fnBytesLength);
+    const [_submissionPriceWei] = await arb.l2Bridge.getTxnSubmissionPrice(
+      fnBytesLength,
+    );
     const submissionPriceWei = _submissionPriceWei.mul(5); // buffer can be reduced
     const maxGas = 200000;
     const gasPriceBid = await satChainProvider.getGasPrice();
@@ -226,13 +216,12 @@ txTask(
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
 
-    for (let n in args.networks) {
+    for (const n in args.networks) {
       const network = args.networks[n];
-      const chainAddresses = await readDeploymentData(network);
       const provider = await getEthersProvider(network);
 
       const sender = await loadSignerSync(args, provider);

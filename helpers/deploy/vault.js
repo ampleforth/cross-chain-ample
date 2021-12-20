@@ -1,6 +1,6 @@
 const { deployContract } = require('../contracts');
 
-async function deployTokenVault(
+async function deployTokenVault (
   ethers,
   deployer,
   txParams = {},
@@ -19,5 +19,5 @@ async function deployTokenVault(
 }
 
 module.exports = {
-  deployTokenVault,
+  deployTokenVault
 };

@@ -1,6 +1,6 @@
 const { deployContract } = require('../contracts');
 
-async function deployMaticBaseChainGatewayContracts(
+async function deployMaticBaseChainGatewayContracts (
   { ampl, policy, tokenVault, checkpointManagerAddress, fxRootAddress },
   ethers,
   deployer,
@@ -25,7 +25,7 @@ async function deployMaticBaseChainGatewayContracts(
   );
 
   const deployerAddress = await deployer.getAddress();
-  if ((await tokenVault.owner()) == deployerAddress) {
+  if ((await tokenVault.owner()) === deployerAddress) {
     await (
       await tokenVault.connect(deployer).addBridgeGateway(rebaseGateway.address)
     ).wait(waitBlocks);
@@ -46,7 +46,7 @@ async function deployMaticBaseChainGatewayContracts(
   return { rebaseGateway, transferGateway };
 }
 
-async function deployMaticSatelliteChainGatewayContracts(
+async function deployMaticSatelliteChainGatewayContracts (
   { xcAmple, xcAmpleController, fxChildAddress },
   ethers,
   deployer,
@@ -71,7 +71,7 @@ async function deployMaticSatelliteChainGatewayContracts(
   );
 
   const deployerAddress = await deployer.getAddress();
-  if ((await xcAmpleController.owner()) == deployerAddress) {
+  if ((await xcAmpleController.owner()) === deployerAddress) {
     await (
       await xcAmpleController
         .connect(deployer)
@@ -96,5 +96,5 @@ async function deployMaticSatelliteChainGatewayContracts(
 
 module.exports = {
   deployMaticBaseChainGatewayContracts,
-  deployMaticSatelliteChainGatewayContracts,
+  deployMaticSatelliteChainGatewayContracts
 };

@@ -3,20 +3,17 @@ const { hexDataLength } = require('@ethersproject/bytes');
 const {
   txTask,
   loadSignerSync,
-  etherscanVerify,
+  etherscanVerify
 } = require('../../helpers/tasks');
 const { getEthersProvider } = require('../../helpers/utils');
 const {
   getDeployedContractInstance,
-  readDeploymentData,
-  writeDeploymentData,
-  writeBulkDeploymentData,
-  getCompiledContractFactory,
+  writeDeploymentData
 } = require('../../helpers/contracts');
 
 const {
   deployArbitrumBaseChainGatewayContracts,
-  deployArbitrumSatelliteChainGatewayContracts,
+  deployArbitrumSatelliteChainGatewayContracts
 } = require('../../helpers/deploy');
 
 txTask(
@@ -24,13 +21,12 @@ txTask(
   'Deploys the chain gateway on the base chain',
 ).setAction(async (args, hre) => {
   const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-  if (txParams.gasPrice == 0) {
+  if (txParams.gasPrice === 0) {
     txParams.gasPrice = await hre.ethers.provider.getGasPrice();
   }
 
   const deployer = loadSignerSync(args, hre.ethers.provider);
   const deployerAddress = await deployer.getAddress();
-  const chainAddresses = await readDeploymentData(hre.network.name);
 
   console.log('------------------------------------------------------------');
   console.log('Deploying contracts on base-chain');
@@ -59,7 +55,7 @@ txTask(
     {
       ampl,
       policy,
-      tokenVault,
+      tokenVault
     },
     hre.ethers,
     deployer,
@@ -85,7 +81,7 @@ txTask(
   await etherscanVerify(hre, gateway.address, [
     ampl.address,
     policy.address,
-    tokenVault.address,
+    tokenVault.address
   ]);
 });
 
@@ -95,13 +91,12 @@ txTask(
 ).setAction(async (args, hre) => {
   // NOTE: gas estimation is off on arbitrum
   // const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-  // if (txParams.gasPrice == 0) {
+  // if (txParams.gasPrice === 0) {
   //   txParams.gasPrice = await hre.ethers.provider.getGasPrice();
   // }
   const txParams = {};
   const deployer = loadSignerSync(args, hre.ethers.provider);
   const deployerAddress = await deployer.getAddress();
-  const chainAddresses = await readDeploymentData(hre.network.name);
 
   console.log('------------------------------------------------------------');
   console.log('Deploying contracts on satellite-chain');
@@ -145,7 +140,7 @@ txTask(
   console.log('Verify on etherscan');
   await etherscanVerify(hre, gateway.address, [
     xcAmple.address,
-    xcAmpleController.address,
+    xcAmpleController.address
   ]);
 });
 
@@ -166,7 +161,7 @@ txTask('deploy:arbitrum_connection', 'Connects the two gateway contracts')
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
 
@@ -230,7 +225,7 @@ txTask('deploy:arbitrum_register_testnet', 'Registers the token to the router')
   )
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
 
@@ -249,16 +244,16 @@ txTask('deploy:arbitrum_register_testnet', 'Registers the token to the router')
           {
             internalType: 'uint256',
             name: '_maxSubmissionCost',
-            type: 'uint256',
-          },
+            type: 'uint256'
+          }
         ],
         name: 'setGateway',
         outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
         stateMutability: 'payable',
-        type: 'function',
-      },
+        type: 'function'
+      }
     ];
-    const router = new ethers.Contract(
+    const router = new hre.ethers.Contract(
       args.baseRouter,
       routerABI,
       hre.ethers.provider,
@@ -277,13 +272,14 @@ txTask('deploy:arbitrum_register_testnet', 'Registers the token to the router')
     );
 
     const arb = await Bridge.init(baseChainSigner, satChainSigner);
-    const fnDataBytes = ethers.utils.defaultAbiCoder.encode(
+    const fnDataBytes = hre.ethers.utils.defaultAbiCoder.encode(
       ['address', 'uint256', 'uint256', 'uint256'],
       [baseGateway.address, '0', '0', '0'],
     );
     const fnBytesLength = hexDataLength(fnDataBytes) + 4;
-    const [_submissionPriceWei, nextUpdateTimestamp] =
-      await arb.l2Bridge.getTxnSubmissionPrice(fnBytesLength);
+    const [_submissionPriceWei] = await arb.l2Bridge.getTxnSubmissionPrice(
+      fnBytesLength,
+    );
     const submissionPriceWei = _submissionPriceWei.mul(5); // buffer can be reduced
     const maxGas = 500000;
     const gasPriceBid = await satChainProvider.getGasPrice();
@@ -300,7 +296,7 @@ txTask('deploy:arbitrum_register_testnet', 'Registers the token to the router')
       .connect(baseChainSigner)
       .externalCall(ptx.to, ptx.data, callValue, {
         ...txParams,
-        value: callValue,
+        value: callValue
       });
 
     console.log(tx.hash);

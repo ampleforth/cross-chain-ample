@@ -1,9 +1,6 @@
 const { types } = require('hardhat/config');
 const { txTask, loadSignerSync, etherscanVerify } = require('../helpers/tasks');
-const {
-  getDeployedContractInstance,
-  upgradeProxyContract,
-} = require('../helpers/contracts');
+const { upgradeProxyContract } = require('../helpers/contracts');
 
 txTask(
   'upgrade:xc_ample',
@@ -12,7 +9,7 @@ txTask(
   .addParam('force', 'Skip storage layout verification', false, types.boolean)
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
-    if (txParams.gasPrice == 0) {
+    if (txParams.gasPrice === 0) {
       txParams.gasPrice = await hre.ethers.provider.getGasPrice();
     }
 

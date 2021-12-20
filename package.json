@@ -8,7 +8,7 @@
     "compile": "yarn hardhat compile",
     "coverage": "yarn hardhat coverage --testfiles 'test/unit/**/*.js'",
     "format": "yarn prettier --config .prettierrc --write '**/*.js' 'contracts/**/*.sol'",
-    "lint": "yarn solhint 'contracts/**/*.sol' && yarn eslint ./test *.js --cache --fix",
+    "lint": "yarn solhint 'contracts/**/*.sol' && yarn eslint '**/*.js' --cache --fix",
     "profile": "REPORT_GAS=true yarn hardhat test",
     "test": "yarn hardhat test",
     "test-ganache": "yarn hardhat test --network ganache"

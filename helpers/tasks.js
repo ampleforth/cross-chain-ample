@@ -2,7 +2,7 @@ const fs = require('fs');
 const { types } = require('hardhat/config');
 const { task } = require('hardhat/config');
 
-function txTask(name, desc) {
+function txTask (name, desc) {
   return task(name, desc)
     .addParam('gasPrice', 'Gas price for the transaction', 0, types.int)
     .addParam('gasLimit', 'Gas limit for the transaction', 7000000, types.int)
@@ -11,7 +11,7 @@ function txTask(name, desc) {
     .addParam('passphrase', 'The passphrase to unlock keyfile');
 }
 
-function cbDeployTask(name, desc) {
+function cbDeployTask (name, desc) {
   return txTask(name, desc)
     .addOptionalParam('chainId', 'Chain ID for the instance', 100, types.int)
     .addOptionalParam(
@@ -40,14 +40,14 @@ function cbDeployTask(name, desc) {
     );
 }
 
-function loadSignerSync(args, provider) {
-  return ethers.Wallet.fromEncryptedJsonSync(
+function loadSignerSync (args, provider) {
+  return hre.ethers.Wallet.fromEncryptedJsonSync(
     fs.readFileSync(args.keyfile),
     args.passphrase,
   ).connect(provider);
 }
 
-async function etherscanVerify(hre, address, constructorArguments = []) {
+async function etherscanVerify (hre, address, constructorArguments = []) {
   try {
     await hre.run('verify:verify', { address, constructorArguments });
   } catch (e) {
@@ -61,5 +61,5 @@ module.exports = {
   txTask,
   cbDeployTask,
   loadSignerSync,
-  etherscanVerify,
+  etherscanVerify
 };
