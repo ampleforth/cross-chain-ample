@@ -37,8 +37,9 @@ txTask(
     deployer,
     [],
     txParams,
+    2,
   );
-  await batchRebaseReporter.deployTransaction.wait(5);
+  await batchRebaseReporter.deployTransaction.wait(2);
 
   console.log('------------------------------------------------------------');
   console.log('Writing data to file');

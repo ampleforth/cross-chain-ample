@@ -2,7 +2,7 @@ dist: trusty
 sudo: required
 language: node_js
 node_js:
-  - '12'
+  - '16'
 cache:
   directories:
     - node_modules
@@ -10,8 +10,8 @@ script:
   - yarn format
   - yarn lint
   - yarn test
-  - yarn coverage
 after_success:
+  - yarn coverage
   - cat coverage/lcov.info | npx coveralls
 notifications:
   email:

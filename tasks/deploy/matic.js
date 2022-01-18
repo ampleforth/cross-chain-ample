@@ -68,6 +68,7 @@ txTask(
         hre.ethers,
         deployer,
         txParams,
+        2,
       );
 
     console.log('------------------------------------------------------------');
@@ -136,6 +137,7 @@ txTask(
         hre.ethers,
         deployer,
         txParams,
+        2,
       );
 
     console.log('------------------------------------------------------------');
@@ -209,22 +211,22 @@ txTask('deploy:matic_connection', 'Connects the two gateway contracts')
       await baseRebaseGateway
         .connect(baseChainSigner)
         .setFxChildTunnel(satRebaseGateway.address, txParams)
-    ).wait();
+    ).wait(2);
     await (
       await satRebaseGateway
         .connect(satChainSigner)
         .setFxRootTunnel(baseRebaseGateway.address, txParams)
-    ).wait();
+    ).wait(2);
 
     await (
       await baseTransferGateway
         .connect(baseChainSigner)
         .setFxChildTunnel(satTransferGateway.address, txParams)
-    ).wait();
+    ).wait(2);
 
     await (
       await satTransferGateway
         .connect(satChainSigner)
         .setFxRootTunnel(baseTransferGateway.address, txParams)
-    ).wait();
+    ).wait(2);
   });

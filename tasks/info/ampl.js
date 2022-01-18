@@ -135,7 +135,7 @@ task('info:ampl:balance', 'Prints AMPL token balance from given networks')
 
 task(
   'info:ampl:setup',
-  'Prints AMPL configuration paramters from given networks',
+  'Prints AMPL configuration parameters from given networks',
 )
   .addParam('networks', 'List of hardhat networks', [], types.json)
   .setAction(async (args, hre) => {
@@ -252,6 +252,14 @@ task(
         console.log(
           'XCAmpleController:totalSupply',
           toAmplFloatingPt(globalAMPLSupply),
+        );
+        console.log(
+          'XCAmpleController:nextGlobalAmpleforthEpoch',
+          (await xcAmpleController.nextGlobalAmpleforthEpoch()).toString(),
+        );
+        console.log(
+          'XCAmpleController:nextGlobalAMPLSupply',
+          toAmplFloatingPt(await xcAmpleController.nextGlobalAMPLSupply()),
         );
         console.log('XCAmpleController:gatewayWhitelist', gatewayWhitelist);
         console.log(

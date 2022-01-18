@@ -18,14 +18,18 @@
     "lint"
   ],
   "dependencies": {
-    "@maticnetwork/maticjs": "^2.0.43",
+    "@maticnetwork/maticjs": "https://github.com/maticnetwork/matic.js.git#2.0.43",
     "@openzeppelin/contracts": "^3.4.0",
     "@openzeppelin/contracts-upgradeable": "^3.3.0",
     "@openzeppelin/upgrades": "^2.8.0",
+    "arb-bridge-eth": "https://gitpkg.now.sh/OffchainLabs/arbitrum/packages/arb-bridge-eth",
+    "arb-bridge-peripherals": "https://gitpkg.now.sh/OffchainLabs/arbitrum/packages/arb-bridge-peripherals",
+    "arb-ts": "^0.0.42",
+    "arbos-contracts": "https://gitpkg.now.sh/OffchainLabs/arb-os/contracts",
     "chainbridge-solidity": "https://github.com/meterio/chainbridge-solidity-v1.0.0-eth#6b02b0a52ce7e3967feeffbe6a6440a5b1006aec",
-    "fx-portal": "fx-portal/contracts",
+    "fx-portal": "fx-portal/contracts#v1.0.1",
     "market-oracle": "https://github.com/ampleforth/market-oracle#v1.0.1",
-    "uFragments": "https://github.com/ampleforth/uFragments#v1.1.0"
+    "uFragments": "https://github.com/ampleforth/ampleforth-contracts#v1.2.0"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.1",

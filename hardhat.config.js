@@ -10,6 +10,7 @@ require('@nomiclabs/hardhat-etherscan');
 require('./tasks/deploy/ampleforth');
 require('./tasks/deploy/chain_bridge');
 require('./tasks/deploy/matic');
+require('./tasks/deploy/arbitrum');
 require('./tasks/deploy/rebase_reporter');
 
 require('./tasks/ops/rebase');
@@ -29,7 +30,7 @@ module.exports = {
         version: '0.4.24'
       },
       {
-        version: '0.7.6'
+        version: '0.5.12'
       },
       {
         version: '0.6.4'
@@ -38,10 +39,25 @@ module.exports = {
         version: '0.6.8'
       },
       {
-        version: '0.5.12'
+        version: '0.6.11',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
       },
       {
         version: '0.7.3',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.7.6',
         settings: {
           optimizer: {
             enabled: true,
@@ -97,6 +113,14 @@ module.exports = {
     },
     dev2MumbaiSatChain: {
       url: 'https://polygon-mumbai.infura.io/v3/' + process.env.INFURA_SECRET
+    },
+
+    // arbitrum
+    dev3RinkebyBaseChain: {
+      url: 'https://eth-rinkeby.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
+    },
+    dev3RinkebyArbitrumSatChain: {
+      url: 'https://rinkeby.arbitrum.io/rpc'
     },
 
     // prod

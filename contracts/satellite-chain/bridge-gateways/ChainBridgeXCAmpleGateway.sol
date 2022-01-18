@@ -4,16 +4,15 @@ pragma solidity 0.7.3;
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
 
-import {ChainBridgeRebaseGateway} from "../../base-bridge-gateways/ChainBridgeRebaseGateway.sol";
-import {ChainBridgeTransferGateway} from "../../base-bridge-gateways/ChainBridgeTransferGateway.sol";
-
+// solhint-disable-next-line max-line-length
+import {IChainBridgeSCRebaseGateway, IChainBridgeSCTransferGateway} from "../../_interfaces/bridge-gateways/IChainBridgeGateway.sol";
 import {IXCAmpleController} from "../../_interfaces/IXCAmpleController.sol";
 import {IXCAmpleControllerGateway} from "../../_interfaces/IXCAmpleControllerGateway.sol";
 import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
 
 /**
  * @title ChainBridgeXCAmpleGateway
- * @dev This contract is deployed on the satellite EVM chains eg). tron, acala, near etc.
+ * @dev This contract is deployed on the satellite EVM chains (Bsc, avax etc).
  *
  *      It's a pass-through contract between the ChainBridge handler contract and
  *      the xc-ample controller contract.
@@ -35,8 +34,8 @@ import {IXCAmple} from "../../_interfaces/IXCAmple.sol";
  *
  */
 contract ChainBridgeXCAmpleGateway is
-    ChainBridgeRebaseGateway,
-    ChainBridgeTransferGateway,
+    IChainBridgeSCRebaseGateway,
+    IChainBridgeSCTransferGateway,
     Ownable
 {
     using SafeMath for uint256;
@@ -76,13 +75,13 @@ contract ChainBridgeXCAmpleGateway is
      * @dev Calculates the amount of xc-amples to be mint based on the amount and the total supply
      *      on the base chain when the transaction was initiated
      *      and mints xc-amples to the recipient.
-     * @param senderAddressInSourceChain Address of the sender wallet in the transaction originating chain.
+     * @param senderInSourceChain Address of the sender wallet in the transaction originating chain.
      * @param recipient Address of the recipient wallet in the current chain (target chain).
      * @param amount Amount of tokens that were {locked/burnt} on the source chain.
      * @param globalAMPLSupply AMPL ERC-20 total supply at the time of transfer.
      */
     function mint(
-        address senderAddressInSourceChain,
+        address senderInSourceChain,
         address recipient,
         uint256 amount,
         uint256 globalAMPLSupply
@@ -104,13 +103,13 @@ contract ChainBridgeXCAmpleGateway is
     /**
      * @dev Validates the data from the handler and burns specified amount from the sender's wallet.
      * @param sender Address of the sender wallet on the source chain.
-     * @param recipientAddressInTargetChain Address of the recipient wallet in the target chain.
+     * @param recipientInTargetChain Address of the recipient wallet in the target chain.
      * @param amount Amount of tokens to be burnt on the current chain (source chain).
      * @param globalAMPLSupply AMPL ERC-20 total supply at the time of transfer burning.
      */
     function validateAndBurn(
         address sender,
-        address recipientAddressInTargetChain,
+        address recipientInTargetChain,
         uint256 amount,
         uint256 globalAMPLSupply
     ) external override onlyOwner {

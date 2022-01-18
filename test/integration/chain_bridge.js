@@ -15,7 +15,7 @@ const {
 const { execRebase, toAmplFixedPt } = require('../../sdk/ampleforth');
 
 const {
-  deployAMPLContracts,
+  deployAMPLTestnetContracts,
   deployXCAmpleContracts,
   deployTokenVault,
   deployChainBridgeContracts,
@@ -55,7 +55,7 @@ async function setupContracts () {
   userASatChain2Wallet = accounts[6];
   userBSatChain2Wallet = accounts[7];
 
-  baseChainAmplContracts = await deployAMPLContracts(ethers, deployer);
+  baseChainAmplContracts = await deployAMPLTestnetContracts(ethers, deployer);
   baseChainAmplContracts.tokenVault = await deployTokenVault(ethers, deployer);
 
   baseChainBridgeContracts = await deployChainBridgeContracts(
