@@ -52,7 +52,7 @@ txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
   });
 
 txTask(
-  'chain_bridge:report_rebase',
+  'chain_bridge:batch_report_rebase',
   'Reports most recent rebase to bridge on base chain for list of given satellite chains through chain bridge',
 )
   .addParam(
@@ -114,7 +114,7 @@ txTask(
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);
     console.log('totalFee', totalFee);
-
+    txParams.value = totalFee
     const tx = await batchRebaseReporter
       .connect(sender)
       .execute(
@@ -122,8 +122,81 @@ txTask(
         baseChainBridge.address,
         satelliteChainIDs,
         XC_REBASE_RESOURCE_ID,
-        { value: totalFee },
+        txParams,
       );
+
+    const txR = await tx.wait();
+    console.log(txR.transactionHash);
+  });
+
+txTask(
+  'chain_bridge:report_rebase',
+  'Reports most recent rebase to bridge on base chain to a given satellite chains through chain bridge',
+)
+  .addParam(
+    'satelliteChainNetwork',
+    'List of satellite chain hardhat networks',
+  )
+  .setAction(async (args, hre) => {
+    const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
+    if (txParams.gasPrice == 0) {
+      txParams.gasPrice = await hre.ethers.provider.getGasPrice();
+    }
+    const sender = await loadSignerSync(args, hre.ethers.provider);
+    const senderAddress = await sender.getAddress();
+    console.log('Sender:', senderAddress);
+    console.log(txParams);
+
+    const baseChainNetwork = hre.network.name;
+    const baseChainProvider = hre.ethers.provider;
+    const policy = await getDeployedContractInstance(
+      baseChainNetwork,
+      'policy',
+      baseChainProvider,
+    );
+    await printRebaseInfo(policy);
+
+    const baseChainBridge = await getDeployedContractInstance(
+      baseChainNetwork,
+      'chainBridge/bridge',
+      baseChainProvider,
+    );
+    const baseChainGenericHandler = await getDeployedContractInstance(
+      baseChainNetwork,
+      'chainBridge/genericHandler',
+      baseChainProvider,
+    );
+    const batchRebaseReporter = await getDeployedContractInstance(
+      baseChainNetwork,
+      'chainBridge/batchRebaseReporter',
+      baseChainProvider,
+    );
+
+    const satChainNetwork = args.satelliteChainNetwork;
+    const satProvider = await getEthersProvider(satChainNetwork);
+    const satelliteChainBridge = await getDeployedContractInstance(
+      satChainNetwork,
+      'chainBridge/bridge',
+      satProvider,
+    );
+    const satelliteChainGenericHandler = await getDeployedContractInstance(
+      satChainNetwork,
+      'chainBridge/genericHandler',
+      satProvider,
+    );
+    const satelliteChainID = await satelliteChainBridge._chainID();
+    const totalFee = await baseChainBridge.getFee(satelliteChainID);
+    console.log('Initiating cross-chain rebase', satelliteChainID);
+    console.log('totalFee', totalFee.toString());
+    txParams.value = totalFee
+    const tx = await executeXCRebase(
+      sender,
+      baseChainBridge,
+      satelliteChainBridge,
+      satelliteChainGenericHandler,
+      policy,
+      txParams,
+    )
 
     const txR = await tx.wait();
     console.log(txR.transactionHash);

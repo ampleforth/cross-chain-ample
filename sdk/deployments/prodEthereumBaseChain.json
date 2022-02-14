@@ -154,7 +154,7 @@
     ]
   },
   "chainBridge/bridge": {
-    "address": "0xa2A22B46B8df38cd7C55E6bf32Ea5a32637Cf2b1",
+    "address": "0xb61B5aca15193ECB719433d0E5c066f9980E1e83",
     "abi": [
       "constructor(uint8 chainID, address[] initialRelayers, uint256 initialRelayerThreshold, uint256 fee, uint256 expiry)",
       "event Deposit(uint8 indexed destinationChainID, bytes32 indexed resourceID, uint64 indexed depositNonce)",
