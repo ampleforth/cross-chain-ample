@@ -180,6 +180,7 @@ txTask(
     const totalFee = await baseChainBridge.getFee(satelliteChainID);
     console.log('Initiating cross-chain rebase', satelliteChainID);
     console.log('totalFee', totalFee.toString());
+    txParams.value = totalFee;
     const { tx, txR } = await executeXCRebase(
       sender,
       baseChainBridge,
