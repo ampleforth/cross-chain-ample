@@ -215,24 +215,27 @@
     "blockNumber": 7954218
   },
   "chainBridge/rebaseGateway": {
-    "address": "0x93b673975Dcf148329097705e1bD1B68c8d22d10",
+    "address": "0x0c318c047e8038E9a5e7AC613e73C39220B0311C",
     "abi": [
       "constructor(address bridgeHandler, address xcAmple_, address xcController_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
       "event XCRebaseReportIn(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply, uint256 recordedGlobalAmpleforthEpoch, uint256 recordedGlobalAMPLSupply)",
       "event XCRebaseReportOut(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
-      "event XCTransferIn(address recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
-      "event XCTransferOut(address sender, uint256 amount, uint256 recordedGlobalAMPLSupply)",
+      "event XCTransferIn(address indexed senderInSourceChain, address indexed recipient, uint256 globalAMPLSupply, uint256 amount, uint256 recordedGlobalAMPLSupply)",
+      "event XCTransferOut(address indexed sender, address indexed recipientInTargetChain, uint256 amount, uint256 recordedGlobalAMPLSupply)",
       "function mint(address senderAddressInSourceChain, address recipient, uint256 amount, uint256 globalAMPLSupply)",
       "function owner() view returns (address)",
       "function renounceOwnership()",
       "function reportRebase(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function transferOwnership(address newOwner)",
+      "function unlock(address senderAddressInSourceChain, address recipient, uint256 amount, uint256 globalAMPLSupply)",
       "function validateAndBurn(address sender, address recipientAddressInTargetChain, uint256 amount, uint256 globalAMPLSupply)",
+      "function validateAndLock(address sender, address recipientAddressInTargetChain, uint256 amount, uint256 globalAMPLSupply)",
+      "function validateRebaseReport(uint256 globalAmpleforthEpoch, uint256 globalAMPLSupply)",
       "function xcAmple() view returns (address)",
       "function xcController() view returns (address)"
     ],
-    "hash": "0x7abaa4d5c157d09c0c7049893545143a507718c7819d3c1eb11ed26f04391ebc",
-    "blockNumber": 7954214
+    "hash": "0x80e9fbc2488b49c8e1f81fb09dd01eee530a69a81eabcbe4c73d1d2b94817cb3",
+    "blockNumber": 15371636
   }
 }
