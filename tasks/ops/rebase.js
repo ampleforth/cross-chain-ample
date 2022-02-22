@@ -114,7 +114,7 @@ txTask(
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);
     console.log('totalFee', totalFee);
-    txParams.value = totalFee
+    txParams.value = totalFee;
     const tx = await batchRebaseReporter
       .connect(sender)
       .execute(
@@ -133,10 +133,7 @@ txTask(
   'chain_bridge:report_rebase',
   'Reports most recent rebase to bridge on base chain to a given satellite chains through chain bridge',
 )
-  .addParam(
-    'satelliteChainNetwork',
-    'List of satellite chain hardhat networks',
-  )
+  .addParam('satelliteChainNetwork', 'List of satellite chain hardhat networks')
   .setAction(async (args, hre) => {
     const txParams = { gasPrice: args.gasPrice, gasLimit: args.gasLimit };
     if (txParams.gasPrice == 0) {
@@ -166,11 +163,6 @@ txTask(
       'chainBridge/genericHandler',
       baseChainProvider,
     );
-    const batchRebaseReporter = await getDeployedContractInstance(
-      baseChainNetwork,
-      'chainBridge/batchRebaseReporter',
-      baseChainProvider,
-    );
 
     const satChainNetwork = args.satelliteChainNetwork;
     const satProvider = await getEthersProvider(satChainNetwork);
@@ -188,17 +180,17 @@ txTask(
     const totalFee = await baseChainBridge.getFee(satelliteChainID);
     console.log('Initiating cross-chain rebase', satelliteChainID);
     console.log('totalFee', totalFee.toString());
-    txParams.value = totalFee
-    const tx = await executeXCRebase(
+    txParams.value = totalFee;
+    const { tx, txR } = await executeXCRebase(
       sender,
       baseChainBridge,
       satelliteChainBridge,
       satelliteChainGenericHandler,
       policy,
       txParams,
-    )
+    );
 
-    const txR = await tx.wait();
+    await tx.wait();
     console.log(txR.transactionHash);
   });
 

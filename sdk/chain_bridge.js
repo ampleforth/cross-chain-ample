@@ -40,7 +40,7 @@ const CB_FUNCTION_SIG_baseChainReportRebase = (gatewayContract) => {
 
 const CB_FUNCTION_SIG_satelliteChainReportRebase = (gatewayContract) => {
   return [
-    CB_BLANK_FUNCTION_SIG,
+    getFunctionSignature(gatewayContract, 'validateRebaseReport'),
     0,
     getFunctionSignature(gatewayContract, 'reportRebase'),
   ];
