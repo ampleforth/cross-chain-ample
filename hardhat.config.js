@@ -48,6 +48,9 @@ module.exports = {
             runs: 200
           }
         }
+      },
+      {
+        version: '0.8.11'
       }
     ]
   },
@@ -70,6 +73,9 @@ module.exports = {
   },
 
   networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true
+    },
     localGethBaseChain: {
       url: 'http://localhost:7545'
     },
