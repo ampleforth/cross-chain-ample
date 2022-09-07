@@ -104,9 +104,10 @@ const executeXCRebase = async (
   const tx = await baseChainBridge
     .connect(sender)
     .deposit(
-      await satelliteChainBridge._chainID(),
+      await satelliteChainBridge._domainID(),
       XC_REBASE_RESOURCE_ID,
       data,
+      [],
       txParams,
     );
   const txR = await tx.wait();
@@ -144,9 +145,10 @@ const executeXCTransfer = async (
   const tx = await sourceChainBridge
     .connect(sender)
     .deposit(
-      await targetChainBridge._chainID(),
+      await targetChainBridge._domainID(),
       XC_TRANSFER_RESOURCE_ID,
       data,
+      [],
       txParams,
     );
   const txR = await tx.wait();

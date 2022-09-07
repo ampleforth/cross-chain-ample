@@ -1,9 +1,9 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
-const ETH_CHAIN_ID = '1';
-const TRON_CHAIN_ID = '2';
-const ACALA_CHAIN_ID = '3';
+const ETH_CHAIN_ID = 1;
+const TRON_CHAIN_ID = 2;
+const ACALA_CHAIN_ID = 3;
 const RELAYER_TRESHOLD = 2;
 
 const {
@@ -180,16 +180,19 @@ async function mockOffchain (
 ) {
   await toChainBridge
     .connect(relayer)
-    .voteProposal(fromChainID, depositNonce, resourceID, dataHash);
+    .voteProposal(fromChainID, depositNonce, resourceID, data);
 
+  // in cb v2 voteProposal takes in the full data packet and not the dataHash
   await toChainBridge
     .connect(deployer)
-    .voteProposal(fromChainID, depositNonce, resourceID, dataHash);
+    .voteProposal(fromChainID, depositNonce, resourceID, data);
 
-  await toChainBridge
-    .connect(deployer)
-    .executeProposal(fromChainID, depositNonce, data, resourceID);
-  // console.log((await toChainBridge.getProposal(fromChainID, depositNonce, dataHash))._status);
+  // NOTE: cb v2 doesn't require an explicit call to execute,
+  // it will automatically execute if there are enough votes
+  // await toChainBridge
+  //   .connect(deployer)
+  //   .executeProposal(fromChainID, depositNonce, data, resourceID, true);
+  // console.log((await toChainBridge.getProposal(fromChainID, depositNonce, resourceID, data))._status);
 }
 
 async function execXCReportRebase (chain) {
@@ -205,7 +208,7 @@ async function execXCReportRebase (chain) {
   // Executing rebase report on sat chain
   await mockOffchain(
     bridgeContractsMap[chain].bridge,
-    await baseChainBridgeContracts.bridge._chainID(),
+    await baseChainBridgeContracts.bridge._domainID(),
     depositNonce,
     resourceID,
     dataHash,
@@ -270,7 +273,7 @@ async function execXCSend (
   const fromChainBridge = bridgeContractsMap[fromChain].bridge;
   const toChainBridge = bridgeContractsMap[toChain].bridge;
   const toChainHandler = bridgeContractsMap[toChain].genericHandler;
-  const fromChainID = await fromChainBridge._chainID();
+  const fromChainID = await fromChainBridge._domainID();
 
   const { data, dataHash, depositNonce, resourceID } = await executeXCTransfer(
     fromAccount,
@@ -623,8 +626,7 @@ describe('Transfers scenarios', function () {
       const senderAddress = await userABaseChainWallet.getAddress();
       const recipientAddress = await userASatChain1Wallet.getAddress();
       const maliciousRecipientAddress = await userBSatChain1Wallet.getAddress();
-      const r =
-        await baseChainAmplContracts.policy.globalAmpleforthEpochAndAMPLSupply();
+      const r = await baseChainAmplContracts.policy.globalAmpleforthEpochAndAMPLSupply();
 
       const correctData = packXCTransferData(
         senderAddress,
@@ -644,9 +646,10 @@ describe('Transfers scenarios', function () {
         fromChainBridge
           .connect(userBBaseChainWallet)
           .deposit(
-            await toChainBridge._chainID(),
+            await toChainBridge._domainID(),
             XC_TRANSFER_RESOURCE_ID,
             maliciousData,
+            [],
           ),
       ).to.be.revertedWith('incorrect depositer in the data');
 
@@ -654,9 +657,10 @@ describe('Transfers scenarios', function () {
         fromChainBridge
           .connect(userABaseChainWallet)
           .deposit(
-            await toChainBridge._chainID(),
+            await toChainBridge._domainID(),
             XC_TRANSFER_RESOURCE_ID,
             correctData,
+            [],
           ),
       ).not.to.be.reverted;
     });

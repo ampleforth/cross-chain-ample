@@ -175,7 +175,7 @@ async function deployChainBridgeHelpers(
 }
 
 async function deployChainBridgeContracts(
-  { chainId, relayers, relayerThreshold, fee, expiry },
+  { chainId, relayers, relayerThreshold, expiry },
   ethers,
   deployer,
   txParams = {},
@@ -184,7 +184,7 @@ async function deployChainBridgeContracts(
     ethers,
     'Bridge',
     deployer,
-    [chainId, relayers, relayerThreshold, fee, expiry],
+    [chainId, relayers, relayerThreshold, expiry],
     txParams,
   );
 
@@ -192,13 +192,13 @@ async function deployChainBridgeContracts(
     ethers,
     'GenericHandler',
     deployer,
-    [bridge.address, [], [], [], [], []],
+    [bridge.address],
     txParams,
   );
 
   const helpers = await deployChainBridgeHelpers(
     bridge,
-    { chainId, relayers, relayerThreshold, fee, expiry },
+    { chainId, relayers, relayerThreshold, expiry },
     ethers,
     deployer,
     txParams,

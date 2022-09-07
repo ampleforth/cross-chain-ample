@@ -127,7 +127,7 @@ describe('BatchTxExecutor', function () {
     });
   });
 
-  describe('when there a transaction with non zero value', async function () {
+  describe('when there is a transaction with non zero value', async function () {
     beforeEach('adding a transaction', async function () {
       const updateWithValueEncoded = await mockDownstream.populateTransaction.updateWithValue(
         '1000000000000000000',
@@ -155,6 +155,7 @@ describe('BatchTxExecutor', function () {
       r = batchExecutor
         .connect(deployer)
         .executeAll({ value: '1000000000000000000' });
+      await r;
     });
 
     it('should call the transaction', async function () {

@@ -27,7 +27,7 @@ task('config:chain_bridge', 'Generates chian_bridge config file')
         'chainBridge/bridge',
         provider,
       );
-      const chainID = await bridge._chainID();
+      const chainID = await bridge._domainID();
       chains.push({
         name: network,
         type: 'ethereum',

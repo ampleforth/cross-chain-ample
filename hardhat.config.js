@@ -99,10 +99,15 @@ module.exports = {
 
     // matic
     dev2GoerliBaseChain: {
-      url: 'https://eth-goerli.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
+      url: 'https://eth-goerli.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET,
+      gasMultiplier: 1.5
     },
     dev2MumbaiSatChain: {
       url: 'https://polygon-mumbai.infura.io/v3/' + process.env.INFURA_SECRET
+    },
+    dev2MeterTestnetSatChain: {
+      url: 'https://rpctest.meter.io',
+      gasMultiplier: 1.1
     },
 
     // prod

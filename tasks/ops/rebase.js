@@ -6,6 +6,7 @@ const {
   getDeployedContractInstance,
 } = require('../../helpers/contracts');
 const {
+  computePackedXCRebaseData,
   executeXCRebase,
   XC_REBASE_RESOURCE_ID,
 } = require('../../sdk/chain_bridge');
@@ -106,7 +107,7 @@ txTask(
         'chainBridge/bridge',
         provider,
       );
-      const satelliteChainID = await satelliteChainBridge._chainID();
+      const satelliteChainID = await satelliteChainBridge._domainID();
       satelliteChainIDs.push(satelliteChainID);
       const fee = await baseChainBridge.getFee(satelliteChainID);
       totalFee = totalFee.add(fee);
@@ -176,8 +177,19 @@ txTask(
       'chainBridge/genericHandler',
       satProvider,
     );
-    const satelliteChainID = await satelliteChainBridge._chainID();
-    const totalFee = await baseChainBridge.getFee(satelliteChainID);
+    const satelliteChainID = await satelliteChainBridge._domainID();
+    const totalFee = await baseChainBridge.calculateFee(
+      satelliteChainID,
+      XC_REBASE_RESOURCE_ID,
+      (
+        await computePackedXCRebaseData(
+          sender,
+          policy,
+          satelliteChainGenericHandler,
+        )
+      ).data,
+      [],
+    );
     console.log('Initiating cross-chain rebase', satelliteChainID);
     console.log('totalFee', totalFee.toString());
     txParams.value = totalFee;
