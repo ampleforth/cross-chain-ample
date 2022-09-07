@@ -63,26 +63,26 @@ async function setupContracts () {
       chainId: ETH_CHAIN_ID,
       relayers: [await deployer.getAddress(), await relayer.getAddress()],
       relayerThreshold: RELAYER_TRESHOLD,
-      fee: 0,
       expiry: 1000
     },
     ethers,
     deployer,
   );
 
-  const baseChainBridgeGatewayContracts =
-    await deployChainBridgeBaseChainGatewayContracts(
-      { ...baseChainAmplContracts, ...baseChainBridgeContracts },
-      ethers,
-      deployer,
-    );
+  const baseChainBridgeGatewayContracts = await deployChainBridgeBaseChainGatewayContracts(
+    { ...baseChainAmplContracts, ...baseChainBridgeContracts },
+    ethers,
+    deployer,
+  );
   baseChainBridgeContracts = Object.assign(
     baseChainBridgeContracts,
     baseChainBridgeGatewayContracts,
   );
 
-  const [globalAmpleforthEpoch, globalAMPLSupply] =
-    await baseChainAmplContracts.policy.globalAmpleforthEpochAndAMPLSupply();
+  const [
+    globalAmpleforthEpoch,
+    globalAMPLSupply
+  ] = await baseChainAmplContracts.policy.globalAmpleforthEpochAndAMPLSupply();
 
   satChain1AmplContracts = await deployXCAmpleContracts(
     {
@@ -94,6 +94,7 @@ async function setupContracts () {
     ethers,
     deployer,
   );
+
   satChain1BridgeContracts = await deployChainBridgeContracts(
     {
       chainId: TRON_CHAIN_ID,
@@ -105,12 +106,12 @@ async function setupContracts () {
     ethers,
     deployer,
   );
-  const satChain1BridgeGatewayContracts =
-    await deployChainBridgeSatelliteChainGatewayContracts(
-      { ...satChain1AmplContracts, ...satChain1BridgeContracts },
-      ethers,
-      deployer,
-    );
+
+  const satChain1BridgeGatewayContracts = await deployChainBridgeSatelliteChainGatewayContracts(
+    { ...satChain1AmplContracts, ...satChain1BridgeContracts },
+    ethers,
+    deployer,
+  );
   satChain1BridgeContracts = Object.assign(
     satChain1BridgeContracts,
     satChain1BridgeGatewayContracts,
@@ -137,12 +138,11 @@ async function setupContracts () {
     ethers,
     deployer,
   );
-  const satChain2BridgeGatewayContracts =
-    await deployChainBridgeSatelliteChainGatewayContracts(
-      { ...satChain2AmplContracts, ...satChain2BridgeContracts },
-      ethers,
-      deployer,
-    );
+  const satChain2BridgeGatewayContracts = await deployChainBridgeSatelliteChainGatewayContracts(
+    { ...satChain2AmplContracts, ...satChain2BridgeContracts },
+    ethers,
+    deployer,
+  );
   satChain2BridgeContracts = Object.assign(
     satChain2BridgeContracts,
     satChain2BridgeGatewayContracts,

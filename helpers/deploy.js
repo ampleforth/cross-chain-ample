@@ -248,8 +248,9 @@ async function deployChainBridgeBaseChainGatewayContracts(
   const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
   const isAdmin = await bridge.hasRole(adminRole, deployerAddress);
 
-  const reportRebaseFnSig =
-    CB_FUNCTION_SIG_baseChainReportRebase(rebaseGateway);
+  const reportRebaseFnSig = CB_FUNCTION_SIG_baseChainReportRebase(
+    rebaseGateway,
+  );
 
   if (isAdmin) {
     await (
@@ -340,43 +341,40 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
     txParams,
   );
 
-  try{
+  try {
     await (
       await xcAmpleController
         .connect(deployer)
         .addBridgeGateway(rebaseGateway.address, txParams)
-    ).wait();  
-  } catch(e) {
+    ).wait();
+  } catch (e) {
     console.log(
       'Failed adding rebase gateway to controller, deployer key not controller owner',
     );
     console.log('Execute the following on-chain');
-    console.log('addBridgeGateway', [
-      rebaseGateway.address,
-    ]);
+    console.log('addBridgeGateway', [rebaseGateway.address]);
   }
-  
-  try{
+
+  try {
     await (
       await xcAmpleController
         .connect(deployer)
         .addBridgeGateway(transferGateway.address, txParams)
     ).wait();
-  } catch(e){
+  } catch (e) {
     console.log(
       'Failed adding rebase gateway to controller, deployer key not controller owner',
     );
     console.log('Execute the following on-chain');
-    console.log('addBridgeGateway', [
-      transferGateway.address,
-    ]);
+    console.log('addBridgeGateway', [transferGateway.address]);
   }
 
   const adminRole = await bridge.DEFAULT_ADMIN_ROLE();
   const isAdmin = await bridge.hasRole(adminRole, await deployer.getAddress());
 
-  const reportRebaseFnSig =
-    CB_FUNCTION_SIG_satelliteChainReportRebase(rebaseGateway);
+  const reportRebaseFnSig = CB_FUNCTION_SIG_satelliteChainReportRebase(
+    rebaseGateway,
+  );
   if (isAdmin) {
     await (
       await bridge.adminSetGenericResource(

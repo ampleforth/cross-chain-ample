@@ -56,19 +56,21 @@ txTask(
       hre.ethers.provider,
     );
 
-    const { rebaseGateway, transferGateway } =
-      await deployMaticBaseChainGatewayContracts(
-        {
-          ampl,
-          policy,
-          tokenVault,
-          checkpointManagerAddress: args.checkpointManager,
-          fxRootAddress: args.fxRoot,
-        },
-        hre.ethers,
-        deployer,
-        txParams,
-      );
+    const {
+      rebaseGateway,
+      transferGateway,
+    } = await deployMaticBaseChainGatewayContracts(
+      {
+        ampl,
+        policy,
+        tokenVault,
+        checkpointManagerAddress: args.checkpointManager,
+        fxRootAddress: args.fxRoot,
+      },
+      hre.ethers,
+      deployer,
+      txParams,
+    );
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');
@@ -130,13 +132,15 @@ txTask(
       hre.ethers.provider,
     );
 
-    const { rebaseGateway, transferGateway } =
-      await deployMaticSatelliteChainGatewayContracts(
-        { xcAmple, xcAmpleController, fxChildAddress: args.fxChild },
-        hre.ethers,
-        deployer,
-        txParams,
-      );
+    const {
+      rebaseGateway,
+      transferGateway,
+    } = await deployMaticSatelliteChainGatewayContracts(
+      { xcAmple, xcAmpleController, fxChildAddress: args.fxChild },
+      hre.ethers,
+      deployer,
+      txParams,
+    );
 
     console.log('------------------------------------------------------------');
     console.log('Writing data to file');
