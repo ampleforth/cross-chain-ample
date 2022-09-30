@@ -9,12 +9,7 @@ interface IBridge {
         bytes calldata feeData
     ) external payable;
 
-    function calculateFee(
-        uint8 destinationDomainID,
-        bytes32 resourceID,
-        bytes calldata depositData,
-        bytes calldata feeData
-    ) external view returns (uint256);
+    function getFee(uint8 destinationDomainID) external view returns (uint256);
 }
 
 interface IPolicy {
@@ -26,29 +21,15 @@ interface IPolicy {
  * @notice Utility that executes rebase report 'deposit' transactions in batch.
  */
 contract ChainBridgeBatchRebaseReport {
-    function calculateFee(
-        address policy,
-        address bridge,
-        uint8[] memory destinationChainIDs,
-        bytes32 resourceID
-    ) external view returns (uint256) {
-        uint256 epoch;
-        uint256 totalSupply;
-        (epoch, totalSupply) = IPolicy(policy).globalAmpleforthEpochAndAMPLSupply();
-
-        uint256 dataLen = 64;
-        bytes memory txData = abi.encode(dataLen, epoch, totalSupply);
-        bytes memory feeData = "";
-
+    function calculateFee(address bridge, uint8[] memory destinationChainIDs)
+        external
+        view
+        returns (uint256)
+    {
         uint256 totalFee = 0;
         for (uint256 i = 0; i < destinationChainIDs.length; i++) {
             uint8 destinationChainID = destinationChainIDs[i];
-            totalFee += IBridge(bridge).calculateFee(
-                destinationChainID,
-                resourceID,
-                txData,
-                feeData
-            );
+            totalFee += IBridge(bridge).getFee(destinationChainID);
         }
 
         return totalFee;
@@ -70,12 +51,7 @@ contract ChainBridgeBatchRebaseReport {
 
         for (uint256 i = 0; i < destinationChainIDs.length; i++) {
             uint8 destinationChainID = destinationChainIDs[i];
-            uint256 bridgeFee = IBridge(bridge).calculateFee(
-                destinationChainID,
-                resourceID,
-                txData,
-                feeData
-            );
+            uint256 bridgeFee = IBridge(bridge).getFee(destinationChainID);
             IBridge(bridge).deposit{value: bridgeFee}(
                 destinationChainID,
                 resourceID,

@@ -28,6 +28,11 @@ txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
       'rateOracle',
       hre.ethers.provider,
     );
+    const cpiOracle = await getDeployedContractInstance(
+      hre.network.name,
+      'cpiOracle',
+      hre.ethers.provider,
+    );
     const orchestrator = await getDeployedContractInstance(
       hre.network.name,
       'orchestrator',
@@ -110,10 +115,8 @@ txTask(
       satelliteChainIDs.push(satelliteChainID);
     }
     const totalFee = await batchRebaseReporter.calculateFee(
-      await policy.address,
       baseChainBridge.address,
       satelliteChainIDs,
-      XC_REBASE_RESOURCE_ID,
     );
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);
@@ -181,18 +184,7 @@ txTask(
       satProvider,
     );
     const satelliteChainID = await satelliteChainBridge._domainID();
-    const totalFee = await baseChainBridge.calculateFee(
-      satelliteChainID,
-      XC_REBASE_RESOURCE_ID,
-      (
-        await computePackedXCRebaseData(
-          sender,
-          policy,
-          satelliteChainGenericHandler,
-        )
-      ).data,
-      [],
-    );
+    const totalFee = await baseChainBridge.getFee(satelliteChainID);
     console.log('Initiating cross-chain rebase', satelliteChainID);
     console.log('totalFee', totalFee.toString());
     txParams.value = totalFee;

@@ -167,7 +167,7 @@ task('info:chain_bridge', 'Prints AMPL token data from given networks')
       console.log(
         'genericHandler:rebaseOffset',
         (
-          await genericHandler._contractAddressToDepositFunctionDepositerOffset(
+          await genericHandler._contractAddressToDepositFunctionDepositorOffset(
             rebaseGateway.address,
           )
         ).toNumber(),
@@ -199,7 +199,7 @@ task('info:chain_bridge', 'Prints AMPL token data from given networks')
       console.log(
         'genericHandler:transferOffset',
         (
-          await genericHandler._contractAddressToDepositFunctionDepositerOffset(
+          await genericHandler._contractAddressToDepositFunctionDepositorOffset(
             transferGateway.address,
           )
         ).toNumber(),

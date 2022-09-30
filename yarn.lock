@@ -3212,9 +3212,9 @@ chai@^4.2.0:
     pathval "^1.1.0"
     type-detect "^4.0.5"
 
-"chainbridge-solidity@https://github.com/meterio/chainbridge-solidity-v2.0.0-eth":
+"chainbridge-solidity@https://github.com/meterio/chainbridge-solidity-v2.0.0-eth#42081a2":
   version "2.0.3"
-  resolved "https://github.com/meterio/chainbridge-solidity-v2.0.0-eth#0e64235e91cfe73245178189de54b698d1417abb"
+  resolved "https://github.com/meterio/chainbridge-solidity-v2.0.0-eth#42081a21e60736fa69a70657abdda4d2764d9df0"
   dependencies:
     undici "^5.8.0"
 

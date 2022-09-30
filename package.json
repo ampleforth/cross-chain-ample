@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "@openzeppelin/contracts-upgradeable": "^3.3.0",
-    "chainbridge-solidity": "https://github.com/meterio/chainbridge-solidity-v2.0.0-eth",
+    "chainbridge-solidity": "https://github.com/meterio/chainbridge-solidity-v2.0.0-eth#master",
     "fx-portal": "fx-portal/contracts",
     "market-oracle": "https://github.com/ampleforth/market-oracle#v1.0.1",
     "oz-contracts": "https://github.com/OpenZeppelin/openzeppelin-contracts#3.4.0",
