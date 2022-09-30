@@ -426,12 +426,12 @@
     "blockNumber": 7683464
   },
   "chainBridge/batchRebaseReporter": {
-    "address": "0x1cDc25c94d709Afd9039fB24650C6d010c4f214b",
+    "address": "0x7CCd479A201CC7E1Be03A393DE1192aecD007583",
     "abi": [
-      "function calculateFee(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID) view returns (uint256)",
+      "function calculateFee(address bridge, uint8[] destinationChainIDs) view returns (uint256)",
       "function execute(address policy, address bridge, uint8[] destinationChainIDs, bytes32 resourceID) payable"
     ],
-    "hash": "0x0bd1f2f143f8c19a66bcf73c480fbf2c7c0ddff720644b4192abb2ca249d8d0c",
-    "blockNumber": 7683462
+    "hash": "0x5448888f2181e7184c5fa5eab53ebca5a8e6ed8e9de74f66ba4d4477cbe28f1f",
+    "blockNumber": 7687677
   }
 }
