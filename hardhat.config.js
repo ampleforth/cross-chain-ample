@@ -29,7 +29,7 @@ module.exports = {
         version: '0.4.24'
       },
       {
-        version: '0.7.6'
+        version: '0.5.12'
       },
       {
         version: '0.6.4'
@@ -38,7 +38,7 @@ module.exports = {
         version: '0.6.8'
       },
       {
-        version: '0.5.12'
+        version: '0.7.6'
       },
       {
         version: '0.7.3',
@@ -50,7 +50,13 @@ module.exports = {
         }
       },
       {
-        version: '0.8.11'
+        version: '0.8.11',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
       }
     ]
   },
