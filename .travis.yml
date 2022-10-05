@@ -10,9 +10,10 @@ script:
   - yarn format
   - yarn lint
   - yarn test
-  - yarn coverage
-after_success:
-  - cat coverage/lcov.info | npx coveralls
+# TODO: migrate to github CI
+# - yarn coverage
+# after_success:
+#   - cat coverage/lcov.info | npx coveralls
 notifications:
   email:
     - dev-support@ampleforth.org
