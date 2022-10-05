@@ -2,7 +2,11 @@
 pragma solidity 0.7.3;
 
 contract MockRebaseRelayer {
-    enum State {Failure, Revert, Success}
+    enum State {
+        Failure,
+        Revert,
+        Success
+    }
     State private state;
 
     function executeAll() external view returns (bool) {

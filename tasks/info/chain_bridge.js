@@ -78,6 +78,12 @@ class BridgeData {
 
 task('info:chain_bridge', 'Prints AMPL token data from given networks')
   .addParam('networks', 'List of hardhat networks', [], types.json)
+  .addParam(
+    'getHistory',
+    'List history of cross-chain transactions',
+    false,
+    types.boolean,
+  )
   .setAction(async (args, hre) => {
     const bridgeData = {};
     const bd = new BridgeData();
@@ -205,19 +211,21 @@ task('info:chain_bridge', 'Prints AMPL token data from given networks')
         ).toNumber(),
       );
 
-      const startBlock = ethers.utils.hexlify(
-        chainAddresses['chainBridge/bridge'].blockNumber,
-      );
-      const depositLogs = await bridge.queryFilter('Deposit', startBlock);
-      const deposits = depositLogs.map((d) => d.args);
-      const proposalLogs = await bridge.queryFilter(
-        'ProposalEvent',
-        startBlock,
-      );
-      const proposals = proposalLogs.map((d) => d.args);
-      const voteLogs = await bridge.queryFilter('ProposalVote', startBlock);
-      const votes = voteLogs.map((d) => d.args);
-      bd.load(chainID, deposits, proposals, votes);
+      if (args.getHistory) {
+        const startBlock = ethers.utils.hexlify(
+          chainAddresses['chainBridge/bridge'].blockNumber,
+        );
+        const depositLogs = await bridge.queryFilter('Deposit', startBlock);
+        const deposits = depositLogs.map((d) => d.args);
+        const proposalLogs = await bridge.queryFilter(
+          'ProposalEvent',
+          startBlock,
+        );
+        const proposals = proposalLogs.map((d) => d.args);
+        const voteLogs = await bridge.queryFilter('ProposalVote', startBlock);
+        const votes = voteLogs.map((d) => d.args);
+        bd.load(chainID, deposits, proposals, votes);
+      }
     }
 
     bd.rollupData();

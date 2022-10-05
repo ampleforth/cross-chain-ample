@@ -45,10 +45,8 @@ task('info:ampl', 'Prints AMPL token data from given networks')
           `${args.bridge}/tokenVault`,
           provider,
         );
-        const [
-          globalAmpleforthEpoch,
-          globalAMPLSupply,
-        ] = await policy.globalAmpleforthEpochAndAMPLSupply();
+        const [globalAmpleforthEpoch, globalAMPLSupply] =
+          await policy.globalAmpleforthEpochAndAMPLSupply();
         const circulatingSupply = await ampl.totalSupply();
         const totalLocked = await tokenVault.totalLocked(ampl.address);
         console.log('Global epoch:', globalAmpleforthEpoch.toString());
@@ -69,10 +67,8 @@ task('info:ampl', 'Prints AMPL token data from given networks')
           'xcAmpleController',
           provider,
         );
-        const [
-          globalAmpleforthEpoch,
-          globalAMPLSupply,
-        ] = await xcAmpleController.globalAmpleforthEpochAndAMPLSupply();
+        const [globalAmpleforthEpoch, globalAMPLSupply] =
+          await xcAmpleController.globalAmpleforthEpochAndAMPLSupply();
         const circulatingSupply = await xcAmple.totalSupply();
         console.log('Global epoch:', globalAmpleforthEpoch.toString());
         console.log('Global supply:', toAmplFloatingPt(globalAMPLSupply));
@@ -111,10 +107,8 @@ task('info:ampl:balance', 'Prints AMPL token balance from given networks')
           'policy',
           provider,
         );
-        const [
-          globalAmpleforthEpoch,
-          globalAMPLSupply,
-        ] = await policy.globalAmpleforthEpochAndAMPLSupply();
+        const [globalAmpleforthEpoch, globalAMPLSupply] =
+          await policy.globalAmpleforthEpochAndAMPLSupply();
         const balance = await ampl.balanceOf(args.wallet);
         console.log('Global supply:', toAmplFloatingPt(globalAMPLSupply));
         console.log(`Balance(${args.wallet}):`, toAmplFloatingPt(balance));
@@ -129,10 +123,8 @@ task('info:ampl:balance', 'Prints AMPL token balance from given networks')
           'xcAmpleController',
           provider,
         );
-        const [
-          globalAmpleforthEpoch,
-          globalAMPLSupply,
-        ] = await xcAmpleController.globalAmpleforthEpochAndAMPLSupply();
+        const [globalAmpleforthEpoch, globalAMPLSupply] =
+          await xcAmpleController.globalAmpleforthEpochAndAMPLSupply();
         const balance = await xcAmple.balanceOf(args.wallet);
         console.log('Global supply:', toAmplFloatingPt(globalAMPLSupply));
         console.log(`Balance(${args.wallet}):`, toAmplFloatingPt(balance));
@@ -169,10 +161,8 @@ task(
           'policy',
           provider,
         );
-        const [
-          globalAmpleforthEpoch,
-          globalAMPLSupply,
-        ] = await policy.globalAmpleforthEpochAndAMPLSupply();
+        const [globalAmpleforthEpoch, globalAMPLSupply] =
+          await policy.globalAmpleforthEpochAndAMPLSupply();
         console.log('AMPL:', ampl.address);
         console.log('AMPL:policy:', await ampl.monetaryPolicy());
         console.log(
@@ -203,10 +193,8 @@ task(
           'rebaseRelayer',
           provider,
         );
-        const [
-          globalAmpleforthEpoch,
-          globalAMPLSupply,
-        ] = await xcAmpleController.globalAmpleforthEpochAndAMPLSupply();
+        const [globalAmpleforthEpoch, globalAMPLSupply] =
+          await xcAmpleController.globalAmpleforthEpochAndAMPLSupply();
 
         let gatewayWhitelist = {};
         try {
@@ -221,7 +209,7 @@ task(
           }, {});
         } catch (e) {
           console.error('Failed to fetch whitelist, verify manually!');
-          console.log(e.message)
+          console.log(e.message);
         }
 
         console.log('ProxyAdmin:', proxyAdmin.address);
