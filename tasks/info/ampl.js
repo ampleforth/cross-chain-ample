@@ -209,6 +209,7 @@ task(
           }, {});
         } catch (e) {
           console.error('Failed to fetch whitelist, verify manually!');
+          console.log(e.message);
         }
 
         console.log('ProxyAdmin:', proxyAdmin.address);

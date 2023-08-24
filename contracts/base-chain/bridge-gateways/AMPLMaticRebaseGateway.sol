@@ -5,7 +5,7 @@ import {FxBaseRootTunnel} from "fx-portal/contracts/tunnel/FxBaseRootTunnel.sol"
 import {Layer2RebaseGateway} from "../../base-bridge-gateways/Layer2RebaseGateway.sol";
 
 import {IAmpleforth} from "uFragments/contracts/interfaces/IAmpleforth.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "oz-contracts/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title AMPLMaticRebaseGateway: AMPL-Matic Rebase Gateway Contract

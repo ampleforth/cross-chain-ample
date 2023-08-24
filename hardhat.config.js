@@ -29,7 +29,7 @@ module.exports = {
         version: '0.4.24'
       },
       {
-        version: '0.7.6'
+        version: '0.5.12'
       },
       {
         version: '0.6.4'
@@ -38,10 +38,19 @@ module.exports = {
         version: '0.6.8'
       },
       {
-        version: '0.5.12'
+        version: '0.7.6'
       },
       {
         version: '0.7.3',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
+      {
+        version: '0.8.11',
         settings: {
           optimizer: {
             enabled: true,
@@ -70,6 +79,9 @@ module.exports = {
   },
 
   networks: {
+    hardhat: {
+      allowUnlimitedContractSize: true
+    },
     localGethBaseChain: {
       url: 'http://localhost:7545'
     },
@@ -93,10 +105,15 @@ module.exports = {
 
     // matic
     dev2GoerliBaseChain: {
-      url: 'https://eth-goerli.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET
+      url: 'https://eth-goerli.alchemyapi.io/v2/' + process.env.ALCHEMY_SECRET,
+      gasMultiplier: 1.5
     },
     dev2MumbaiSatChain: {
       url: 'https://polygon-mumbai.infura.io/v3/' + process.env.INFURA_SECRET
+    },
+    dev2MeterTestnetSatChain: {
+      url: 'https://rpctest.meter.io',
+      gasMultiplier: 1.1
     },
 
     // prod

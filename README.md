@@ -127,3 +127,11 @@ Each new bridge integration should check for the following cases.
 ### Production
 * [Deploy meter passport PROD](https://github.com/ampleforth/cross-chain-ample/wiki/AMPL-Meter-Passport-prod-deployment)
 * [Deploy Matic PROD](https://github.com/ampleforth/cross-chain-ample/wiki/Matic-prod-deployment)
+
+
+## Misc
+
+```
+# generate typescript bindings
+yarn typechain --target ethers-v5 --outDir types/ [ABI_JSON_FILE]
+```

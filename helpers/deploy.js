@@ -175,7 +175,7 @@ async function deployChainBridgeHelpers(
 }
 
 async function deployChainBridgeContracts(
-  { chainId, relayers, relayerThreshold, fee, expiry },
+  { chainId, relayers, relayerThreshold, expiry },
   ethers,
   deployer,
   txParams = {},
@@ -184,7 +184,7 @@ async function deployChainBridgeContracts(
     ethers,
     'Bridge',
     deployer,
-    [chainId, relayers, relayerThreshold, fee, expiry],
+    [chainId, relayers, relayerThreshold, expiry],
     txParams,
   );
 
@@ -192,13 +192,13 @@ async function deployChainBridgeContracts(
     ethers,
     'GenericHandler',
     deployer,
-    [bridge.address, [], [], [], [], []],
+    [bridge.address],
     txParams,
   );
 
   const helpers = await deployChainBridgeHelpers(
     bridge,
-    { chainId, relayers, relayerThreshold, fee, expiry },
+    { chainId, relayers, relayerThreshold, expiry },
     ethers,
     deployer,
     txParams,
@@ -340,36 +340,32 @@ async function deployChainBridgeSatelliteChainGatewayContracts(
     txParams,
   );
 
-  try{
+  try {
     await (
       await xcAmpleController
         .connect(deployer)
         .addBridgeGateway(rebaseGateway.address, txParams)
-    ).wait();  
-  } catch(e) {
+    ).wait();
+  } catch (e) {
     console.log(
       'Failed adding rebase gateway to controller, deployer key not controller owner',
     );
     console.log('Execute the following on-chain');
-    console.log('addBridgeGateway', [
-      rebaseGateway.address,
-    ]);
+    console.log('addBridgeGateway', [rebaseGateway.address]);
   }
-  
-  try{
+
+  try {
     await (
       await xcAmpleController
         .connect(deployer)
         .addBridgeGateway(transferGateway.address, txParams)
     ).wait();
-  } catch(e){
+  } catch (e) {
     console.log(
       'Failed adding rebase gateway to controller, deployer key not controller owner',
     );
     console.log('Execute the following on-chain');
-    console.log('addBridgeGateway', [
-      transferGateway.address,
-    ]);
+    console.log('addBridgeGateway', [transferGateway.address]);
   }
 
   const adminRole = await bridge.DEFAULT_ADMIN_ROLE();

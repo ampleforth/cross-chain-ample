@@ -172,7 +172,7 @@ cbDeployTask(
     console.log('------------------------------------------------------------');
     console.log('Verify on etherscan');
     await etherscanVerify(hre, bridge.address, [
-      await bridge._chainID(),
+      await bridge._domainID(),
       [],
       await bridge._relayerThreshold(),
       await bridge._fee(),
@@ -287,7 +287,7 @@ cbDeployTask(
     console.log('------------------------------------------------------------');
     console.log('Verify on etherscan');
     await etherscanVerify(hre, bridge.address, [
-      await bridge._chainID(),
+      await bridge._domainID(),
       [],
       await bridge._relayerThreshold(),
       await bridge._fee(),

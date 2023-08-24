@@ -6,6 +6,10 @@ const {
   readDeploymentData,
   getDeployedContractInstance,
 } = require('../../helpers/contracts');
+const {
+  XC_REBASE_RESOURCE_ID,
+  XC_TRANSFER_RESOURCE_ID,
+} = require('../../sdk/chain_bridge');
 
 class BridgeData {
   constructor() {
@@ -37,14 +41,14 @@ class BridgeData {
     }
   }
 
-  depositKey(sourceChainID, e) {
-    return `${sourceChainID}-${e.depositNonce.toNumber()}`;
+  depositKey(originDomainID, e) {
+    return `${originDomainID}-${e.depositNonce.toNumber()}`;
   }
 
-  recordDeposit(sourceChainID, e) {
-    this.depositData[this.depositKey(sourceChainID, e)] = {
-      sourceChainID,
-      destinationChainID: e.destinationChainID.toString(),
+  recordDeposit(originDomainID, e) {
+    this.depositData[this.depositKey(originDomainID, e)] = {
+      originDomainID,
+      destinationDomainID: `${e.destinationDomainID}`,
       depositNonce: e.depositNonce.toString(),
       executionStatus: 0,
       votes: 0,
@@ -52,11 +56,11 @@ class BridgeData {
   }
 
   recordProposal(e) {
-    const k = this.depositKey(e.originChainID, e);
+    const k = this.depositKey(e.originDomainID, e);
     let d = this.depositData[k];
     if (!d) {
       d = this.depositData[k] = {
-        sourceChainID: e.originChainID,
+        originDomainID: `${e.originDomainID}`,
         depositNonce: e.depositNonce.toString(),
         executionStatus: 0,
         votes: 0,
@@ -66,7 +70,7 @@ class BridgeData {
   }
 
   recordVote(e) {
-    const k = this.depositKey(e.originChainID, e);
+    const k = this.depositKey(e.originDomainID, e);
     const d = this.depositData[k];
     d.votes++;
   }
@@ -74,6 +78,12 @@ class BridgeData {
 
 task('info:chain_bridge', 'Prints AMPL token data from given networks')
   .addParam('networks', 'List of hardhat networks', [], types.json)
+  .addParam(
+    'getHistory',
+    'List history of cross-chain transactions',
+    false,
+    types.boolean,
+  )
   .setAction(async (args, hre) => {
     const bridgeData = {};
     const bd = new BridgeData();
@@ -96,8 +106,23 @@ task('info:chain_bridge', 'Prints AMPL token data from given networks')
         'chainBridge/bridge',
         provider,
       );
+      const genericHandler = await getDeployedContractInstance(
+        network,
+        'chainBridge/genericHandler',
+        provider,
+      );
+      const rebaseGateway = await getDeployedContractInstance(
+        network,
+        'chainBridge/rebaseGateway',
+        provider,
+      );
+      const transferGateway = await getDeployedContractInstance(
+        network,
+        'chainBridge/transferGateway',
+        provider,
+      );
 
-      const chainID = await bridge._chainID();
+      const chainID = await bridge._domainID();
       const relayerThreshold = await bridge._relayerThreshold();
       const fee = await bridge._fee();
       const expiry = await bridge._expiry();
@@ -109,26 +134,98 @@ task('info:chain_bridge', 'Prints AMPL token data from given networks')
         relayers.push(await bridge.getRoleMember(relayerRole, i));
       }
 
+      console.log('Bridge:', bridge.address);
       console.log('ChainID:', chainID);
-      console.log('RelayerThreshold:', relayerThreshold.toNumber());
+      console.log('RelayerThreshold:', relayerThreshold);
       console.log('Fee:', ethers.utils.formatEther(fee));
-      console.log('Expiry:', expiry.toNumber());
+      console.log('Expiry:', expiry);
       console.log('Paused:', paused);
       console.log('Relayers:', relayers);
 
-      const startBlock = ethers.utils.hexlify(
-        chainAddresses['chainBridge/bridge'].blockNumber,
+      console.log(
+        'genericHandler:bridge',
+        await genericHandler._bridgeAddress(),
       );
-      const depositLogs = await bridge.queryFilter('Deposit', startBlock);
-      const deposits = depositLogs.map((d) => d.args);
-      const proposalLogs = await bridge.queryFilter(
-        'ProposalEvent',
-        startBlock,
+      console.log(
+        'genericHandler:rebaseContractRef',
+        await genericHandler._resourceIDToContractAddress(
+          XC_REBASE_RESOURCE_ID,
+        ),
       );
-      const proposals = proposalLogs.map((d) => d.args);
-      const voteLogs = await bridge.queryFilter('ProposalVote', startBlock);
-      const votes = voteLogs.map((d) => d.args);
-      bd.load(chainID, deposits, proposals, votes);
+      console.log(
+        'genericHandler:rebaseResourceId',
+        await genericHandler._contractAddressToResourceID(
+          rebaseGateway.address,
+        ),
+      );
+      console.log(
+        'genericHandler:rebaseDepositFunctionSignature',
+        await genericHandler._contractAddressToDepositFunctionSignature(
+          rebaseGateway.address,
+        ),
+      );
+      console.log(
+        'genericHandler:rebaseExecutionFunctionSignature',
+        await genericHandler._contractAddressToExecuteFunctionSignature(
+          rebaseGateway.address,
+        ),
+      );
+      console.log(
+        'genericHandler:rebaseOffset',
+        (
+          await genericHandler._contractAddressToDepositFunctionDepositorOffset(
+            rebaseGateway.address,
+          )
+        ).toNumber(),
+      );
+      console.log(
+        'genericHandler:transferContractRef',
+        await genericHandler._resourceIDToContractAddress(
+          XC_TRANSFER_RESOURCE_ID,
+        ),
+      );
+      console.log(
+        'genericHandler:transferResourceId',
+        await genericHandler._contractAddressToResourceID(
+          transferGateway.address,
+        ),
+      );
+      console.log(
+        'genericHandler:transferDepositFunctionSignature',
+        await genericHandler._contractAddressToDepositFunctionSignature(
+          transferGateway.address,
+        ),
+      );
+      console.log(
+        'genericHandler:transferExecutionFunctionSignature',
+        await genericHandler._contractAddressToExecuteFunctionSignature(
+          transferGateway.address,
+        ),
+      );
+      console.log(
+        'genericHandler:transferOffset',
+        (
+          await genericHandler._contractAddressToDepositFunctionDepositorOffset(
+            transferGateway.address,
+          )
+        ).toNumber(),
+      );
+
+      if (args.getHistory) {
+        const startBlock = ethers.utils.hexlify(
+          chainAddresses['chainBridge/bridge'].blockNumber,
+        );
+        const depositLogs = await bridge.queryFilter('Deposit', startBlock);
+        const deposits = depositLogs.map((d) => d.args);
+        const proposalLogs = await bridge.queryFilter(
+          'ProposalEvent',
+          startBlock,
+        );
+        const proposals = proposalLogs.map((d) => d.args);
+        const voteLogs = await bridge.queryFilter('ProposalVote', startBlock);
+        const votes = voteLogs.map((d) => d.args);
+        bd.load(chainID, deposits, proposals, votes);
+      }
     }
 
     bd.rollupData();

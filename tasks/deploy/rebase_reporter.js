@@ -132,7 +132,7 @@ txTask(
             'chainBridge/bridge',
             provider,
           );
-          const satelliteChainID = await satelliteChainBridge._chainID();
+          const satelliteChainID = await satelliteChainBridge._domainID();
           satelliteChainIDs.push(satelliteChainID);
           const fee = await baseChainBridge.getFee(satelliteChainID);
           totalFee = totalFee.add(fee);

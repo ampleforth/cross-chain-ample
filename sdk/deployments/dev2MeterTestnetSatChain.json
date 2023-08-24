@@ -1,119 +1,6 @@
 {
-  "proxyAdmin": {
-    "address": "0x14C81A0331c4116804Ab092712c7D3ED4369ee0f",
-    "abi": [
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "function changeProxyAdmin(address proxy, address newAdmin)",
-      "function getProxyAdmin(address proxy) view returns (address)",
-      "function getProxyImplementation(address proxy) view returns (address)",
-      "function isOwner() view returns (bool)",
-      "function owner() view returns (address)",
-      "function renounceOwnership()",
-      "function transferOwnership(address newOwner)",
-      "function upgrade(address proxy, address implementation)",
-      "function upgradeAndCall(address proxy, address implementation, bytes data) payable"
-    ],
-    "hash": "0xce9bba49c161c49b074925e7fd0aed6fd9813a78ad2a5c2d762c607f643151f7",
-    "blockNumber": 16691516
-  },
-  "xcAmple": {
-    "address": "0x1cf09D1B5Da9d9d24365D87B932A7c4bD018A419",
-    "abi": [
-      "event Approval(address indexed owner, address indexed spender, uint256 value)",
-      "event ControllerUpdated(address controller)",
-      "event LogRebase(uint256 indexed epoch, uint256 globalAMPLSupply)",
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "event Transfer(address indexed from, address indexed to, uint256 value)",
-      "function DOMAIN_SEPARATOR() view returns (bytes32)",
-      "function EIP712_DOMAIN() view returns (bytes32)",
-      "function EIP712_REVISION() view returns (string)",
-      "function PERMIT_TYPEHASH() view returns (bytes32)",
-      "function allowance(address owner_, address spender) view returns (uint256)",
-      "function approve(address spender, uint256 value) returns (bool)",
-      "function balanceOf(address who) view returns (uint256)",
-      "function burnFrom(address who, uint256 xcAmpleAmount)",
-      "function controller() view returns (address)",
-      "function decimals() view returns (uint8)",
-      "function decreaseAllowance(address spender, uint256 subtractedValue) returns (bool)",
-      "function globalAMPLSupply() view returns (uint256)",
-      "function increaseAllowance(address spender, uint256 addedValue) returns (bool)",
-      "function initialize(string name, string symbol, uint256 globalAMPLSupply_)",
-      "function mint(address who, uint256 xcAmpleAmount)",
-      "function name() view returns (string)",
-      "function nonces(address who) view returns (uint256)",
-      "function owner() view returns (address)",
-      "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)",
-      "function rebase(uint256 epoch, uint256 newGlobalAMPLSupply) returns (uint256)",
-      "function renounceOwnership()",
-      "function scaledBalanceOf(address who) view returns (uint256)",
-      "function scaledTotalSupply() pure returns (uint256)",
-      "function setController(address controller_)",
-      "function symbol() view returns (string)",
-      "function totalSupply() view returns (uint256)",
-      "function transfer(address to, uint256 value) returns (bool)",
-      "function transferAll(address to) returns (bool)",
-      "function transferAllFrom(address from, address to) returns (bool)",
-      "function transferFrom(address from, address to, uint256 value) returns (bool)",
-      "function transferOwnership(address newOwner)"
-    ],
-    "hash": "0xb8db3e0a8d1bed41316329d4d44b8e0a6ef64247f1fb5db614c1baac9132f975",
-    "blockNumber": 16691541
-  },
-  "xcAmpleController": {
-    "address": "0x5353C43b3aF8E9F9c044B55Ea2c139aC977E0F19",
-    "abi": [
-      "event GatewayBurn(address indexed bridgeGateway, address indexed depositor, uint256 xcAmpleAmount)",
-      "event GatewayMint(address indexed bridgeGateway, address indexed recipient, uint256 xcAmpleAmount)",
-      "event GatewayRebaseReported(address indexed bridgeGateway, uint256 indexed epoch, uint256 globalAMPLSupply, uint256 timestampSec)",
-      "event GatewayWhitelistUpdated(address indexed bridgeGateway, bool active)",
-      "event LogRebase(uint256 indexed epoch, int256 requestedSupplyAdjustment, uint256 timestampSec)",
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "function addBridgeGateway(address bridgeGateway)",
-      "function burn(address depositor, uint256 xcAmpleAmount)",
-      "function globalAmpleforthEpoch() view returns (uint256)",
-      "function globalAmpleforthEpochAndAMPLSupply() view returns (uint256, uint256)",
-      "function initialize(address xcAmple_, uint256 globalAmpleforthEpoch_)",
-      "function lastRebaseTimestampSec() view returns (uint256)",
-      "function mint(address recipient, uint256 xcAmpleAmount)",
-      "function nextGlobalAMPLSupply() view returns (uint256)",
-      "function nextGlobalAmpleforthEpoch() view returns (uint256)",
-      "function owner() view returns (address)",
-      "function rebase()",
-      "function rebaseRelayer() view returns (address)",
-      "function removeBridgeGateway(address bridgeGateway)",
-      "function renounceOwnership()",
-      "function reportRebase(uint256 nextGlobalAmpleforthEpoch_, uint256 nextGlobalAMPLSupply_)",
-      "function setRebaseRelayer(address rebaseRelayer_)",
-      "function transferOwnership(address newOwner)",
-      "function whitelistedBridgeGateways(address) view returns (bool)",
-      "function xcAmple() view returns (address)"
-    ],
-    "hash": "0x2bbae620516746e188c97514398739da9d087f2ce84964f1ecaa2c7ebe17c58f",
-    "blockNumber": 16691565
-  },
-  "rebaseRelayer": {
-    "address": "0xb8A175Bf9b2BC3Be976D2E328Bb96E83ae6A3e4B",
-    "abi": [
-      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
-      "event TransactionFailed(address indexed destination, uint256 index, bytes data, bytes reason)",
-      "function addTransaction(address destination, uint256 value, bytes data)",
-      "function checkExecution(uint256 index) payable returns (bool)",
-      "function executeAll() payable returns (bool)",
-      "function owner() view returns (address)",
-      "function removeTransaction(uint256 index)",
-      "function renounceOwnership()",
-      "function setTransactionEnabled(uint256 index, bool enabled)",
-      "function totalValue() view returns (uint256)",
-      "function transactions(uint256) view returns (bool enabled, address destination, uint256 value, bytes data)",
-      "function transactionsSize() view returns (uint256)",
-      "function transferOwnership(address newOwner)"
-    ],
-    "hash": "0x5c57aea5b9e64f8f7cbf322967db3dd33552479d2fc94c38dd10e776c6da17cf",
-    "blockNumber": 16691582
-  },
-  "isBaseChain": false,
   "chainBridge/bridge": {
-    "address": "0x23894d2937A2a4A479f0407909DA5B028049568E",
+    "address": "0xcE785E92bc448de7c58D3f7D74F2BDcEd9Cc7c49",
     "abi": [
       "constructor(uint8 domainID, address[] initialRelayers, uint256 initialRelayerThreshold, uint256 expiry)",
       "error IncorrectFeeSupplied(uint256 msgValue, uint256 fee)",
@@ -192,11 +79,11 @@
       "function voteProposal(uint8 domainID, uint64 depositNonce, bytes32 resourceID, bytes data)",
       "function voteProposals(uint8 domainID, uint64 depositNonce, bytes32 resourceID, bytes data, bytes[] signatures)"
     ],
-    "hash": "0x2f3d2a148dd31a757413999a8d4088b58757a2e7ae7f2487fc2e411d7cdafb8e",
-    "blockNumber": 28698530
+    "hash": "0x5d2cf6d30212089d05da6f765cd6dadb44a6a56c52cab74d54d9426d5150a3b6",
+    "blockNumber": 20515385
   },
   "chainBridge/genericHandler": {
-    "address": "0x701627e8638c452732eceCC7d0238746654fb365",
+    "address": "0x64BBA8492a0CfaB65a954860Cf1D99b28eD2D418",
     "abi": [
       "constructor(address bridgeAddress)",
       "function _bridgeAddress() view returns (address)",
@@ -211,11 +98,124 @@
       "function removeResource(bytes32 resourceID, address contractAddress)",
       "function setResource(bytes32 resourceID, address contractAddress, bytes4 depositFunctionSig, uint256 depositFunctionDepositorOffset, bytes4 executeFunctionSig)"
     ],
-    "hash": "0x49d0959a6325e687fe7244dbe5ee5eddd26125ac283574ab690eb7942eff0a88",
-    "blockNumber": 28698559
+    "hash": "0x86150c2cc10a85405c1c078f86ba5948b68f339e9093bede81d764c2053624f5",
+    "blockNumber": 20515445
   },
+  "proxyAdmin": {
+    "address": "0x85036e4dA9E968286eec567Aeb5430c649c5E909",
+    "abi": [
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "function changeProxyAdmin(address proxy, address newAdmin)",
+      "function getProxyAdmin(address proxy) view returns (address)",
+      "function getProxyImplementation(address proxy) view returns (address)",
+      "function isOwner() view returns (bool)",
+      "function owner() view returns (address)",
+      "function renounceOwnership()",
+      "function transferOwnership(address newOwner)",
+      "function upgrade(address proxy, address implementation)",
+      "function upgradeAndCall(address proxy, address implementation, bytes data) payable"
+    ],
+    "hash": "0xe0160cd3ada690269f690b9e331b8af8082c3f1eed3f7a233be4e8782b0c8fc5",
+    "blockNumber": 19918828
+  },
+  "xcAmple": {
+    "address": "0xEc133791822D441d2CA58A51D4b53cC23b2e7B73",
+    "abi": [
+      "event Approval(address indexed owner, address indexed spender, uint256 value)",
+      "event ControllerUpdated(address controller)",
+      "event LogRebase(uint256 indexed epoch, uint256 globalAMPLSupply)",
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "event Transfer(address indexed from, address indexed to, uint256 value)",
+      "function DOMAIN_SEPARATOR() view returns (bytes32)",
+      "function EIP712_DOMAIN() view returns (bytes32)",
+      "function EIP712_REVISION() view returns (string)",
+      "function PERMIT_TYPEHASH() view returns (bytes32)",
+      "function allowance(address owner_, address spender) view returns (uint256)",
+      "function approve(address spender, uint256 value) returns (bool)",
+      "function balanceOf(address who) view returns (uint256)",
+      "function burnFrom(address who, uint256 xcAmpleAmount)",
+      "function controller() view returns (address)",
+      "function decimals() view returns (uint8)",
+      "function decreaseAllowance(address spender, uint256 subtractedValue) returns (bool)",
+      "function globalAMPLSupply() view returns (uint256)",
+      "function increaseAllowance(address spender, uint256 addedValue) returns (bool)",
+      "function initialize(string name, string symbol, uint256 globalAMPLSupply_)",
+      "function mint(address who, uint256 xcAmpleAmount)",
+      "function name() view returns (string)",
+      "function nonces(address who) view returns (uint256)",
+      "function owner() view returns (address)",
+      "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s)",
+      "function rebase(uint256 epoch, uint256 newGlobalAMPLSupply) returns (uint256)",
+      "function renounceOwnership()",
+      "function scaledBalanceOf(address who) view returns (uint256)",
+      "function scaledTotalSupply() pure returns (uint256)",
+      "function setController(address controller_)",
+      "function symbol() view returns (string)",
+      "function totalSupply() view returns (uint256)",
+      "function transfer(address to, uint256 value) returns (bool)",
+      "function transferAll(address to) returns (bool)",
+      "function transferAllFrom(address from, address to) returns (bool)",
+      "function transferFrom(address from, address to, uint256 value) returns (bool)",
+      "function transferOwnership(address newOwner)"
+    ],
+    "hash": "0xae0fd33f785e87c1c88ba3ba6f1e12cc64e9e107a0b9982ab2928dda6d03c2f8",
+    "blockNumber": 19918862
+  },
+  "xcAmpleController": {
+    "address": "0x122ef99672eFD49123Ce54cE1Ca902fC3125678f",
+    "abi": [
+      "event GatewayBurn(address indexed bridgeGateway, address indexed depositor, uint256 xcAmpleAmount)",
+      "event GatewayMint(address indexed bridgeGateway, address indexed recipient, uint256 xcAmpleAmount)",
+      "event GatewayRebaseReported(address indexed bridgeGateway, uint256 indexed epoch, uint256 globalAMPLSupply, uint256 timestampSec)",
+      "event GatewayWhitelistUpdated(address indexed bridgeGateway, bool active)",
+      "event LogRebase(uint256 indexed epoch, int256 requestedSupplyAdjustment, uint256 timestampSec)",
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "function addBridgeGateway(address bridgeGateway)",
+      "function burn(address depositor, uint256 xcAmpleAmount)",
+      "function globalAmpleforthEpoch() view returns (uint256)",
+      "function globalAmpleforthEpochAndAMPLSupply() view returns (uint256, uint256)",
+      "function initialize(address xcAmple_, uint256 globalAmpleforthEpoch_)",
+      "function lastRebaseTimestampSec() view returns (uint256)",
+      "function mint(address recipient, uint256 xcAmpleAmount)",
+      "function nextGlobalAMPLSupply() view returns (uint256)",
+      "function nextGlobalAmpleforthEpoch() view returns (uint256)",
+      "function owner() view returns (address)",
+      "function rebase()",
+      "function rebaseRelayer() view returns (address)",
+      "function removeBridgeGateway(address bridgeGateway)",
+      "function renounceOwnership()",
+      "function reportRebase(uint256 nextGlobalAmpleforthEpoch_, uint256 nextGlobalAMPLSupply_)",
+      "function setRebaseRelayer(address rebaseRelayer_)",
+      "function transferOwnership(address newOwner)",
+      "function whitelistedBridgeGateways(address) view returns (bool)",
+      "function xcAmple() view returns (address)"
+    ],
+    "hash": "0xa304e4104893c65a18f15144e80c1c1d6088ef628c1f8491c61bf40a08f3c4a6",
+    "blockNumber": 19918891
+  },
+  "rebaseRelayer": {
+    "address": "0xc17228E13Ae98A46416F23f805C9919aEAfE0773",
+    "abi": [
+      "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+      "event TransactionFailed(address indexed destination, uint256 index, bytes data, bytes reason)",
+      "function addTransaction(address destination, uint256 value, bytes data)",
+      "function checkExecution(uint256 index) payable returns (bool)",
+      "function executeAll() payable returns (bool)",
+      "function owner() view returns (address)",
+      "function removeTransaction(uint256 index)",
+      "function renounceOwnership()",
+      "function setTransactionEnabled(uint256 index, bool enabled)",
+      "function totalValue() view returns (uint256)",
+      "function transactions(uint256) view returns (bool enabled, address destination, uint256 value, bytes data)",
+      "function transactionsSize() view returns (uint256)",
+      "function transferOwnership(address newOwner)"
+    ],
+    "hash": "0x23323029ef211f0fac5a64e37da095ca66583a5082a6d414e6b747193aec6d07",
+    "blockNumber": 19918905
+  },
+  "isBaseChain": false,
   "chainBridge/transferGateway": {
-    "address": "0x977380747AD9AB0b94BFd213E6d99b16caE69Ec3",
+    "address": "0xB327e8d87516CCe894aE6452027994242A05c6AA",
     "abi": [
       "constructor(address bridgeHandler, address xcAmple_, address xcController_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -235,11 +235,11 @@
       "function xcAmple() view returns (address)",
       "function xcController() view returns (address)"
     ],
-    "hash": "0x573e4373d760e2728adeac2142b314fae613a4999ec30ac356bd278429231b74",
-    "blockNumber": 28836476
+    "hash": "0xaa69851c30f7e073bbc654bb36850d99bf1342e0dc1bce75db6cc2e68f12143f",
+    "blockNumber": 20640962
   },
   "chainBridge/rebaseGateway": {
-    "address": "0x7F36bf9A63e899F4107f96dfE3dC0c3026c0A6c2",
+    "address": "0x913111fE3B12E86098C9F9b7774A4738253E9EcA",
     "abi": [
       "constructor(address bridgeHandler, address xcAmple_, address xcController_)",
       "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
@@ -259,7 +259,7 @@
       "function xcAmple() view returns (address)",
       "function xcController() view returns (address)"
     ],
-    "hash": "0x8c55426f5b4339c58abb3671ca8532d2b9209268e411c908e213941729150ecc",
-    "blockNumber": 28836469
+    "hash": "0x4ec6ff98e1b8b484dc48f674bf88fc612202c7de6ce78c2aaf413a60a084fad1",
+    "blockNumber": 20640218
   }
 }

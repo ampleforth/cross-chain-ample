@@ -42,6 +42,7 @@ const execRebase = async (
 
   const rateTx = await rateOracle.connect(signer).pushReport(newRate, txParams);
   await rateTx.wait();
+  console.log('New rate', newRate.toString());
 
   const rebaseTx = await orchestrator.connect(signer).rebase(txParams);
   return rebaseTx.wait();

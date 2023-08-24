@@ -86,6 +86,19 @@ const packXCTransferData = (depositor, recipient, amount, totalSupply) => {
   );
 };
 
+const computePackedXCRebaseData = async (
+  sender,
+  policy,
+  satelliteChainGenericHandler,
+) => {
+  const r = await policy.connect(sender).globalAmpleforthEpochAndAMPLSupply();
+  const data = packXCRebaseData(r[0], r[1]);
+  const dataHash = ethers.utils.keccak256(
+    satelliteChainGenericHandler.address + data.substr(2),
+  );
+  return { data, dataHash };
+};
+
 const executeXCRebase = async (
   sender,
   baseChainBridge,
@@ -94,28 +107,25 @@ const executeXCRebase = async (
   policy,
   txParams = {},
 ) => {
-  const r = await policy.connect(sender).globalAmpleforthEpochAndAMPLSupply();
-
-  const data = packXCRebaseData(r[0], r[1]);
-  const dataHash = ethers.utils.keccak256(
-    satelliteChainGenericHandler.address + data.substr(2),
+  const packed = await computePackedXCRebaseData(
+    sender,
+    policy,
+    satelliteChainGenericHandler,
   );
-
   const tx = await baseChainBridge
     .connect(sender)
     .deposit(
-      await satelliteChainBridge._chainID(),
+      await satelliteChainBridge._domainID(),
       XC_REBASE_RESOURCE_ID,
-      data,
+      packed.data,
+      [],
       txParams,
     );
   const txR = await tx.wait();
-
   const depositEvent = txR.events.filter((e) => e.event == 'Deposit')[0];
   const depositNonce = depositEvent.args.depositNonce;
   const resourceID = depositEvent.args.resourceID;
-
-  return { tx, txR, data, dataHash, depositNonce, resourceID };
+  return { tx, txR, ...packed, depositNonce, resourceID };
 };
 
 const executeXCTransfer = async (
@@ -144,9 +154,10 @@ const executeXCTransfer = async (
   const tx = await sourceChainBridge
     .connect(sender)
     .deposit(
-      await targetChainBridge._chainID(),
+      await targetChainBridge._domainID(),
       XC_TRANSFER_RESOURCE_ID,
       data,
+      [],
       txParams,
     );
   const txR = await tx.wait();
@@ -161,6 +172,7 @@ const executeXCTransfer = async (
 module.exports = {
   packXCRebaseData,
   packXCTransferData,
+  computePackedXCRebaseData,
 
   XC_REBASE_RESOURCE_ID,
   XC_TRANSFER_RESOURCE_ID,

@@ -93,9 +93,14 @@ logs
 # testnetdeployment
 sdk/deployments/geth*.json
 
-console.js
-
+# mac
 .DS_Store
 
-
+# etherscan flattened
 flattened
+
+# typechain
+types
+
+# misc
+console.js

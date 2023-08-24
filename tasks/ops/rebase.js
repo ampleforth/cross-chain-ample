@@ -6,6 +6,7 @@ const {
   getDeployedContractInstance,
 } = require('../../helpers/contracts');
 const {
+  computePackedXCRebaseData,
   executeXCRebase,
   XC_REBASE_RESOURCE_ID,
 } = require('../../sdk/chain_bridge');
@@ -25,6 +26,11 @@ txTask('testnet:rebase:base_chain', 'Executes rebase on the base chain')
     const rateOracle = await getDeployedContractInstance(
       hre.network.name,
       'rateOracle',
+      hre.ethers.provider,
+    );
+    const cpiOracle = await getDeployedContractInstance(
+      hre.network.name,
+      'cpiOracle',
       hre.ethers.provider,
     );
     const orchestrator = await getDeployedContractInstance(
@@ -97,7 +103,6 @@ txTask(
     );
 
     const satelliteChainIDs = [];
-    let totalFee = hre.ethers.BigNumber.from('0');
     for (let n in args.satelliteChainNetworks) {
       const network = args.satelliteChainNetworks[n];
       const provider = await getEthersProvider(network);
@@ -106,14 +111,16 @@ txTask(
         'chainBridge/bridge',
         provider,
       );
-      const satelliteChainID = await satelliteChainBridge._chainID();
+      const satelliteChainID = await satelliteChainBridge._domainID();
       satelliteChainIDs.push(satelliteChainID);
-      const fee = await baseChainBridge.getFee(satelliteChainID);
-      totalFee = totalFee.add(fee);
     }
+    const totalFee = await batchRebaseReporter.calculateFee(
+      baseChainBridge.address,
+      satelliteChainIDs,
+    );
 
     console.log('Initiating cross-chain rebase', satelliteChainIDs);
-    console.log('totalFee', totalFee);
+    console.log('totalFee', totalFee.toString());
     txParams.value = totalFee;
     const tx = await batchRebaseReporter
       .connect(sender)
@@ -176,7 +183,7 @@ txTask(
       'chainBridge/genericHandler',
       satProvider,
     );
-    const satelliteChainID = await satelliteChainBridge._chainID();
+    const satelliteChainID = await satelliteChainBridge._domainID();
     const totalFee = await baseChainBridge.getFee(satelliteChainID);
     console.log('Initiating cross-chain rebase', satelliteChainID);
     console.log('totalFee', totalFee.toString());

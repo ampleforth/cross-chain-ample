@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.7.3;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {SafeMath} from "oz-contracts/contracts/math/SafeMath.sol";
+import {Ownable} from "oz-contracts/contracts/access/Ownable.sol";
 
 /**
  * @title BatchTxExecutor
